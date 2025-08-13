@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import Sidebar from '../../components/Sidebar';
+import Sidebar from '../../components/Sidebar'; // common sidebar
 import HomeCard from '../../components/HomeCard';
 
-const Home = () => {
+const AdminHome = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
@@ -23,7 +23,7 @@ const Home = () => {
 
     return (
         <div className="flex h-screen bg-gradient-to-b from-gray-600 to-gray-900">
-            <Sidebar isOpen={sidebarOpen} role="CUSTOMER" />
+            <Sidebar isOpen={sidebarOpen} role="ADMIN" />
 
             <div className="flex-1 flex flex-col">
                 {/* Mobile Top Bar */}
@@ -35,34 +35,34 @@ const Home = () => {
                     >
                         ☰
                     </button>
-                    <h1 className="text-lg font-semibold text-indigo-300">Home</h1>
+                    <h1 className="text-lg font-semibold text-indigo-300">Admin Home</h1>
                 </header>
 
                 {/* Main Content */}
                 <main className="flex-1 p-6 overflow-auto text-indigo-100">
                     {isLoggedIn ? (
                         <>
-                            <h2 className="text-3xl font-bold mb-6">{`Welcome back, ${username}!`}</h2>
+                            <h2 className="text-3xl font-bold mb-6">{`Welcome back, Admin ${username}!`}</h2>
 
                             <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                                 {[
                                     {
-                                        title: 'Accounts',
-                                        description: 'View balances and manage your bank accounts.',
-                                        link: '/accounts',
-                                        buttonText: 'View Accounts',
+                                        title: 'User Management',
+                                        description: 'Manage user accounts and roles.',
+                                        link: '/admin/users',
+                                        buttonText: 'Manage Users',
                                     },
                                     {
-                                        title: 'Transactions',
-                                        description: 'Check your recent deposits, withdrawals, and transfers.',
-                                        link: '/transactions',
-                                        buttonText: 'View Transactions',
+                                        title: 'Reports',
+                                        description: 'View system reports and analytics.',
+                                        link: '/admin/reports',
+                                        buttonText: 'View Reports',
                                     },
                                     {
-                                        title: 'Support',
-                                        description: 'Need help? Contact our support team.',
-                                        link: '/support',
-                                        buttonText: 'Contact Support',
+                                        title: 'Settings',
+                                        description: 'Configure system settings and preferences.',
+                                        link: '/admin/settings',
+                                        buttonText: 'Settings',
                                     },
                                 ].map((card, idx) => (
                                     <HomeCard
@@ -77,15 +77,15 @@ const Home = () => {
                         </>
                     ) : (
                         <div className="text-center mt-20">
-                            <h2 className="text-4xl font-bold mb-4 text-indigo-300">Welcome to MyBank</h2>
+                            <h2 className="text-4xl font-bold mb-4 text-indigo-300">Welcome to MyBank Admin</h2>
                             <p className="text-indigo-400 mb-8 max-w-md mx-auto">
-                                Secure, reliable, and convenient banking solutions tailored for you.
+                                Admin portal to manage the banking system efficiently.
                             </p>
                             <a
-                                href="/register"
+                                href="/admin/login"
                                 className="bg-indigo-600 text-white px-6 py-3 rounded hover:bg-indigo-700 transition"
                             >
-                                Get Started
+                                Login
                             </a>
                         </div>
                     )}
@@ -95,4 +95,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default AdminHome;

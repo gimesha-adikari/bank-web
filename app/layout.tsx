@@ -4,7 +4,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 
 export const metadata: Metadata = {
   title: "My Bank",
-  description: "Secure self-service banking connected to BankingSystem"
+  description: "Secure self-service banking connected to bank-core"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

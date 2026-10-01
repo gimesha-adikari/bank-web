@@ -40,6 +40,6 @@ describe("typed HTTP client", () => {
   });
 
   it("parses lossless JSON recursively", () => {
-    expect(parseJsonLossless('{"amount":99999999999999999999.9999,"items":[1]}')).toEqual({ amount: "99999999999999999999.9999", items: ["1"] });
+    expect(parseJsonLossless('{"amount":99999999999999999999.9999,"items":[1]}')).toEqual({ amount: "99999999999999999999.9999", items: [1] });
   });
 });

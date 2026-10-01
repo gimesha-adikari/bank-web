@@ -44,9 +44,9 @@ export type Account = {
   createdAt?: string;
   updatedAt?: string;
 };
-export type AccountRequest = { accountType: AccountType; initialDeposit: string; branchId?: string };
+export type AccountRequest = { accountType: AccountType; initialDeposit: string; branchId: number };
 
-export type Branch = { branchId: string; branchName: string; [key: string]: unknown };
+export type Branch = { branchId: number; branchName: string; [key: string]: unknown };
 export type Customer = {
   customerId: string;
   firstName: string;

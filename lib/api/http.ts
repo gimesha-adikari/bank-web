@@ -17,10 +17,17 @@ export function configureGetRefresh(callback: RefreshCallback | undefined): void
   refreshCallback = callback;
 }
 
-function reviveLossless(value: unknown): unknown {
-  if (isLosslessNumber(value)) return value.value;
-  if (Array.isArray(value)) return value.map(reviveLossless);
-  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, reviveLossless(item)]));
+const DECIMAL_FIELDS = new Set(["amount", "balance", "balanceAfter", "totalAmount", "initialDeposit"]);
+
+function reviveLossless(value: unknown, field?: string): unknown {
+  if (isLosslessNumber(value)) {
+    if (field && DECIMAL_FIELDS.has(field)) return value.value;
+    const numeric = Number(value.value);
+    if (Number.isSafeInteger(numeric) && String(numeric) === value.value) return numeric;
+    return value.value;
+  }
+  if (Array.isArray(value)) return value.map((item) => reviveLossless(item));
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, reviveLossless(item, key)]));
   return value;
 }
 

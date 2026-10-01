@@ -1,0 +1,2 @@
+import { RegisterForm } from "@/components/auth/RegisterForm";
+export default function RegisterPage() { return <main className="shell"><div className="container grid flex-1 items-center py-12"><div className="mx-auto w-full max-w-lg"><p className="mb-2 font-bold uppercase tracking-[.16em] text-teal-700">My Bank</p><h1 className="mb-6 text-4xl font-black">Create your profile</h1><RegisterForm /></div></div></main>; }

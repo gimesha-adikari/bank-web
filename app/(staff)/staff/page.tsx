@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { SectionHeading } from "@/components/layout/ProtectedLayout";
+export default function StaffPage() { return <><SectionHeading eyebrow="Staff workspace" title="Operational banking" /><div className="grid gap-4 md:grid-cols-2"><div className="card"><h2 className="text-xl font-black">Account opening</h2><p className="mt-2 muted">Open an account through the server-authorized teller flow.</p><Link href="/staff/accounts/new" className="button mt-5">Open an account</Link></div><div className="card"><h2 className="text-xl font-black">Authority boundary</h2><p className="mt-2 muted">Customer ownership, thresholds, and balances are decided by BankingSystem.</p></div></div></>; }

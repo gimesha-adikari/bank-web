@@ -11,6 +11,17 @@ node_modules
 dist
 dist-ssr
 *.local
+.next
+out
+coverage
+playwright-report
+test-results
+.env
+.env.*
+!.env.example
+tsconfig.tsbuildinfo
+AGENTS.md
+CLAUDE.md
 
 # Editor directories and files
 .vscode/*

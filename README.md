@@ -1,18 +1,23 @@
 # bank-web
 
-React and Vite web client for the BankingSystem core banking API.
+The standalone Next.js web application for the BankingSystem project.
 
-## Requirements
+## Runtime contract
 
-- Node.js with npm
-- A reachable BankingSystem HTTP API for authenticated application flows
+The browser calls the thin same-origin `/api/v1/*` transport route. The route forwards requests to `BANKING_API_BASE_URL`; it does not implement authentication, account ownership, balance, transaction, reversal, or idempotency rules. BankingSystem remains the authority for those decisions.
 
-The client reads its API origin from `VITE_API_BASE_URL`. Copy `.env.example` to
-`.env` when a local override is needed. The browser client communicates with the
-backend over HTTP; it does not require the backend repository to be present as a
-filesystem sibling.
+The approved compatibility model stores the JWT in browser `localStorage` and sends it as `Authorization: Bearer ...`. This rebuild intentionally does not migrate authentication to cookies. Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header.
 
-## Local development
+## Development
+
+Copy `.env.example` to `.env.local` and set the server-only backend URL:
+
+```text
+BANKING_API_BASE_URL=http://127.0.0.1:8080
+BANKING_API_TIMEOUT_MS=15000
+```
+
+`BANKING_API_BASE_URL` must never be prefixed with `NEXT_PUBLIC_`.
 
 ```bash
 npm ci
@@ -23,13 +28,16 @@ npm run dev
 
 ```bash
 npm run lint
+npm run typecheck
+npm test
+npm run test:e2e
 npm run build
 ```
 
-There is no separate test script in the current package manifest.
+The Playwright suite mocks `/api/v1/*` for deterministic UI checks. A separate optional contract smoke can run against a controlled local BankingSystem environment.
 
 ## Related repositories
 
-- [BankingSystem](https://github.com/gimesha-adikari/BankingSystem) — Spring Boot core banking API
-- [banking-service](https://github.com/gimesha-adikari/banking-service) — FastAPI AI/KYC service
+- [BankingSystem](https://github.com/gimesha-adikari/BankingSystem) — Spring Boot banking authority
+- [banking-service](https://github.com/gimesha-adikari/banking-service) — FastAPI AI/KYC service used by the backend
 - [BankApp](https://github.com/gimesha-adikari/BankApp) — Android client

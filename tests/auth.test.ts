@@ -13,4 +13,10 @@ describe("authentication contract", () => {
     await expect(authApi.validateToken("expired")).rejects.toMatchObject({ status: 401 });
     expect(fetch).toHaveBeenCalledTimes(1);
   });
+
+  it("uses the audited username availability GET contract", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("Username available", { status: 200 })));
+    await expect(authApi.usernameAvailable("new-user")).resolves.toBe("Username available");
+    expect(fetch).toHaveBeenCalledWith("/api/v1/auth/available?username=new-user", expect.objectContaining({ method: "GET" }));
+  });
 });

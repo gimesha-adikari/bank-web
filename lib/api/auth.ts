@@ -4,6 +4,7 @@ import type { ChangePasswordRequest, ForgotPasswordRequest, LoginRequest, LoginR
 export const authApi = {
   login: (body: LoginRequest) => apiJson<LoginResponse>("/api/v1/auth/login", "POST", body, { allowGetRefresh: false }),
   validateToken: (token: string) => apiGet<TokenIdentity>("/api/v1/auth/validate-token", token, { allowGetRefresh: false }),
+  usernameAvailable: (username: string) => apiGet<string>(`/api/v1/auth/available?username=${encodeURIComponent(username)}`, null, { allowGetRefresh: false }),
   refresh: (token: string, username: string) => apiJson<RefreshResponse>("/api/v1/auth/refresh-token", "POST", { username }, { token, allowGetRefresh: false }),
   logout: (token: string) => apiJson<void>("/api/v1/auth/logout", "POST", undefined, { token, allowGetRefresh: false }),
   changePassword: (token: string, body: ChangePasswordRequest) => apiJson<void>("/api/v1/auth/change-password", "PUT", body, { token, allowGetRefresh: false }),

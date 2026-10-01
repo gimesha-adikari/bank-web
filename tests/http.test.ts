@@ -17,6 +17,11 @@ describe("typed HTTP client", () => {
     await expect(apiJson("/api/v1/transactions/deposit", "POST", { amount: "x" }, { token: "jwt", headers: { "Idempotency-Key": "key" } })).rejects.toMatchObject({ status: 422, code: "ERR_AMOUNT", message: "Amount is invalid", fieldErrors: { amount: "Use decimal text" } });
   });
 
+  it("accepts the backend's plain-text success responses", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("Password changed successfully", { status: 200 })));
+    await expect(apiJson<string>("/api/v1/auth/change-password", "PUT", { newPassword: "secret" })).resolves.toBe("Password changed successfully");
+  });
+
   it("does not replay mutations after a 401", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: "AUTH", message: "No" }), { status: 401 }));
     vi.stubGlobal("fetch", fetchMock);

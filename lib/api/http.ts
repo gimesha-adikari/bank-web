@@ -45,7 +45,7 @@ function requestBody(options: RequestOptions): BodyInit | undefined {
 
 function backendError(status: number, parsed: unknown): ApiError {
   const body = (parsed && typeof parsed === "object" ? parsed : {}) as BackendErrorBody;
-  const message = typeof body.message === "string" ? body.message : typeof body.error === "string" ? body.error : errorMessageForStatus(status);
+  const message = typeof parsed === "string" ? parsed : typeof body.message === "string" ? body.message : typeof body.error === "string" ? body.error : errorMessageForStatus(status);
   return new ApiError({
     kind: "backend",
     status,
@@ -69,7 +69,11 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}, 
   try {
     const response = await fetch(path, { ...options, method, headers, body: requestBody(options), signal: controller.signal });
     const text = await response.text();
-    const parsed = text ? parseJsonLossless(text) : undefined;
+    let parsed: unknown;
+    if (text) {
+      try { parsed = parseJsonLossless(text); }
+      catch { parsed = text; }
+    }
     if (response.ok) return parsed as T;
     if (response.status === 401 && method === "GET" && options.allowGetRefresh !== false && !retried && refreshCallback) {
       const refreshed = await refreshOnce();

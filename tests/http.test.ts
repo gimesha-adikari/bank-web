@@ -29,6 +29,13 @@ describe("typed HTTP client", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it.each([409, 422, 503])("does not replay a financial mutation after status %s", async (status) => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: `ERR_${status}`, message: "No replay" }), { status }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(apiJson("/api/v1/transactions/withdraw", "POST", { amount: "1.00" }, { token: "jwt", headers: { "Idempotency-Key": "key" } })).rejects.toMatchObject({ status });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("allows one approved refresh/replay for an ordinary GET only", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ code: "AUTH", message: "Expired" }), { status: 401 }))

@@ -21,4 +21,20 @@ describe("financial request contracts", () => {
     expect(((options as RequestInit).headers as Headers).get("Idempotency-Key")).toBeNull();
     expect(String((options as RequestInit).body)).toBe('{"reason":"Duplicate teller posting"}');
   });
+
+  it.each([
+    ["deposit", "transactions/deposit", { accountId: "a", amount: "10.00" }],
+    ["withdraw", "transactions/withdraw", { accountId: "a", amount: "10.00" }],
+    ["transfer", "transactions/transfer", { sourceAccountId: "a", destinationAccountId: "b", amount: "10.00" }]
+  ] as const)("uses decimal text and the caller key for %s", async (operation, path, body) => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ operation, amount: "10.00" }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    if (operation === "deposit") await transactionsApi.deposit("jwt", body, "same-logical-operation");
+    if (operation === "withdraw") await transactionsApi.withdraw("jwt", body, "same-logical-operation");
+    if (operation === "transfer") await transactionsApi.transfer("jwt", body, "same-logical-operation");
+    const [url, options] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe(`/api/v1/${path}`);
+    expect(((options as RequestInit).headers as Headers).get("Idempotency-Key")).toBe("same-logical-operation");
+    expect(String((options as RequestInit).body)).toContain('"amount":"10.00"');
+  });
 });

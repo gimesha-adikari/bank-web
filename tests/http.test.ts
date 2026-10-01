@@ -39,6 +39,11 @@ describe("typed HTTP client", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it.each([400, 403, 404, 409, 500, 503])("normalizes backend status %s without changing the status", async (status) => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: `ERR_${status}`, message: `Backend ${status}` }), { status })));
+    await expect(apiGet("/api/v1/accounts/my", "jwt", { allowGetRefresh: false })).rejects.toMatchObject({ status, code: `ERR_${status}`, message: `Backend ${status}` });
+  });
+
   it("parses lossless JSON recursively", () => {
     expect(parseJsonLossless('{"amount":99999999999999999999.9999,"items":[1]}')).toEqual({ amount: "99999999999999999999.9999", items: [1] });
   });

@@ -1,5 +1,5 @@
 import { appendAuthCookie } from "@/lib/server/auth-cookie";
-import { fetchBankingApi, responseFromUpstream } from "@/lib/server/banking-upstream";
+import { fetchDedicatedAuthApi, responseFromUpstream } from "@/lib/server/banking-upstream";
 import { appendCsrfCookie, csrfFailureResponse, generateCsrfToken, validateCsrfRequest } from "@/lib/server/csrf";
 
 export const runtime = "nodejs";
@@ -18,7 +18,7 @@ function protocolFailure(): Response {
 
 export async function POST(request: Request): Promise<Response> {
   if (!validateCsrfRequest(request)) return csrfFailureResponse();
-  const result = await fetchBankingApi(request, ["auth", "login"], { authenticated: false, validateCsrf: false });
+  const result = await fetchDedicatedAuthApi(request, "login", { authenticated: false, validateCsrf: false });
   if (!result.upstream || !result.responseHeaders) return responseFromUpstream(result);
   const text = await result.upstream.text();
   const headers = new Headers(result.responseHeaders);

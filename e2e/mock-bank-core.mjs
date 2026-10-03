@@ -3,6 +3,7 @@ import http from "node:http";
 const port = Number(process.env.MOCK_BANK_CORE_PORT ?? "38080");
 const token = "e2e-sentinel-jwt";
 const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
+const requests = [];
 
 function json(response, status, value, headers = {}) {
   response.writeHead(status, { "Content-Type": "application/json", ...headers });
@@ -21,6 +22,8 @@ async function body(request) {
 
 const server = http.createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", `http://127.0.0.1:${port}`);
+  if (url.pathname === "/test/requests" && request.method === "GET") return json(response, 200, { count: requests.length, requests });
+  requests.push({ method: request.method, path: url.pathname, correlationId: request.headers["x-correlation-id"] ?? null });
   if (url.pathname === "/health") return json(response, 200, { ok: true });
   const path = url.pathname.replace(/^\/api\/v1\//, "");
   if (path === "auth/login" && request.method === "POST") {

@@ -57,3 +57,28 @@ test("logout uses the BFF lifecycle and clears the session", async ({ page }) =>
   await expect(page).toHaveURL(/login/);
   expect(await page.evaluate(() => document.cookie)).toBe("");
 });
+
+test("encoded auth aliases cannot bypass dedicated BFF boundaries", async ({ page, request }) => {
+  await page.goto("/login");
+  const before = await request.get("http://127.0.0.1:38080/test/requests");
+  const beforeRequests = (await before.json()).requests;
+  const results = await page.evaluate(async () => {
+    const csrfResponse = await fetch("/api/auth/csrf");
+    const csrf = (await csrfResponse.json()).token;
+    const headers = { "Content-Type": "application/json", "X-CSRF-Token": csrf };
+    const login = await fetch("/api/v1/auth/log%69n", { method: "POST", headers: { ...headers, "X-Correlation-Id": "encoded-login" }, body: JSON.stringify({ username: "customer", password: "secret" }) });
+    const logout = await fetch("/api/v1/auth/log%256Fut", { method: "POST", headers: { ...headers, "X-Correlation-Id": "encoded-logout" }, body: "{}" });
+    const changePassword = await fetch("/api/v1/auth/change%2Dpassword", { method: "PUT", headers: { ...headers, "X-Correlation-Id": "encoded-change-password" }, body: "{}" });
+    const refresh = await fetch("/api/v1/auth/refresh%252Dtoken", { method: "POST", headers: { ...headers, "X-Correlation-Id": "encoded-refresh-token" }, body: "{}" });
+    return await Promise.all([login, logout, changePassword, refresh].map(async (response) => ({ status: response.status, body: await response.text() })));
+  });
+  expect(results).toHaveLength(4);
+  for (const result of results) {
+    expect(result.status).toBe(404);
+    expect(result.body).toBe(JSON.stringify({ code: "NOT_FOUND", message: "The requested resource was not found." }));
+    expect(result.body).not.toContain("e2e-sentinel-jwt");
+  }
+  const after = await request.get("http://127.0.0.1:38080/test/requests");
+  const afterRequests = (await after.json()).requests;
+  expect(afterRequests.filter((entry: { correlationId: string | null }) => entry.correlationId?.startsWith("encoded-") && !beforeRequests.some((beforeEntry: { correlationId: string | null }) => beforeEntry.correlationId === entry.correlationId))).toEqual([]);
+});

@@ -25,6 +25,13 @@ const PUBLIC_PATHS = new Set([
   "auth/reset-password",
   "users/me/email/verify"
 ]);
+const BLOCKED_BROWSER_PATHS = new Set(["auth/login", "auth/logout", "auth/change-password", "auth/refresh-token"]);
+const DEDICATED_AUTH_ENDPOINTS = {
+  login: ["auth", "login"],
+  logout: ["auth", "logout"],
+  "change-password": ["auth", "change-password"]
+} as const;
+type DedicatedAuthEndpoint = keyof typeof DEDICATED_AUTH_ENDPOINTS;
 
 export class UpstreamConfigurationError extends Error {}
 
@@ -43,33 +50,42 @@ export function upstreamBaseUrl(): URL {
   return url;
 }
 
-export function isAllowedPath(segments: string[]): boolean {
-  if (!segments.length) return false;
-  return segments.every((segment) => {
+export function canonicalizePathSegments(segments: readonly string[]): string[] | null {
+  if (!segments.length) return null;
+  const canonical: string[] = [];
+  for (const segment of segments) {
+    if (!segment) return null;
+    let decoded: string;
     try {
-      const decoded = decodeURIComponent(segment);
-      return decoded !== "" && decoded !== "." && decoded !== ".." && !decoded.includes("/") && !decoded.includes("\\");
+      decoded = decodeURIComponent(segment);
     } catch {
-      return false;
+      return null;
     }
-  });
+    if (!decoded || decoded === "." || decoded === ".." || decoded.includes("/") || decoded.includes("\\") || /%[0-9A-Fa-f]{2}/.test(decoded)) return null;
+    canonical.push(decoded);
+  }
+  return canonical;
 }
 
-export function isPublicPath(segments: string[]): boolean {
+export function isAllowedPath(segments: readonly string[]): boolean {
+  return canonicalizePathSegments(segments) !== null;
+}
+
+function isPublicPath(segments: readonly string[]): boolean {
   const path = segments.join("/");
   return PUBLIC_PATHS.has(path) || path.startsWith("auth/reset-password/");
 }
 
-export function isExternalCallbackPath(segments: string[]): boolean {
+function isExternalCallbackPath(segments: readonly string[]): boolean {
   const path = segments.join("/");
   return path === "wallet/payhere" || path.startsWith("wallet/payhere/") || path === "wallet/webhook" || path.startsWith("wallet/webhook/");
 }
 
-export function isBlockedBrowserPath(segments: string[]): boolean {
-  return segments.join("/") === "auth/refresh-token";
+function isBlockedBrowserPath(segments: readonly string[]): boolean {
+  return BLOCKED_BROWSER_PATHS.has(segments.join("/"));
 }
 
-export function isAuthenticatedPath(segments: string[]): boolean {
+function isAuthenticatedPath(segments: readonly string[]): boolean {
   return !isPublicPath(segments) && !isExternalCallbackPath(segments) && !isBlockedBrowserPath(segments);
 }
 
@@ -103,9 +119,13 @@ function transportResponse(authenticated: boolean, isTimeout: boolean): Response
   return new Response(JSON.stringify({ code: isTimeout ? "BANKING_UPSTREAM_TIMEOUT" : "BANKING_UPSTREAM_UNAVAILABLE", message: isTimeout ? "The banking service timed out." : "The banking service could not be reached." }), { status: isTimeout ? 504 : 502, headers });
 }
 
-export async function fetchBankingApi(request: Request, segments: string[], options: { authenticated?: boolean; validateCsrf?: boolean } = {}): Promise<UpstreamResult> {
-  if (!isAllowedPath(segments)) return { response: Response.json({ code: "INVALID_API_PATH", message: "The requested API path is not valid." }, { status: 400 }), authenticated: false };
-  if (isBlockedBrowserPath(segments)) return { response: browserNotFoundResponse(), authenticated: false };
+type UpstreamOptions = { authenticated?: boolean; validateCsrf?: boolean };
+
+function invalidPathResponse(): Response {
+  return Response.json({ code: "INVALID_API_PATH", message: "The requested API path is not valid." }, { status: 400 });
+}
+
+async function fetchCanonicalBankingApi(request: Request, segments: readonly string[], options: UpstreamOptions = {}): Promise<UpstreamResult> {
   const method = request.method.toUpperCase();
   const external = isExternalCallbackPath(segments);
   const authenticated = options.authenticated ?? isAuthenticatedPath(segments);
@@ -118,7 +138,7 @@ export async function fetchBankingApi(request: Request, segments: string[], opti
   const destination = new URL(base.toString());
   const basePath = base.pathname.replace(/\/$/, "");
   const apiPrefix = basePath.endsWith("/api/v1") ? basePath : `${basePath}/api/v1`;
-  destination.pathname = `${apiPrefix}/${segments.join("/")}`;
+  destination.pathname = `${apiPrefix}/${segments.map((segment) => encodeURIComponent(segment)).join("/")}`;
   destination.search = source.search;
 
   const headers = new Headers();
@@ -146,6 +166,10 @@ export async function fetchBankingApi(request: Request, segments: string[], opti
   }
 }
 
+export async function fetchDedicatedAuthApi(request: Request, endpoint: DedicatedAuthEndpoint, options: UpstreamOptions = {}): Promise<UpstreamResult> {
+  return fetchCanonicalBankingApi(request, DEDICATED_AUTH_ENDPOINTS[endpoint], options);
+}
+
 export function responseFromUpstream(result: UpstreamResult): Response {
   if (result.response) return result.response;
   if (!result.upstream || !result.responseHeaders) return transportResponse(result.authenticated, false);
@@ -158,6 +182,9 @@ export function responseFromUpstream(result: UpstreamResult): Response {
   return new Response(result.upstream.body, { status: result.upstream.status, headers });
 }
 
-export async function proxyToBankingApi(request: Request, segments: string[]): Promise<Response> {
-  return responseFromUpstream(await fetchBankingApi(request, segments));
+export async function proxyToBankingApi(request: Request, segments: readonly string[]): Promise<Response> {
+  const canonical = canonicalizePathSegments(segments);
+  if (!canonical) return invalidPathResponse();
+  if (isBlockedBrowserPath(canonical)) return browserNotFoundResponse();
+  return responseFromUpstream(await fetchCanonicalBankingApi(request, canonical));
 }

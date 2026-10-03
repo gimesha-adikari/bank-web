@@ -1,6 +1,6 @@
 import { appendAuthCookieDeletion } from "@/lib/server/auth-cookie";
 import { appendCsrfCookieDeletion, csrfFailureResponse, validateCsrfRequest } from "@/lib/server/csrf";
-import { fetchBankingApi, responseFromUpstream } from "@/lib/server/banking-upstream";
+import { fetchDedicatedAuthApi, responseFromUpstream } from "@/lib/server/banking-upstream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ function withSessionDeletion(response: Response): Response {
 
 export async function PUT(request: Request): Promise<Response> {
   if (!validateCsrfRequest(request)) return csrfFailureResponse();
-  const result = await fetchBankingApi(request, ["auth", "change-password"], { authenticated: true, validateCsrf: false });
+  const result = await fetchDedicatedAuthApi(request, "change-password", { authenticated: true, validateCsrf: false });
   if (!result.upstream) return responseFromUpstream(result);
   if (!result.responseHeaders) return responseFromUpstream(result);
   const response = new Response(result.upstream.body, { status: result.upstream.status, headers: result.responseHeaders });

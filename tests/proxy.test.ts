@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
-import { isAllowedPath, proxyToBankingApi } from "@/lib/server/banking-upstream";
+import { canonicalizePathSegments, isAllowedPath, proxyToBankingApi } from "@/lib/server/banking-upstream";
 
 const csrf = "a".repeat(43);
 
@@ -24,6 +24,25 @@ describe("same-origin banking proxy", () => {
     expect(isAllowedPath(["%2e%2e", "users"])).toBe(false);
     expect(isAllowedPath(["%2fsecret"])).toBe(false);
     expect(isAllowedPath(["accounts/../../secret"])).toBe(false);
+  });
+
+  it("canonicalizes route segments once and rejects residual encoded delimiters", () => {
+    expect(canonicalizePathSegments(["auth", "log%69n"])).toEqual(["auth", "login"]);
+    expect(canonicalizePathSegments(["auth", "refresh%2Dtoken"])).toEqual(["auth", "refresh-token"]);
+    expect(canonicalizePathSegments(["café", "accounts"])).toEqual(["café", "accounts"]);
+    expect(canonicalizePathSegments(["auth", "%2Fsecret"])).toBeNull();
+    expect(canonicalizePathSegments(["auth", "%5Csecret"])).toBeNull();
+    expect(canonicalizePathSegments(["auth", "%2e%2e"])).toBeNull();
+    expect(canonicalizePathSegments(["auth", "%252Fsecret"])).toBeNull();
+    expect(canonicalizePathSegments(["auth", "%252Dtoken"])).toBeNull();
+    expect(canonicalizePathSegments(["auth", "%ZZ"])).toBeNull();
+  });
+
+  it("reconstructs the upstream path from canonical segments", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response("ok", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await proxyToBankingApi(new Request("http://web.local/api/v1/caf%C3%A9/accounts"), ["café", "accounts"]);
+    expect((fetchMock.mock.calls[0]?.[0] as URL).toString()).toBe("http://banking.internal:8080/api/v1/caf%C3%A9/accounts");
   });
 
   it("translates only the server cookie into upstream Bearer and preserves idempotency", async () => {
@@ -97,6 +116,24 @@ describe("same-origin banking proxy", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const response = await proxyToBankingApi(new Request("http://web.local/api/v1/auth/refresh-token", { method: "POST" }), ["auth", "refresh-token"]);
+    expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({ code: "NOT_FOUND", message: "The requested resource was not found." });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["literal login", ["auth", "login"]],
+    ["encoded login", ["auth", "log%69n"]],
+    ["literal logout", ["auth", "logout"]],
+    ["encoded logout", ["auth", "log%6fut"]],
+    ["literal change-password", ["auth", "change-password"]],
+    ["encoded change-password", ["auth", "change%2Dpassword"]],
+    ["literal refresh-token", ["auth", "refresh-token"]],
+    ["encoded refresh-token", ["auth", "refresh%2Dtoken"]]
+  ] as const)("blocks %s from the generic catch-all before upstream", async (_name, segments) => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await proxyToBankingApi(new Request("http://web.local/api/v1/alias", { method: "POST" }), segments);
     expect(response.status).toBe(404);
     expect(await response.json()).toEqual({ code: "NOT_FOUND", message: "The requested resource was not found." });
     expect(fetchMock).not.toHaveBeenCalled();

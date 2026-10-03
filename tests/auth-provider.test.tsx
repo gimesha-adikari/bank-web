@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
+import { ApiError } from "@/lib/api/errors";
 
 const mocks = vi.hoisted(() => ({
   validateToken: vi.fn(),
-  refresh: vi.fn(),
   logout: vi.fn(),
   login: vi.fn(),
   push: vi.fn(),
@@ -14,7 +15,6 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/lib/api/auth", () => ({
   authApi: {
     validateToken: mocks.validateToken,
-    refresh: mocks.refresh,
     logout: mocks.logout,
     login: mocks.login
   }
@@ -26,15 +26,19 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { AuthProvider, useAuth } from "@/components/auth/AuthProvider";
+import { triggerAuthExpired } from "@/lib/api/http";
 
 function Harness() {
   const auth = useAuth();
+  const [failure, setFailure] = useState<string | null>(null);
   return <div>
     <output data-testid="status">{auth.status}</output>
     <output data-testid="username">{auth.username ?? ""}</output>
     <output data-testid="role">{auth.role ?? ""}</output>
-    <button onClick={() => void auth.refreshToken()}>Refresh session</button>
-    <button onClick={() => void auth.signOut()}>Sign out</button>
+    <button onClick={() => void auth.signIn({ username: "new-user", password: "secret" })}>Sign in</button>
+    <button onClick={() => void auth.signOut().catch((error) => setFailure(error.message))}>Sign out</button>
+    <output data-testid="logout-error">{failure ?? ""}</output>
+    <button onClick={auth.retryBootstrap}>Retry session check</button>
   </div>;
 }
 
@@ -44,71 +48,70 @@ function renderAuth() {
 
 describe("mounted authentication state", () => {
   beforeEach(() => {
-    window.localStorage.clear();
     vi.clearAllMocks();
+    mocks.validateToken.mockResolvedValue({ username: "sam", role: "CUSTOMER" });
+    mocks.logout.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    window.localStorage.clear();
+    vi.clearAllMocks();
   });
 
-  it("starts anonymous without reading a missing session as authenticated", async () => {
-    renderAuth();
-    await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("anonymous"));
-    expect(mocks.validateToken).not.toHaveBeenCalled();
-  });
-
-  it("validates a stored token on startup without automatic bootstrap refresh", async () => {
-    window.localStorage.setItem("bank-web.jwt", "stored-jwt");
-    mocks.validateToken.mockResolvedValue({ username: "sam", role: "CUSTOMER" });
+  it("validates the ambient cookie-backed session on startup", async () => {
     renderAuth();
     await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("authenticated"));
-    expect(mocks.validateToken).toHaveBeenCalledWith("stored-jwt");
-    expect(mocks.refresh).not.toHaveBeenCalled();
+    expect(mocks.validateToken).toHaveBeenCalledTimes(1);
+    expect(mocks.validateToken).toHaveBeenCalledWith();
     expect(screen.getByTestId("username")).toHaveTextContent("sam");
   });
 
-  it("clears an invalid startup token instead of replaying validation", async () => {
-    window.localStorage.setItem("bank-web.jwt", "expired-jwt");
-    mocks.validateToken.mockRejectedValue(new Error("expired"));
+  it("becomes anonymous on a terminal bootstrap 401", async () => {
+    mocks.validateToken.mockRejectedValue(new ApiError({ kind: "backend", status: 401, message: "Expired", authExpired: true }));
     renderAuth();
     await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("anonymous"));
-    expect(mocks.refresh).not.toHaveBeenCalled();
-    expect(window.localStorage.getItem("bank-web.jwt")).toBeNull();
+    expect(mocks.validateToken).toHaveBeenCalledTimes(1);
   });
 
-  it("refreshes an authenticated session and stores the replacement token", async () => {
-    window.localStorage.setItem("bank-web.jwt", "old-jwt");
-    mocks.validateToken.mockResolvedValue({ username: "sam", role: "CUSTOMER" });
-    mocks.refresh.mockResolvedValue({ token: "new-jwt" });
+  it("keeps backend-unavailable bootstrap distinct from anonymous", async () => {
+    mocks.validateToken.mockRejectedValue(new ApiError({ kind: "backend", status: 503, message: "Unavailable", retryableTransport: true }));
     renderAuth();
-    await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("authenticated"));
-    await userEvent.click(screen.getByRole("button", { name: "Refresh session" }));
-    await waitFor(() => expect(mocks.refresh).toHaveBeenCalledWith("old-jwt", "sam"));
-    expect(window.localStorage.getItem("bank-web.jwt")).toBe("new-jwt");
+    await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("boot-error"));
+    expect(screen.getByRole("button", { name: "Retry session check" })).toBeVisible();
   });
 
-  it("clears the session when refresh fails", async () => {
-    window.localStorage.setItem("bank-web.jwt", "old-jwt");
-    mocks.validateToken.mockResolvedValue({ username: "sam", role: "CUSTOMER" });
-    mocks.refresh.mockRejectedValue(new Error("refresh failed"));
+  it("clears identity when the HTTP layer emits terminal authentication expiry", async () => {
     renderAuth();
     await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("authenticated"));
-    await userEvent.click(screen.getByRole("button", { name: "Refresh session" }));
+    await act(async () => { triggerAuthExpired(); });
     await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("anonymous"));
-    expect(window.localStorage.getItem("bank-web.jwt")).toBeNull();
+    expect(screen.getByTestId("username")).toHaveTextContent("");
   });
 
-  it("logs out through the backend then removes the browser token", async () => {
-    window.localStorage.setItem("bank-web.jwt", "stored-jwt");
-    mocks.validateToken.mockResolvedValue({ username: "sam", role: "CUSTOMER" });
-    mocks.logout.mockResolvedValue(undefined);
+  it("signs in with identity only and routes by role", async () => {
+    mocks.login.mockResolvedValue({ username: "sam", role: "CUSTOMER" });
+    renderAuth();
+    await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("authenticated"));
+    mocks.login.mockResolvedValue({ username: "new-user", role: "CUSTOMER" });
+    await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    await waitFor(() => expect(screen.getByTestId("username")).toHaveTextContent("new-user"));
+    expect(mocks.push).toHaveBeenCalledWith("/customer");
+  });
+
+  it("logs out through the cookie-backed API", async () => {
     renderAuth();
     await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("authenticated"));
     await userEvent.click(screen.getByRole("button", { name: "Sign out" }));
     await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("anonymous"));
-    expect(mocks.logout).toHaveBeenCalledWith("stored-jwt");
-    expect(window.localStorage.getItem("bank-web.jwt")).toBeNull();
+    expect(mocks.logout).toHaveBeenCalledWith();
     expect(mocks.push).toHaveBeenCalledWith("/login");
+  });
+
+  it("preserves authenticated state when logout revocation is unconfirmed", async () => {
+    mocks.logout.mockRejectedValue(new ApiError({ kind: "backend", status: 503, message: "Unavailable", retryableTransport: true }));
+    renderAuth();
+    await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("authenticated"));
+    await userEvent.click(screen.getByRole("button", { name: "Sign out" }));
+    await waitFor(() => expect(screen.getByTestId("logout-error")).toHaveTextContent("Unavailable"));
+    expect(screen.getByTestId("status")).toHaveTextContent("authenticated");
   });
 });

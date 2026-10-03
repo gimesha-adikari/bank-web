@@ -1,17 +1,29 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authApi } from "@/lib/api/auth";
+import { invalidateCsrfToken } from "@/lib/api/http";
+
+const csrf = "a".repeat(43);
 
 describe("authentication contract", () => {
-  it("sends login credentials and returns the backend identity shape", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ token: "jwt", username: "sam", role: "CUSTOMER" }), { status: 200 })));
-    await expect(authApi.login({ username: "sam", password: "secret" })).resolves.toEqual({ token: "jwt", username: "sam", role: "CUSTOMER" });
-    expect(fetch).toHaveBeenCalledWith("/api/v1/auth/login", expect.objectContaining({ method: "POST" }));
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    invalidateCsrfToken();
   });
 
-  it("does not permit the bootstrap validation call to refresh itself", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: "AUTH", message: "Expired" }), { status: 401 })));
-    await expect(authApi.validateToken("expired")).rejects.toMatchObject({ status: 401 });
-    expect(fetch).toHaveBeenCalledTimes(1);
+  it("sends login credentials and returns identity without a token", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ token: csrf }), { status: 200 })).mockResolvedValueOnce(new Response(JSON.stringify({ username: "sam", role: "CUSTOMER" }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(authApi.login({ username: "sam", password: "secret" })).resolves.toEqual({ username: "sam", role: "CUSTOMER" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/v1/auth/login");
+    expect(String((fetchMock.mock.calls[1]?.[1] as RequestInit).body)).toContain('"username":"sam"');
+  });
+
+  it("uses ambient cookie validation without refresh", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: "AUTH", message: "Expired" }), { status: 401, headers: { "X-Bank-Auth-Expired": "1" } }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(authApi.validateToken()).rejects.toMatchObject({ status: 401, authExpired: true });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("uses the audited username availability GET contract", async () => {

@@ -22,7 +22,7 @@ type Kind = "deposit" | "withdraw" | "transfer";
 const EMPTY_OPERATION: IdempotencyState = { key: null, payloadFingerprint: null, status: "idle" };
 
 export function FinancialForm({ kind }: { kind: Kind }) {
-  const { token } = useAuth();
+  const { status } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [accountId, setAccountId] = useState("");
   const [destinationAccountId, setDestinationAccountId] = useState("");
@@ -36,25 +36,25 @@ export function FinancialForm({ kind }: { kind: Kind }) {
   const [refreshedBalances, setRefreshedBalances] = useState<Account[]>([]);
 
   useEffect(() => {
-    if (!token) return;
-    void accountsApi.mine(token)
+    if (status !== "authenticated") return;
+    void accountsApi.mine()
       .then((items) => { setAccounts(items); if (!accountId && items[0]) setAccountId(items[0].accountId); })
       .catch((failure) => setError(failure instanceof ApiError ? failure : new ApiError({ kind: "network", message: "Accounts could not be loaded." })));
-  }, [accountId, token]);
+  }, [accountId, status]);
 
   const payload = kind === "transfer" ? { sourceAccountId: accountId, destinationAccountId, amount } : { accountId, amount };
 
   async function refreshAuthoritative(): Promise<void> {
-    if (!token || !accountId) return;
+    if (status !== "authenticated" || !accountId) return;
     setRefreshWarning(null);
     try {
-      const [source, history] = await Promise.all([accountsApi.byId(token, accountId), accountsApi.history(token, accountId)]);
+      const [source, history] = await Promise.all([accountsApi.byId(accountId), accountsApi.history(accountId)]);
       setAccounts((current) => current.map((account) => account.accountId === source.accountId ? source : account));
       setRefreshedBalances([source]);
       setRecentHistory(history as Transaction[]);
       if (kind === "transfer" && destinationAccountId) {
         try {
-          const destination = await accountsApi.byId(token, destinationAccountId);
+          const destination = await accountsApi.byId(destinationAccountId);
           setRefreshedBalances((current) => [...current.filter((account) => account.accountId !== destination.accountId), destination]);
         } catch {
           // A valid destination may belong to another customer and therefore be unreadable by this caller.
@@ -87,12 +87,12 @@ export function FinancialForm({ kind }: { kind: Kind }) {
 
     try {
       const key = current.key;
-      if (!key || !token) throw new ApiError({ kind: "backend", status: 401, message: "Sign in again to submit this transaction." });
+      if (!key || status !== "authenticated") throw new ApiError({ kind: "backend", status: 401, message: "Sign in again to submit this transaction." });
       const result = kind === "deposit"
-        ? await transactionsApi.deposit(token, { accountId, amount }, key)
+        ? await transactionsApi.deposit({ accountId, amount }, key)
         : kind === "withdraw"
-          ? await transactionsApi.withdraw(token, { accountId, amount }, key)
-          : await transactionsApi.transfer(token, { sourceAccountId: accountId, destinationAccountId: destinationAccountId.trim(), amount }, key);
+          ? await transactionsApi.withdraw({ accountId, amount }, key)
+          : await transactionsApi.transfer({ sourceAccountId: accountId, destinationAccountId: destinationAccountId.trim(), amount }, key);
       setOperation(completeSuccess(current));
       setReceipt(result);
       await refreshAuthoritative();

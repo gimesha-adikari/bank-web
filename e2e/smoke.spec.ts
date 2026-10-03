@@ -1,21 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
-
-async function mockApi(page: import("@playwright/test").Page) {
-  await page.route("**/api/v1/**", async (route) => {
-    const request = route.request();
-    const url = new URL(request.url());
-    if (url.pathname.endsWith("/auth/validate-token")) return route.fulfill({ status: 200, json: { username: "customer", role: "CUSTOMER" } });
-    if (url.pathname.endsWith("/auth/login")) return route.fulfill({ status: 200, json: { token: "jwt", username: "customer", role: "CUSTOMER" } });
-    if (url.pathname.endsWith("/accounts/my")) return route.fulfill({ status: 200, json: [account] });
-    if (url.pathname.endsWith("/accounts/account-1")) return route.fulfill({ status: 200, json: account });
-    if (url.pathname.endsWith("/transactions") && request.method() === "GET") return route.fulfill({ status: 200, json: [] });
-    if (url.pathname.endsWith("/transactions/deposit")) return route.fulfill({ status: 200, json: { operation: "DEPOSIT", journalReference: "JR-1", amount: "10.00", currency: "LKR" } });
-    return route.fulfill({ status: 404, json: { code: "NOT_FOUND", message: "Not found" } });
-  });
-}
-
 test("public boot and sign-in route render", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "A calm, dependable view of your money." })).toBeVisible();
@@ -23,11 +7,14 @@ test("public boot and sign-in route render", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
 });
 
-test("customer direct navigation, refresh, and financial receipt", async ({ page }) => {
-  await mockApi(page);
-  await page.addInitScript(() => window.localStorage.setItem("bank-web.jwt", "jwt"));
-  await page.goto("/customer");
+test("real BFF login establishes HttpOnly auth, reloads, and preserves financial idempotency", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Username").fill("customer");
+  await page.getByLabel("Password").fill("secret");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/customer$/);
   await expect(page.getByRole("heading", { name: /Welcome, customer/ })).toBeVisible();
+  expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length, cookies: document.cookie }))).toEqual({ local: 0, session: 0, cookies: "" });
   await page.reload();
   await expect(page.getByText("100.0000 LKR")).toBeVisible();
   await page.getByRole("link", { name: "Deposit" }).click();
@@ -36,10 +23,37 @@ test("customer direct navigation, refresh, and financial receipt", async ({ page
   await expect(page.getByTestId("transaction-receipt")).toContainText("JR-1");
 });
 
-test("customer is denied from admin route by UX guard", async ({ page }) => {
-  await mockApi(page);
-  await page.addInitScript(() => window.localStorage.setItem("bank-web.jwt", "jwt"));
+test("customer role guard remains a UX guard", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Username").fill("customer");
+  await page.getByLabel("Password").fill("secret");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/customer$/);
   await page.goto("/admin");
-  await expect(page).toHaveURL(/\/unauthorized/);
+  await expect(page).toHaveURL(/unauthorized/);
   await expect(page.getByRole("heading", { name: /do not have access/i })).toBeVisible();
+});
+
+test("terminal authenticated 401 clears the browser session and returns to login", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Username").fill("customer");
+  await page.getByLabel("Password").fill("secret");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/customer$/);
+  const status = await page.evaluate(async () => (await fetch("/api/v1/expired")).status);
+  expect(status).toBe(401);
+  await page.reload();
+  await expect(page).toHaveURL(/login/);
+  expect(await page.evaluate(() => document.cookie)).toBe("");
+});
+
+test("logout uses the BFF lifecycle and clears the session", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Username").fill("customer");
+  await page.getByLabel("Password").fill("secret");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/customer$/);
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page).toHaveURL(/login/);
+  expect(await page.evaluate(() => document.cookie)).toBe("");
 });

@@ -1,9 +1,11 @@
 import "server-only";
 
+import { appendAuthCookieDeletion, authCookieValue } from "./auth-cookie";
+import { appendCsrfCookieDeletion, csrfFailureResponse, validateCsrfRequest } from "./csrf";
+
 const FORWARDED_HEADERS = [
   "accept",
   "accept-language",
-  "authorization",
   "cache-control",
   "content-type",
   "idempotency-key",
@@ -13,8 +15,25 @@ const FORWARDED_HEADERS = [
 ];
 
 const RESPONSE_HEADERS = ["content-type", "cache-control", "location", "retry-after"];
+const PUBLIC_PATHS = new Set([
+  "auth/available",
+  "auth/register",
+  "auth/login",
+  "auth/verify-email",
+  "auth/resend-verification",
+  "auth/forgot-password",
+  "auth/reset-password",
+  "users/me/email/verify"
+]);
 
 export class UpstreamConfigurationError extends Error {}
+
+export type UpstreamResult = {
+  upstream?: Response;
+  response?: Response;
+  responseHeaders?: Headers;
+  authenticated: boolean;
+};
 
 export function upstreamBaseUrl(): URL {
   const raw = process.env.BANKING_API_BASE_URL;
@@ -36,12 +55,64 @@ export function isAllowedPath(segments: string[]): boolean {
   });
 }
 
+export function isPublicPath(segments: string[]): boolean {
+  const path = segments.join("/");
+  return PUBLIC_PATHS.has(path) || path.startsWith("auth/reset-password/");
+}
+
+export function isExternalCallbackPath(segments: string[]): boolean {
+  const path = segments.join("/");
+  return path === "wallet/payhere" || path.startsWith("wallet/payhere/") || path === "wallet/webhook" || path.startsWith("wallet/webhook/");
+}
+
+export function isBlockedBrowserPath(segments: string[]): boolean {
+  return segments.join("/") === "auth/refresh-token";
+}
+
+export function isAuthenticatedPath(segments: string[]): boolean {
+  return !isPublicPath(segments) && !isExternalCallbackPath(segments) && !isBlockedBrowserPath(segments);
+}
+
+export function browserNotFoundResponse(): Response {
+  return new Response(JSON.stringify({ code: "NOT_FOUND", message: "The requested resource was not found." }), { status: 404, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+}
+
 function timeoutMilliseconds(): number {
   const configured = Number.parseInt(process.env.BANKING_API_TIMEOUT_MS ?? "15000", 10);
   return Number.isFinite(configured) && configured >= 500 && configured <= 60_000 ? configured : 15_000;
 }
 
-export async function proxyToBankingApi(request: Request, segments: string[]): Promise<Response> {
+function ensureNoStore(value: string | null): string {
+  if (!value) return "no-store";
+  return /(^|,)\s*no-store(?:\s*,|$)/i.test(value) ? value : `${value}, no-store`;
+}
+
+function responseHeadersFor(upstream: Response, authenticated: boolean): Headers {
+  const headers = new Headers();
+  for (const name of RESPONSE_HEADERS) {
+    const value = upstream.headers.get(name);
+    if (value !== null) headers.set(name, value);
+  }
+  if (authenticated) headers.set("Cache-Control", ensureNoStore(headers.get("Cache-Control")));
+  return headers;
+}
+
+function transportResponse(authenticated: boolean, isTimeout: boolean): Response {
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (authenticated) headers.set("Cache-Control", "no-store");
+  return new Response(JSON.stringify({ code: isTimeout ? "BANKING_UPSTREAM_TIMEOUT" : "BANKING_UPSTREAM_UNAVAILABLE", message: isTimeout ? "The banking service timed out." : "The banking service could not be reached." }), { status: isTimeout ? 504 : 502, headers });
+}
+
+export async function fetchBankingApi(request: Request, segments: string[], options: { authenticated?: boolean; validateCsrf?: boolean } = {}): Promise<UpstreamResult> {
+  if (!isAllowedPath(segments)) return { response: Response.json({ code: "INVALID_API_PATH", message: "The requested API path is not valid." }, { status: 400 }), authenticated: false };
+  if (isBlockedBrowserPath(segments)) return { response: browserNotFoundResponse(), authenticated: false };
+  const method = request.method.toUpperCase();
+  const external = isExternalCallbackPath(segments);
+  const authenticated = options.authenticated ?? isAuthenticatedPath(segments);
+  if (options.validateCsrf !== false && !external && ["POST", "PUT", "PATCH", "DELETE"].includes(method) && !validateCsrfRequest(request)) {
+    return { response: csrfFailureResponse(), authenticated };
+  }
+
   const base = upstreamBaseUrl();
   const source = new URL(request.url);
   const destination = new URL(base.toString());
@@ -55,30 +126,38 @@ export async function proxyToBankingApi(request: Request, segments: string[]): P
     const value = request.headers.get(name);
     if (value !== null) headers.set(name, value);
   }
+  if (authenticated) {
+    const token = authCookieValue(request);
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+  }
 
-  const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
+  const body = method === "GET" || method === "HEAD" ? undefined : await request.arrayBuffer();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMilliseconds());
   try {
-    const upstream = await fetch(destination, {
-      method: request.method,
-      headers,
-      body,
-      signal: controller.signal,
-      redirect: "manual",
-      cache: "no-store"
-    });
-    const responseHeaders = new Headers();
-    for (const name of RESPONSE_HEADERS) {
-      const value = upstream.headers.get(name);
-      if (value !== null) responseHeaders.set(name, value);
-    }
-    return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
+    const upstream = await fetch(destination, { method, headers, body, signal: controller.signal, redirect: "manual", cache: "no-store" });
+    return { upstream, responseHeaders: responseHeadersFor(upstream, authenticated), authenticated };
   } catch (error) {
     const isTimeout = error instanceof DOMException && error.name === "AbortError";
     console.error("banking proxy transport failure", { path: source.pathname, timeout: isTimeout });
-    return Response.json({ code: isTimeout ? "BANKING_UPSTREAM_TIMEOUT" : "BANKING_UPSTREAM_UNAVAILABLE", message: isTimeout ? "The banking service timed out." : "The banking service could not be reached." }, { status: isTimeout ? 504 : 502 });
+    return { response: transportResponse(authenticated, isTimeout), authenticated };
   } finally {
     clearTimeout(timer);
   }
+}
+
+export function responseFromUpstream(result: UpstreamResult): Response {
+  if (result.response) return result.response;
+  if (!result.upstream || !result.responseHeaders) return transportResponse(result.authenticated, false);
+  const headers = new Headers(result.responseHeaders);
+  if (result.authenticated && result.upstream.status === 401) {
+    appendAuthCookieDeletion(headers);
+    appendCsrfCookieDeletion(headers);
+    headers.set("X-Bank-Auth-Expired", "1");
+  }
+  return new Response(result.upstream.body, { status: result.upstream.status, headers });
+}
+
+export async function proxyToBankingApi(request: Request, segments: string[]): Promise<Response> {
+  return responseFromUpstream(await fetchBankingApi(request, segments));
 }

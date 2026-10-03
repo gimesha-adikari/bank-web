@@ -1,9 +1,8 @@
 export type Role = "ADMIN" | "EMPLOYEE" | "CUSTOMER" | "TELLER" | "MANAGER" | "BANNED";
 
 export type LoginRequest = { username: string; password: string };
-export type LoginResponse = { token: string; username: string; role: Role };
+export type LoginResponse = { username: string; role: Role };
 export type TokenIdentity = { username: string; role: Role };
-export type RefreshResponse = { token: string };
 export type RegisterRequest = {
   username: string;
   email: string;

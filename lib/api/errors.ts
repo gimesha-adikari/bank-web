@@ -8,6 +8,7 @@ export class ApiError extends Error {
   readonly code?: string;
   readonly fieldErrors?: FieldErrors;
   readonly retryableTransport: boolean;
+  readonly authExpired: boolean;
 
   constructor(input: {
     kind: ApiErrorKind;
@@ -16,6 +17,7 @@ export class ApiError extends Error {
     message: string;
     fieldErrors?: FieldErrors;
     retryableTransport?: boolean;
+    authExpired?: boolean;
   }) {
     super(input.message);
     this.name = "ApiError";
@@ -24,6 +26,7 @@ export class ApiError extends Error {
     this.code = input.code;
     this.fieldErrors = input.fieldErrors;
     this.retryableTransport = input.retryableTransport ?? false;
+    this.authExpired = input.authExpired ?? false;
   }
 }
 

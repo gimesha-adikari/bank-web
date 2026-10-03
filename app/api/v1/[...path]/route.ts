@@ -1,4 +1,4 @@
-import { proxyToBankingApi, isAllowedPath, UpstreamConfigurationError } from "@/lib/server/banking-upstream";
+import { proxyToBankingApi, UpstreamConfigurationError } from "@/lib/server/banking-upstream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -7,7 +7,6 @@ type RouteContext = { params: Promise<{ path?: string[] }> };
 
 async function handle(request: Request, context: RouteContext): Promise<Response> {
   const { path = [] } = await context.params;
-  if (!isAllowedPath(path)) return Response.json({ code: "INVALID_API_PATH", message: "The requested API path is not valid." }, { status: 400 });
   try {
     return await proxyToBankingApi(request, path);
   } catch (error) {

@@ -5,9 +5,11 @@ The standalone Next.js web application for the Banking Platform, using
 
 ## Runtime contract
 
-The browser calls the thin same-origin `/api/v1/*` transport route. The route forwards requests to `BANKING_API_BASE_URL`; it does not implement authentication, account ownership, balance, transaction, reversal, or idempotency rules. bank-core remains the authority for those decisions.
+The browser calls same-origin Next.js BFF routes. The server contains the bank-core JWT in an HttpOnly session cookie, translates it to an upstream Bearer header, and never returns the JWT to browser JavaScript. bank-core remains the authority for credential verification, Sessions, roles, ownership, balances, transactions, reversals, and idempotency.
 
-The approved compatibility model stores the JWT in browser `localStorage` and sends it as `Authorization: Bearer ...`. This rebuild intentionally does not migrate authentication to cookies. Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header.
+Production cookies are `__Host-bank-web-auth` and `__Host-bank-web-csrf`; local development uses `bank-web-auth-dev` and `bank-web-csrf-dev`. They are host-only, HttpOnly, SameSite=Strict, Path=/, and session-only; production requires HTTPS and Secure cookies. Unsafe browser requests require the in-memory CSRF echo. Authenticated 401 ends the web browser Session and requires sign-in again. There is no reactive GET refresh and the browser refresh-token route is blocked. Active XSS can still act as the current user while it executes.
+
+Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header. Android remains a direct Bearer client of bank-core.
 
 ## Development
 
@@ -35,7 +37,7 @@ npm run test:e2e
 npm run build
 ```
 
-The Playwright suite mocks `/api/v1/*` for deterministic UI checks. A separate optional contract smoke can run against a controlled local bank-core environment.
+The Playwright suite runs the Next.js BFF against a test-only local bank-core mock. It does not seed browser auth storage or intercept the core `/api/v1/*` flows. A separate optional contract smoke can run against a controlled local bank-core environment.
 
 ## Related repositories
 

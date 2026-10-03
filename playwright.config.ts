@@ -13,10 +13,18 @@ export default defineConfig({
     screenshot: "only-on-failure"
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: "npm run dev -- --hostname 127.0.0.1 --port 3100",
-    url: "http://127.0.0.1:3100",
-    reuseExistingServer: false,
-    timeout: 120_000
-  }
+  webServer: [
+    {
+      command: "MOCK_BANK_CORE_PORT=38080 node e2e/mock-bank-core.mjs",
+      url: "http://127.0.0.1:38080/health",
+      reuseExistingServer: false,
+      timeout: 120_000
+    },
+    {
+      command: "BANKING_API_BASE_URL=http://127.0.0.1:38080 npm run dev -- --hostname 127.0.0.1 --port 3100",
+      url: "http://127.0.0.1:3100",
+      reuseExistingServer: false,
+      timeout: 120_000
+    }
+  ]
 });

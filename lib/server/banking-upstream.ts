@@ -166,8 +166,8 @@ async function fetchCanonicalBankingApi(request: Request, segments: readonly str
   }
 }
 
-export async function fetchDedicatedAuthApi(request: Request, endpoint: DedicatedAuthEndpoint, options: UpstreamOptions = {}): Promise<UpstreamResult> {
-  return fetchCanonicalBankingApi(request, DEDICATED_AUTH_ENDPOINTS[endpoint], options);
+export async function fetchDedicatedAuthApi(request: Request, endpoint: DedicatedAuthEndpoint): Promise<UpstreamResult> {
+  return fetchCanonicalBankingApi(request, DEDICATED_AUTH_ENDPOINTS[endpoint], { authenticated: endpoint !== "login", validateCsrf: false });
 }
 
 export function responseFromUpstream(result: UpstreamResult): Response {

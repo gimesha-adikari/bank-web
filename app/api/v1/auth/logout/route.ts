@@ -14,7 +14,7 @@ function withSessionDeletion(response: Response): Response {
 
 export async function POST(request: Request): Promise<Response> {
   if (!validateCsrfRequest(request)) return csrfFailureResponse();
-  const result = await fetchDedicatedAuthApi(request, "logout", { authenticated: true, validateCsrf: false });
+  const result = await fetchDedicatedAuthApi(request, "logout");
   if (!result.upstream) return responseFromUpstream(result);
   if (!result.responseHeaders) return responseFromUpstream(result);
   const response = new Response(result.upstream.body, { status: result.upstream.status, headers: result.responseHeaders });

@@ -18,7 +18,7 @@ function protocolFailure(): Response {
 
 export async function POST(request: Request): Promise<Response> {
   if (!validateCsrfRequest(request)) return csrfFailureResponse();
-  const result = await fetchDedicatedAuthApi(request, "login", { authenticated: false, validateCsrf: false });
+  const result = await fetchDedicatedAuthApi(request, "login");
   if (!result.upstream || !result.responseHeaders) return responseFromUpstream(result);
   const text = await result.upstream.text();
   const headers = new Headers(result.responseHeaders);

@@ -1,8 +1,9 @@
 export type IdempotencyStatus = "idle" | "pending" | "uncertain" | "confirmed-failure" | "succeeded";
 
-export type IdempotencyState = {
-  key: string | null;
-  payloadFingerprint: string | null;
+export type IdempotencyState<Payload extends object = object> = {
+  key: string;
+  payloadFingerprint: string;
+  payload: Readonly<Payload>;
   status: IdempotencyStatus;
 };
 
@@ -10,38 +11,38 @@ export function newIdempotencyKey(): string {
   return crypto.randomUUID();
 }
 
-export function stableFingerprint(payload: unknown): string {
-  return JSON.stringify(payload, Object.keys(payload as object).sort());
+export function stableFingerprint(payload: object): string {
+  return JSON.stringify(payload, Object.keys(payload).sort());
 }
 
-export function startLogicalOperation(payload: unknown): IdempotencyState {
-  return { key: newIdempotencyKey(), payloadFingerprint: stableFingerprint(payload), status: "idle" };
+export function startLogicalOperation<Payload extends object>(payload: Payload): IdempotencyState<Payload> {
+  return { key: newIdempotencyKey(), payloadFingerprint: stableFingerprint(payload), payload: { ...payload }, status: "idle" };
 }
 
 export function canSubmit(state: IdempotencyState): boolean {
   return state.status !== "pending" && state.status !== "succeeded";
 }
 
-export function beginSubmit(state: IdempotencyState): IdempotencyState {
+export function beginSubmit<Payload extends object>(state: IdempotencyState<Payload>): IdempotencyState<Payload> {
   return { ...state, status: "pending" };
 }
 
-export function uncertainFailure(state: IdempotencyState): IdempotencyState {
+export function uncertainFailure<Payload extends object>(state: IdempotencyState<Payload>): IdempotencyState<Payload> {
   return { ...state, status: "uncertain" };
 }
 
-export function confirmedFailure(state: IdempotencyState): IdempotencyState {
+export function confirmedFailure<Payload extends object>(state: IdempotencyState<Payload>): IdempotencyState<Payload> {
   return { ...state, status: "confirmed-failure" };
 }
 
-export function completeSuccess(state: IdempotencyState): IdempotencyState {
+export function completeSuccess<Payload extends object>(state: IdempotencyState<Payload>): IdempotencyState<Payload> {
   return { ...state, status: "succeeded" };
 }
 
-export function operationPayloadChanged(state: IdempotencyState, payload: unknown): boolean {
+export function operationPayloadChanged(state: IdempotencyState, payload: object): boolean {
   return state.payloadFingerprint !== stableFingerprint(payload);
 }
 
-export function resetForNewOperation(payload: unknown): IdempotencyState {
+export function resetForNewOperation<Payload extends object>(payload: Payload): IdempotencyState<Payload> {
   return startLogicalOperation(payload);
 }

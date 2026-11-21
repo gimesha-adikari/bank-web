@@ -13,6 +13,7 @@ const account = { accountId: "account-1", accountNumber: "100001", accountType: 
 const documentId = "85baf41c-42a5-4e47-ae18-bfbca3acf998";
 const kycDocument = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 255]);
 const requests = [];
+const delayedDepositReceipts = new Map();
 
 function json(response, status, value, headers = {}) {
   response.writeHead(status, { "Content-Type": "application/json", ...headers });
@@ -89,7 +90,29 @@ const server = http.createServer(async (request, response) => {
   if (path === "accounts/account-1" && request.method === "GET") return json(response, 200, account);
   if (path === "accounts/account-1/transactions" && request.method === "GET") return json(response, 200, []);
   if (path === "transactions/deposit" && request.method === "POST") {
-    await body(request);
+    let amount;
+    try {
+      amount = JSON.parse((await body(request)).toString()).amount;
+    } catch {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid deposit request" });
+    }
+    if (amount === "70.01") {
+      const key = request.headers["idempotency-key"];
+      if (!key) return json(response, 400, { code: "ERR_IDEMPOTENCY_KEY_INVALID", message: "An idempotency key is required" });
+      const saved = delayedDepositReceipts.get(key);
+      if (saved) return json(response, 200, { ...saved, replayed: true });
+
+      const receipt = { operationType: "DEPOSIT", journalReference: "JR-delayed", amount: "70.0100", currency: "LKR" };
+      delayedDepositReceipts.set(key, receipt);
+      setTimeout(() => {
+        if (!response.destroyed) json(response, 200, receipt);
+      }, 4_000).unref();
+      return;
+    }
+    if (amount === "70.02") {
+      request.socket.destroy();
+      return;
+    }
     return json(response, 200, { operation: "DEPOSIT", journalReference: "JR-1", amount: "10.00", currency: "LKR" });
   }
   return json(response, 404, { code: "NOT_FOUND", message: "Not found" });

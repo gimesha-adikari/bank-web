@@ -21,7 +21,7 @@ export default defineConfig({
       timeout: 120_000
     },
     {
-      command: "BANKING_API_BASE_URL=http://127.0.0.1:38080 npm run dev -- --hostname 127.0.0.1 --port 3100",
+      command: "BANKING_API_BASE_URL=http://127.0.0.1:38080 BANKING_API_TIMEOUT_MS=2000 npm run dev -- --hostname 127.0.0.1 --port 3100",
       url: "http://127.0.0.1:3100",
       reuseExistingServer: false,
       timeout: 120_000

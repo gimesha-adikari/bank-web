@@ -15,6 +15,8 @@ After sign-in, bank-web resumes a recognized page only if the user's role can ac
 
 Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header. Android remains a direct Bearer client of bank-core.
 
+The money forms accept positive decimal text with up to two fractional digits. If the result of a submission is uncertain, the open form keeps the original request and key for a manual retry. Check account history before starting a different transaction or leaving the form. After a confirmed receipt, bank-web fetches balances and account-scoped history from core.
+
 ### KYC transport
 
 The browser uses `/api/kyc` for upload, protected files, submission, and case reads, and `/api/admin/kyc` for review. The BFF maps these specific operations to bank-core's unversioned `/kyc` and `/admin/kyc` paths, preserving any deployment prefix before `/api/v1` in `BANKING_API_BASE_URL`. Core enforces case ownership and Admin access. Protected file responses are non-cacheable.

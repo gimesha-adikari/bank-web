@@ -4,6 +4,7 @@ import { GET as csrfGet } from "@/app/api/auth/csrf/route";
 import { POST as loginPost } from "@/app/api/v1/auth/login/route";
 import { POST as logoutPost } from "@/app/api/v1/auth/logout/route";
 import { PUT as changePasswordPut } from "@/app/api/v1/auth/change-password/route";
+import { POST as proxyPost } from "@/app/api/v1/[...path]/route";
 
 const csrf = "a".repeat(43);
 
@@ -69,5 +70,78 @@ describe("BFF lifecycle routes", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("set-cookie")).toContain("bank-web-auth-dev=");
     expect(response.headers.get("set-cookie")).toContain("bank-web-csrf-dev=");
+  });
+});
+
+describe("BFF password reset", () => {
+  const path = "/api/v1/auth/reset-password";
+  const fields = { token: "fixture+token&part", newPassword: "Fixture+Pass1&=" };
+  const form = new URLSearchParams(fields).toString();
+  const context = { params: Promise.resolve({ path: ["auth", "reset-password"] }) };
+
+  beforeEach(() => {
+    process.env.BANKING_API_BASE_URL = "http://banking.internal:8080";
+  });
+
+  function postReset(body: string, search = "", withCsrf = true) {
+    const headers = new Headers(browserHeaders());
+    headers.set("content-type", "application/x-www-form-urlencoded");
+    if (!withCsrf) headers.delete("x-csrf-token");
+    return proxyPost(new Request(`http://web.local${path}${search}`, { method: "POST", headers, body }), context);
+  }
+
+  it("forwards the encoded form without URL secrets or session credentials", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response("Password has been reset"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await postReset(form);
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("Password has been reset");
+    expect(response.headers.get("set-cookie")).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, options] = fetchMock.mock.calls[0] as [URL, RequestInit];
+    expect(url.href).toBe(`http://banking.internal:8080${path}`);
+    const headers = new Headers(options.headers);
+    expect(headers.get("content-type")).toBe("application/x-www-form-urlencoded");
+    expect(headers.get("authorization")).toBeNull();
+    expect(headers.get("cookie")).toBeNull();
+    expect(new TextDecoder().decode(options.body as ArrayBuffer)).toBe(form);
+  });
+
+  it.each([
+    { label: "an expired or used token", body: form, status: 500, message: "Token expired or used" },
+    { label: "a missing password", body: new URLSearchParams({ token: fields.token }).toString(), status: 400, message: "Bad Request" }
+  ])("relays core's failure for $label", async ({ body, status, message }) => {
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ message }, { status }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await postReset(body);
+
+    expect(response.status).toBe(status);
+    expect(await response.json()).toEqual({ message });
+    expect(response.headers.get("set-cookie")).toBeNull();
+    expect((fetchMock.mock.calls[0][0] as URL).search).toBe("");
+  });
+
+  it("rejects reset fields in a query string before forwarding them", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response("Password has been reset"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await postReset("", `?${form}`);
+
+    expect(response.status).toBe(400);
+    expect(await response.text()).not.toContain(fields.newPassword);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a form without a matching CSRF header", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await postReset(form, "", false);
+
+    expect(response.status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

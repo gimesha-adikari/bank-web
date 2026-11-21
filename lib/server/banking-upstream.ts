@@ -133,8 +133,18 @@ async function fetchCanonicalBankingApi(request: Request, segments: readonly str
     return { response: csrfFailureResponse(), authenticated };
   }
 
-  const base = upstreamBaseUrl();
   const source = new URL(request.url);
+  if (method === "POST" && segments.join("/") === "auth/reset-password" && source.search) {
+    return {
+      response: Response.json(
+        { code: "INVALID_RESET_REQUEST", message: "Send password reset fields in the form body." },
+        { status: 400, headers: { "Cache-Control": "no-store" } }
+      ),
+      authenticated
+    };
+  }
+
+  const base = upstreamBaseUrl();
   const destination = new URL(base.toString());
   const basePath = base.pathname.replace(/\/$/, "");
   const apiPrefix = basePath.endsWith("/api/v1") ? basePath : `${basePath}/api/v1`;

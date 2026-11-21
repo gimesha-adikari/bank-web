@@ -9,6 +9,8 @@ The browser calls same-origin Next.js BFF routes. The server contains the bank-c
 
 Production cookies are `__Host-bank-web-auth` and `__Host-bank-web-csrf`; local development uses `bank-web-auth-dev` and `bank-web-csrf-dev`. They are host-only, HttpOnly, SameSite=Strict, Path=/, and session-only; production requires HTTPS and Secure cookies. Unsafe browser requests require the in-memory CSRF echo. Authenticated 401 ends the web browser Session and requires sign-in again. There is no reactive GET refresh and the browser refresh-token route is blocked. Active XSS can still act as the current user while it executes.
 
+The password-reset page reads the token from the emailed link. It submits the token and new password through the CSRF-protected, URL-encoded POST body. Core checks expiry and prior use when it processes the POST.
+
 Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header. Android remains a direct Bearer client of bank-core.
 
 ## Development

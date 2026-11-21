@@ -26,7 +26,10 @@ export function AppHeader() {
           <Link href="/customer/transactions/transfer">Transfer</Link>
           <Link href="/customer/profile">Profile</Link>
         </>}
-        {allowsRole(role, PAGE_ROLES.admin) && <Link href="/staff">Staff workspace</Link>}
+        {allowsRole(role, PAGE_ROLES.admin) && <>
+          <Link href="/admin/kyc">KYC review</Link>
+          <Link href="/staff">Staff workspace</Link>
+        </>}
         {allowsRole(role, PAGE_ROLES.staff) && <>
           <Link href="/staff/accounts">Accounts</Link>
           <Link href="/staff/customers">Customers</Link>

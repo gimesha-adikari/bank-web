@@ -25,7 +25,8 @@ const pageRoles = new Map<string, readonly Role[]>([
   ["/staff/customers", PAGE_ROLES.staff],
   ["/staff/customers/new", PAGE_ROLES.staff],
   [TELLER_ACCOUNT_OPENING, PAGE_ROLES.teller],
-  ["/admin", PAGE_ROLES.admin]
+  ["/admin", PAGE_ROLES.admin],
+  ["/admin/kyc", PAGE_ROLES.admin]
 ]);
 
 const historyPages = [

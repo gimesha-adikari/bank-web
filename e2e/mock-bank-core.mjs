@@ -9,6 +9,9 @@ const users = [
   ["admin", "ADMIN", "e2e-admin-jwt"],
   ["employee", "EMPLOYEE", "e2e-employee-jwt"],
   ["banned", "BANNED", "e2e-banned-jwt"],
+  ["kyc-review-admin", "ADMIN", "e2e-kyc-review-admin-jwt"],
+  ["kyc-review-decisions", "ADMIN", "e2e-kyc-review-decisions-jwt"],
+  ["kyc-review-timeout", "ADMIN", "e2e-kyc-review-timeout-jwt"],
   ["directory-forbidden", "TELLER", "e2e-directory-forbidden-jwt"],
   ["directory-expired", "TELLER", "e2e-directory-expired-jwt"],
   ["directory-network", "TELLER", "e2e-directory-network-jwt"],
@@ -34,6 +37,13 @@ const usedVerificationTokens = new Set();
 const documentTypes = ["DOC_FRONT", "DOC_BACK", "SELFIE", "ADDRESS_PROOF"];
 const onboardingUploads = new Map();
 const onboardingCases = new Map();
+const adminReviewCases = new Map();
+const adminReviewDecisions = [];
+const adminReviewAttempts = [];
+const adminReviewDocumentIds = new Set([
+  "75000000-0000-4000-8000-000000000001", "75000000-0000-4000-8000-000000000002",
+  "75000000-0000-4000-8000-000000000003", "75000000-0000-4000-8000-000000000004"
+]);
 const customerRecords = new Map();
 const customerDirectoryRecords = new Map();
 const retryAttempts = new Map();
@@ -115,7 +125,8 @@ const server = http.createServer(async (request, response) => {
   if (url.pathname === "/test/requests" && request.method === "GET") return json(response, 200, {
     count: requests.length, requests, accountOpeningCreations: Object.fromEntries(accountOpeningCreations),
     tellerOpeningRequests, tellerOpenedAccountCount: tellerOpenedAccounts.size,
-    staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords)
+    staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords),
+    adminReviewDecisions, adminReviewAttempts
   });
   if (url.pathname === "/test/seed-account-opening-conflict" && request.method === "POST") {
     const input = await new Response(await body(request)).json().catch(() => null);
@@ -301,15 +312,75 @@ const server = http.createServer(async (request, response) => {
     onboardingUploads.set(id, { owner: user.username, type });
     return json(response, 200, { id });
   }
-  if (url.pathname === `/kyc/file/${documentId}` && request.method === "GET") {
+  if (url.pathname.startsWith("/kyc/file/") && request.method === "GET") {
+    const requestedId = url.pathname.split("/").at(-1);
     if (!["CUSTOMER", "ADMIN"].includes(user.role)) return json(response, 403, { message: "Access denied" });
+    if (requestedId !== documentId && !adminReviewDocumentIds.has(requestedId)) return json(response, 404, { message: "Document not found" });
+    if (user.role === "ADMIN" && requestedId !== documentId && !user.username.startsWith("kyc-review-")) return json(response, 404, { message: "Document not found" });
     response.writeHead(200, { "Content-Type": "image/png", "Content-Disposition": 'inline; filename="synthetic.png"' });
     return response.end(kycDocument);
   }
   if (url.pathname === "/admin/kyc" && request.method === "GET") {
-    return user.role === "ADMIN"
-      ? json(response, 200, { page: Number(url.searchParams.get("page") ?? "0"), size: 20, total: 0, content: [] })
-      : json(response, 403, { message: "Access denied" });
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (!adminReviewCases.has(user.username)) {
+      const reviewFixtureUser = ["kyc-review-admin", "kyc-review-decisions", "kyc-review-timeout"].includes(user.username);
+      const pending = Array.from({ length: user.username === "kyc-review-admin" ? 21 : reviewFixtureUser ? 2 : 0 }, (_, index) => ({
+        caseId: `70000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+        status: "PENDING", docFrontId: "75000000-0000-4000-8000-000000000001", docBackId: "75000000-0000-4000-8000-000000000002",
+        selfieId: "75000000-0000-4000-8000-000000000003", addressId: "75000000-0000-4000-8000-000000000004",
+        decisionReason: null, createdAt: "2026-03-01T10:00:00Z", updatedAt: "2026-03-01T10:00:00Z", reviewerId: null, decidedAt: null, reviewerNotes: null
+      }));
+      if (reviewFixtureUser) pending.push({
+        caseId: "70000000-0000-4000-8000-000000000099", status: "UNDER_REVIEW", docFrontId: "75000000-0000-4000-8000-000000000001",
+        docBackId: "75000000-0000-4000-8000-000000000002", selfieId: "75000000-0000-4000-8000-000000000003", addressId: "75000000-0000-4000-8000-000000000004",
+        decisionReason: null, createdAt: "2026-03-02T10:00:00Z", updatedAt: "2026-03-02T10:00:00Z", reviewerId: null, decidedAt: null, reviewerNotes: null
+      });
+      if (user.username === "kyc-review-decisions") pending.push({
+        caseId: "70000000-0000-4000-8000-000000000098", status: "NEEDS_MORE_INFO", docFrontId: "75000000-0000-4000-8000-000000000001",
+        docBackId: "75000000-0000-4000-8000-000000000002", selfieId: "75000000-0000-4000-8000-000000000003", addressId: "75000000-0000-4000-8000-000000000004",
+        decisionReason: "Please clarify the address document.", createdAt: "2026-03-02T09:00:00Z", updatedAt: "2026-03-02T09:30:00Z", reviewerId: null, decidedAt: null, reviewerNotes: null
+      });
+      adminReviewCases.set(user.username, pending);
+    }
+    const status = url.searchParams.get("status") ?? "PENDING";
+    const page = Number(url.searchParams.get("page") ?? "0");
+    const size = Number(url.searchParams.get("size") ?? "20");
+    const matching = adminReviewCases.get(user.username).filter((item) => item.status === status);
+    return json(response, 200, { page, size, total: matching.length, content: matching.slice(page * size, (page + 1) * size) });
+  }
+  const adminChecksMatch = /^\/admin\/kyc\/([\da-f-]{36})\/checks$/.exec(url.pathname);
+  if (adminChecksMatch && request.method === "GET") {
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    const found = (adminReviewCases.get(user.username) ?? []).find((item) => item.caseId === adminChecksMatch[1]);
+    return json(response, 200, found ? [{
+      id: "76000000-0000-4000-8000-000000000001", caseId: found.caseId, type: "FACE_MATCH", score: 0.91,
+      passed: true, detailsJson: "{\"sensitiveFixture\":\"must not render\"}", createdAt: "2026-03-02T10:01:00Z"
+    }] : []);
+  }
+  const adminDecisionMatch = /^\/admin\/kyc\/([\da-f-]{36})\/decision$/.exec(url.pathname);
+  if (adminDecisionMatch && request.method === "POST") {
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    adminReviewAttempts.push({ username: user.username, caseId: adminDecisionMatch[1] });
+    const decision = await new Response(await body(request)).json().catch(() => null);
+    const cases = adminReviewCases.get(user.username) ?? [];
+    const found = cases.find((item) => item.caseId === adminDecisionMatch[1]);
+    if (!found || !["APPROVED", "REJECTED", "NEEDS_MORE_INFO"].includes(decision?.decision)) return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid decision" });
+    const allowed = found.status === "PENDING" ? decision.decision === "NEEDS_MORE_INFO"
+      : found.status === "AUTO_REVIEW" || found.status === "UNDER_REVIEW" ? true
+        : found.status === "NEEDS_MORE_INFO" ? decision.decision === "REJECTED" : false;
+    if (!allowed) return json(response, 400, { code: "ERR_VALIDATION", message: "Illegal transition" });
+    adminReviewDecisions.push({ username: user.username, caseId: found.caseId, decision: decision.decision, reason: decision.reason ?? null });
+    found.status = decision.decision;
+    found.decisionReason = decision.reason ?? null;
+    found.reviewerNotes = decision.reason ?? null;
+    found.reviewerId = "00000000-0000-4000-8000-000000000001";
+    found.decidedAt = new Date().toISOString();
+    found.updatedAt = found.decidedAt;
+    if (user.username === "kyc-review-timeout") {
+      request.socket.destroy();
+      return;
+    }
+    return json(response, 200, found);
   }
   if (path === "customers" || path.startsWith("customers/")) {
     if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });

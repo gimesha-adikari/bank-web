@@ -8,6 +8,7 @@ export const authApi = {
   logout: () => apiJson<void>("/api/v1/auth/logout", "POST"),
   changePassword: (body: ChangePasswordRequest) => apiJson<void>("/api/v1/auth/change-password", "PUT", body),
   register: (body: RegisterRequest) => apiJson<void>("/api/v1/auth/register", "POST", body),
+  resendVerification: (body: ForgotPasswordRequest) => apiJson<string>("/api/v1/auth/resend-verification", "POST", body),
   forgotPassword: (body: ForgotPasswordRequest) => apiJson<void>("/api/v1/auth/forgot-password", "POST", body),
   resetPassword: (token: string, newPassword: string) => apiRequest<void>("/api/v1/auth/reset-password", {
     method: "POST",

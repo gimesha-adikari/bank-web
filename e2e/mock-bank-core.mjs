@@ -14,6 +14,7 @@ const documentId = "85baf41c-42a5-4e47-ae18-bfbca3acf998";
 const kycDocument = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 255]);
 const requests = [];
 const delayedDepositReceipts = new Map();
+const usedVerificationTokens = new Set();
 
 function json(response, status, value, headers = {}) {
   response.writeHead(status, { "Content-Type": "application/json", ...headers });
@@ -36,6 +37,41 @@ const server = http.createServer(async (request, response) => {
   requests.push({ method: request.method, path: url.pathname, correlationId: request.headers["x-correlation-id"] ?? null });
   if (url.pathname === "/health") return json(response, 200, { ok: true });
   const path = url.pathname.replace(/^\/api\/v1\//, "");
+  if (path === "auth/register" && request.method === "POST") {
+    const registration = await new Response(await body(request)).json().catch(() => null);
+    if (!registration?.username || !registration.email || !registration.password) {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid registration" });
+    }
+    response.writeHead(201, { "Content-Type": "text/plain" });
+    return response.end("User registered successfully");
+  }
+  if (path === "auth/resend-verification" && request.method === "POST") {
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    if (typeof payload?.email !== "string" || !payload.email.includes("@") || Object.keys(payload).length !== 1) {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid email address" });
+    }
+    if (payload.email === "rate-limited@example.test") return json(response, 429, { message: "Too many requests" }, { "Retry-After": "60" });
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    return response.end("If an account exists, a verification email has been sent");
+  }
+  if (["auth/verify-email", "users/me/email/verify"].includes(path) && request.method === "GET") {
+    if (request.headers.authorization || request.headers.cookie) return json(response, 400, { message: "Unexpected credentials" });
+    const isRegistration = path === "auth/verify-email";
+    const token = url.searchParams.get("token");
+    const validToken = isRegistration ? "registration-fixture" : "email-change-fixture";
+    if (token === "transport-fixture") {
+      request.socket.destroy();
+      return;
+    }
+    if (token !== validToken || usedVerificationTokens.has(token)) {
+      if (!isRegistration) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Invalid or expired verification token" });
+      response.writeHead(403, { "Content-Type": "text/plain" });
+      return response.end("Invalid or expired token");
+    }
+    usedVerificationTokens.add(token);
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    return response.end(isRegistration ? "Email verified successfully" : "Email updated successfully");
+  }
   if (path === "auth/login" && request.method === "POST") {
     let credentials;
     try {

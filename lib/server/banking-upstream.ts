@@ -45,7 +45,7 @@ export type UpstreamResult = {
 
 export function upstreamBaseUrl(): URL {
   const raw = process.env.BANKING_API_BASE_URL;
-  if (!raw) throw new UpstreamConfigurationError("BANKING_API_BASE_URL is not configured");
+  if (!raw || !URL.canParse(raw)) throw new UpstreamConfigurationError("BANKING_API_BASE_URL is not configured");
   const url = new URL(raw);
   if (!/^https?:$/.test(url.protocol)) throw new UpstreamConfigurationError("BANKING_API_BASE_URL must use HTTP or HTTPS");
   return url;
@@ -122,7 +122,7 @@ function transportResponse(authenticated: boolean, isTimeout: boolean): Response
 
 type KycOperation = "upload" | "submit" | "document" | "json";
 type KycScope = "kyc" | "admin/kyc";
-type UpstreamOptions = { authenticated?: boolean; validateCsrf?: boolean; kyc?: KycOperation };
+type UpstreamOptions = { authenticated?: boolean; validateCsrf?: boolean; kyc?: KycOperation; verificationToken?: string };
 
 function invalidPathResponse(): Response {
   return Response.json({ code: "INVALID_API_PATH", message: "The requested API path is not valid." }, { status: 400 });
@@ -190,7 +190,9 @@ async function fetchCanonicalBankingApi(request: Request, segments: readonly str
     ? (versioned ? basePath.slice(0, -"/api/v1".length) : basePath)
     : (versioned ? basePath : `${basePath}/api/v1`);
   destination.pathname = `${apiPrefix}/${segments.map((segment) => encodeURIComponent(segment)).join("/")}`;
-  destination.search = source.search;
+  destination.search = options.verificationToken === undefined
+    ? source.search
+    : new URLSearchParams({ token: options.verificationToken }).toString();
 
   const headers = new Headers();
   for (const name of FORWARDED_HEADERS) {
@@ -255,7 +257,54 @@ export async function proxyToBankingApi(request: Request, segments: readonly str
   const canonical = canonicalizePathSegments(segments);
   if (!canonical) return invalidPathResponse();
   if (isBlockedBrowserPath(canonical)) return browserNotFoundResponse();
+  const path = canonical.join("/");
+  if (path === "auth/verify-email") return verifyEmailLink(request, canonical, "registration");
+  if (path === "users/me/email/verify") return verifyEmailLink(request, canonical, "email-change");
+  if (path === "auth/resend-verification" && request.method !== "POST") {
+    return new Response(null, { status: 405, headers: { Allow: "POST", "Cache-Control": "no-store" } });
+  }
   return responseFromUpstream(await fetchCanonicalBankingApi(request, canonical));
+}
+
+async function verifyEmailLink(request: Request, path: readonly string[], flow: "registration" | "email-change"): Promise<Response> {
+  const headers = new Headers({ "Cache-Control": "no-store", "Referrer-Policy": "no-referrer", Vary: "Accept, Sec-Fetch-Mode" });
+  if (request.method !== "GET") {
+    headers.set("Allow", "GET");
+    return new Response(null, { status: 405, headers });
+  }
+  const purpose = `${request.headers.get("Sec-Purpose") ?? ""} ${request.headers.get("Purpose") ?? ""}`;
+  if (/\b(prefetch|prerender|preview)\b/i.test(purpose) || request.headers.has("Next-Router-Prefetch") || request.headers.has("RSC")) {
+    return new Response(null, { status: 204, headers });
+  }
+
+  const tokens = new URL(request.url).searchParams.getAll("token");
+  let upstream: Response;
+  if (tokens.length !== 1 || !tokens[0].trim()) {
+    upstream = new Response("Invalid verification link", { status: 400 });
+  } else {
+    try {
+      upstream = responseFromUpstream(await fetchCanonicalBankingApi(request, path, { authenticated: false, verificationToken: tokens[0] }));
+    } catch (error) {
+      if (!(error instanceof UpstreamConfigurationError)) throw error;
+      upstream = Response.json({ code: "BANKING_PROXY_MISCONFIGURED", message: "The banking API is not configured." }, { status: 500 });
+    }
+  }
+
+  const isNavigation = request.headers.get("Sec-Fetch-Mode") === "navigate" || request.headers.get("Accept")?.includes("text/html");
+  if (isNavigation) {
+    const { status } = upstream;
+    const invalid = status === 400 || status === (flow === "registration" ? 403 : 404);
+    const outcome = status === 200 ? "verified" : invalid ? "invalid" : status === 409 ? "conflict" : "unavailable";
+    headers.set("Location", `/verification-result?flow=${flow}&status=${outcome}`);
+    void upstream.body?.cancel().catch(() => {});
+    return new Response(null, { status: 303, headers });
+  }
+
+  for (const name of ["content-type", "retry-after"]) {
+    const value = upstream.headers.get(name);
+    if (value !== null) headers.set(name, value);
+  }
+  return new Response(upstream.body, { status: upstream.status, headers });
 }
 
 function expireSession(headers: Headers): void {

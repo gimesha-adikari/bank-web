@@ -11,6 +11,14 @@ Production cookies are `__Host-bank-web-auth` and `__Host-bank-web-csrf`; local 
 
 The password-reset page reads the token from the emailed link. It submits the token and new password through the CSRF-protected, URL-encoded POST body. Core checks expiry and prior use when it processes the POST.
 
+Registration requires email verification before sign-in. Users can resend a verification email from the registration confirmation, sign-in page, or an unsuccessful registration verification result. The resend request uses an email-only JSON body and the normal CSRF check.
+
+Core builds registration links from `APP_FRONTEND_URL` plus `/api/v1/auth/verify-email?token=…` and email-change links from `APP_BASE_URL` plus `/api/v1/users/me/email/verify?token=…`. Serve these exact public paths through bank-web to display its result page. If `APP_BASE_URL` points at the public core origin, route just the email-change verification path at that ingress to bank-web while keeping `BANKING_API_BASE_URL` pointed at bank-core directly. This keeps the emailed origin and avoids sending the BFF back through itself. Direct requests to Spring still receive Spring's API response.
+
+Browser navigation to either verification path is handled server-side and redirected to `/verification-result` with only the flow and outcome. The verification response uses `Cache-Control: no-store` and `Referrer-Policy: no-referrer`. HEAD and marked preview or prefetch requests skip verification. An email scanner that sends an ordinary GET can still consume a one-time link under the existing backend contract.
+
+Use `npm run dev` for verification testing. It suppresses Next.js 16.3.8 development trace spans, which otherwise record full request URLs even with request logging filtered. Redact query strings for these paths in deployment access logs, tracing, and email link tracking because the initial request and the upstream core request carry the token.
+
 After sign-in, bank-web resumes a recognized page only if the user's role can access it. The staff workspace and its account history allow Admin, Manager, and Teller. Staff account opening is Teller-only. Employee and Banned roles land on the public access-denied page. These checks guide browser navigation. Bank-core authorizes every banking request.
 
 Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header. Android remains a direct Bearer client of bank-core.

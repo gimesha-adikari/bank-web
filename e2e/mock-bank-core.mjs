@@ -11,7 +11,8 @@ const users = [
   ["banned", "BANNED", "e2e-banned-jwt"],
   ...["new-customer", "timeout-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer",
     "opening-approved", "opening-timeout", "opening-network", "opening-branch", "opening-missing", "opening-pending", "opening-auth", "opening-expired",
-    "opening-vault", "opening-record-gone", "opening-branches-unavailable"]
+    "opening-vault", "opening-record-gone", "opening-branches-unavailable", "opening-conflict", "opening-invalid-key",
+    "opening-kyc-rejected", "opening-network-validation"]
     .map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`])
 ].map(([username, role, token]) => ({ username, role, token }));
 const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
@@ -26,6 +27,9 @@ const onboardingCases = new Map();
 const customerRecords = new Map();
 const retryAttempts = new Map();
 const openedAccounts = new Map();
+const accountOpeningClaims = new Map();
+const accountOpeningAttempts = new Map();
+const accountOpeningCreations = new Map();
 const openingMinimum = { SAVINGS: 1000n, CHECKING: 0n, FIXED_DEPOSIT: 5000n };
 const branches = [
   { branchId: 21, branchName: "Central Branch", address: "5 Main Street", contactNumber: "0112234567" },
@@ -60,8 +64,33 @@ async function body(request) {
 
 const server = http.createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", `http://127.0.0.1:${port}`);
-  if (url.pathname === "/test/requests" && request.method === "GET") return json(response, 200, { count: requests.length, requests });
-  requests.push({ method: request.method, path: url.pathname, correlationId: request.headers["x-correlation-id"] ?? null });
+  if (url.pathname === "/test/requests" && request.method === "GET") return json(response, 200, {
+    count: requests.length, requests, accountOpeningCreations: Object.fromEntries(accountOpeningCreations)
+  });
+  if (url.pathname === "/test/seed-account-opening-conflict" && request.method === "POST") {
+    const input = await new Response(await body(request)).json().catch(() => null);
+    if (input?.username !== "opening-conflict" || typeof input.key !== "string") {
+      return json(response, 400, { message: "Invalid account-opening conflict fixture" });
+    }
+    const user = users.find(({ username }) => username === input.username);
+    const seededAccount = {
+      accountId: randomUUID(), accountNumber: "1000099999", accountType: "CHECKING", accountStatus: "ACTIVE", balance: "10.0000"
+    };
+    openedAccounts.set(input.username, [seededAccount]);
+    accountOpeningClaims.set(`${input.username}:${input.key.toLowerCase()}`, {
+      fingerprint: JSON.stringify(["CHECKING", 21, "10.00"]), account: seededAccount
+    });
+    accountOpeningCreations.set(input.username, 1);
+    return json(response, 201, { account: seededAccount, userFound: Boolean(user) });
+  }
+  requests.push({
+    method: request.method,
+    path: url.pathname,
+    correlationId: request.headers["x-correlation-id"] ?? null,
+    ...(url.pathname === "/api/v1/accounts" && request.method === "POST"
+      ? { idempotencyKey: request.headers["idempotency-key"] ?? null }
+      : {})
+  });
   if (url.pathname === "/health") return json(response, 200, { ok: true });
   const path = url.pathname.replace(/^\/api\/v1\//, "");
   if (path === "auth/register" && request.method === "POST") {
@@ -233,9 +262,29 @@ const server = http.createServer(async (request, response) => {
     if (user.username === "opening-expired") return json(response, 401, { code: "AUTH", message: "Expired" });
     if (["opening-record-gone", "opening-missing"].includes(user.username)) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
     const payload = await new Response(await body(request)).json().catch(() => null);
+    const idempotencyKey = request.headers["idempotency-key"];
+    if (user.username === "opening-invalid-key") {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid idempotency key" });
+    }
+    if (user.username === "opening-kyc-rejected") {
+      return json(response, 422, { code: "ERR_KYC_NOT_APPROVED", message: "KYC must be APPROVED before self-service account opening" });
+    }
     if (!payload || !Object.hasOwn(openingMinimum, payload.accountType) || typeof payload.initialDeposit !== "string"
-      || !/^\d+(\.\d+)?$/.test(payload.initialDeposit) || request.headers["idempotency-key"]) {
+      || !/^\d+(\.\d+)?$/.test(payload.initialDeposit)
+      || typeof idempotencyKey !== "string" || !/^[A-Za-z0-9._:-]{1,128}$/.test(idempotencyKey)) {
       return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid account request" });
+    }
+    const claimId = `${user.username}:${idempotencyKey.toLowerCase()}`;
+    const fingerprint = JSON.stringify([payload.accountType, payload.branchId, payload.initialDeposit]);
+    const previousClaim = accountOpeningClaims.get(claimId);
+    if (previousClaim) {
+      if (previousClaim.fingerprint !== fingerprint) {
+        return json(response, 409, { code: "ERR_IDEMPOTENCY_CONFLICT", message: "Idempotency key was used with a different account-opening request" });
+      }
+      return json(response, 201, previousClaim.account);
+    }
+    if (user.username === "opening-network-validation" && (accountOpeningAttempts.get(user.username) ?? 0) === 1) {
+      return json(response, 422, { code: "ERR_MIN_DEPOSIT", message: "Opening deposit below minimum" });
     }
     if (!branches.some(({ branchId }) => branchId === payload.branchId)
       || (user.username === "opening-branch" && payload.branchId === branches[1].branchId)) {
@@ -246,7 +295,9 @@ const server = http.createServer(async (request, response) => {
     const zero = /^0+(\.0+)?$/.test(payload.initialDeposit);
     if (!zero && fraction.length > 2) return json(response, 422, { code: "ERR_DEPOSIT_INVALID", message: "Too many fractional digits" });
     if (user.username === "opening-vault") return json(response, 422, { code: "ERR_VAULT_ACCOUNT_NOT_FOUND", message: "Missing internal ledger fixture" });
-    if (user.username === "opening-network") {
+    const attempts = (accountOpeningAttempts.get(user.username) ?? 0) + 1;
+    accountOpeningAttempts.set(user.username, attempts);
+    if (["opening-network", "opening-network-validation"].includes(user.username) && attempts === 1) {
       request.socket.destroy();
       return;
     }
@@ -256,6 +307,8 @@ const server = http.createServer(async (request, response) => {
       accountType: payload.accountType, accountStatus: "ACTIVE", balance: zero ? "0.0000" : `${BigInt(whole)}.${fraction.padEnd(4, "0")}`
     };
     openedAccounts.set(user.username, [...previous, saved]);
+    accountOpeningClaims.set(claimId, { fingerprint, account: saved });
+    accountOpeningCreations.set(user.username, (accountOpeningCreations.get(user.username) ?? 0) + 1);
     if (user.username === "opening-timeout") {
       setTimeout(() => {
         if (!response.destroyed) json(response, 201, saved);

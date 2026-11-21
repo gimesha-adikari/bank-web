@@ -46,20 +46,33 @@ export type Account = {
 export type AccountRequest = { accountType: AccountType; initialDeposit: string; branchId: number };
 
 export type Branch = { branchId: number; branchName: string; [key: string]: unknown };
+export type CustomerGender = "MALE" | "FEMALE" | "OTHER";
+export type CustomerStatus = "ACTIVE" | "INACTIVE" | "PENDING" | "RESIGNED";
 export type Customer = {
   customerId: string;
   firstName: string;
   lastName: string;
-  gender?: string;
+  gender?: CustomerGender;
   email?: string;
   phone?: string;
   address?: string;
   dateOfBirth?: string;
-  status?: string;
+  status?: CustomerStatus;
   createdAt?: string;
   updatedAt?: string;
   username?: string;
   userId?: string;
+};
+export type CustomerRecordRequest = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  gender: CustomerGender;
+  email: string;
+  phone: string;
+  address: string;
+  dateOfBirth: string;
+  status: CustomerStatus;
 };
 
 export type TransactionType = "DEPOSIT" | "WITHDRAWAL" | "TRANSFER_IN" | "TRANSFER_OUT" | string;

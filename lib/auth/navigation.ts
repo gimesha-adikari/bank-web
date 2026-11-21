@@ -8,9 +8,11 @@ export const PAGE_ROLES = {
 } as const;
 
 export const TELLER_ACCOUNT_OPENING = "/staff/accounts/new";
+export const CUSTOMER_ONBOARDING = "/customer/onboarding";
 
 const pageRoles = new Map<string, readonly Role[]>([
   ["/customer", PAGE_ROLES.customer],
+  [CUSTOMER_ONBOARDING, PAGE_ROLES.customer],
   ["/customer/accounts", PAGE_ROLES.customer],
   ["/customer/profile", PAGE_ROLES.customer],
   ["/customer/transactions/deposit", PAGE_ROLES.customer],

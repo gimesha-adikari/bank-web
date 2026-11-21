@@ -1,4 +1,5 @@
 import http from "node:http";
+import { randomUUID } from "node:crypto";
 
 const port = Number(process.env.MOCK_BANK_CORE_PORT ?? "38080");
 const users = [
@@ -7,7 +8,9 @@ const users = [
   ["manager", "MANAGER", "e2e-manager-jwt"],
   ["admin", "ADMIN", "e2e-admin-jwt"],
   ["employee", "EMPLOYEE", "e2e-employee-jwt"],
-  ["banned", "BANNED", "e2e-banned-jwt"]
+  ["banned", "BANNED", "e2e-banned-jwt"],
+  ...["new-customer", "timeout-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer"]
+    .map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`])
 ].map(([username, role, token]) => ({ username, role, token }));
 const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
 const documentId = "85baf41c-42a5-4e47-ae18-bfbca3acf998";
@@ -15,6 +18,11 @@ const kycDocument = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 255]);
 const requests = [];
 const delayedDepositReceipts = new Map();
 const usedVerificationTokens = new Set();
+const documentTypes = ["DOC_FRONT", "DOC_BACK", "SELFIE", "ADDRESS_PROOF"];
+const onboardingUploads = new Map();
+const onboardingCases = new Map();
+const customerRecords = new Map();
+const retryAttempts = new Map();
 
 function json(response, status, value, headers = {}) {
   response.writeHead(status, { "Content-Type": "application/json", ...headers });
@@ -23,6 +31,17 @@ function json(response, status, value, headers = {}) {
 
 function authenticatedUser(request) {
   return users.find(({ token }) => request.headers.authorization === `Bearer ${token}`);
+}
+
+function profileFor(user) {
+  return {
+    userId: `0ce3cd10-6395-4acd-9a40-${String(users.indexOf(user) + 1).padStart(12, "0")}`,
+    username: user.username, firstName: "Test", lastName: "", email: `${user.username}@example.test`, roleName: user.role
+  };
+}
+
+function caseFor(status, fields = {}) {
+  return { caseId: randomUUID(), status, decisionReason: null, reviewerNotes: null, ...fields };
 }
 
 async function body(request) {
@@ -102,13 +121,87 @@ const server = http.createServer(async (request, response) => {
     return user ? json(response, 200, { username: user.username, role: user.role }) : json(response, 401, { code: "AUTH", message: "Expired" });
   }
   if (!user || (path === "expired" && request.method === "GET")) return json(response, 401, { code: "AUTH", message: "Expired" });
+  if (path === "users/me" && request.method === "GET") return json(response, 200, profileFor(user));
+  if (path === "customers/me" && request.method === "GET") {
+    if (user.username === "lookup-error") return json(response, 503, { message: "Service unavailable" });
+    const existing = customerRecords.get(user.username);
+    if (existing) return json(response, 200, existing);
+    if (["customer", "accounts-error"].includes(user.username)) {
+      return json(response, 200, { ...profileFor(user), customerId: "existing-customer", status: "ACTIVE" });
+    }
+    return json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
+  }
+  if (path === "customers/me" && request.method === "PUT") {
+    if (onboardingCases.get(user.username)?.status !== "APPROVED") return json(response, 409, {});
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    const userId = profileFor(user).userId;
+    if (!payload || payload.userId !== userId || !payload.firstName?.trim() || !payload.lastName?.trim()
+      || !payload.email?.includes("@") || !payload.phone?.trim() || !["MALE", "FEMALE", "OTHER"].includes(payload.gender)
+      || !/^\d{4}-\d{2}-\d{2}$/.test(payload.dateOfBirth) || payload.status !== "ACTIVE") {
+      return json(response, 400, { code: "ERR_VALIDATION", errors: { userId: "Required authenticated user UUID and valid customer fields." } });
+    }
+    const saved = { ...payload, customerId: customerRecords.get(user.username)?.customerId ?? randomUUID(), updatedAt: new Date().toISOString() };
+    customerRecords.set(user.username, saved);
+    return json(response, 200, saved);
+  }
+  if (url.pathname === "/kyc/me" && request.method === "GET") {
+    if (user.username === "denied-customer") return json(response, 403, { message: "Access denied" });
+    if (!onboardingCases.has(user.username)) {
+      if (user.username === "info-customer") onboardingCases.set(user.username, caseFor("NEEDS_MORE_INFO", { decisionReason: "Please clarify your address." }));
+      if (user.username === "rejected-customer") onboardingCases.set(user.username, caseFor("REJECTED", { decisionReason: "Document could not be verified." }));
+    }
+    const latest = onboardingCases.get(user.username);
+    if (!latest) return json(response, 404, { status: 404, error: "Not Found" });
+    const result = json(response, 200, latest);
+    if (user.username === "new-customer" && latest.status === "PENDING") latest.status = "APPROVED";
+    return result;
+  }
+  if (/^\/kyc\/[^/]+\/checks$/.test(url.pathname) && request.method === "GET") {
+    const latest = onboardingCases.get(user.username);
+    if (latest?.caseId !== url.pathname.split("/")[2]) return json(response, 404, {});
+    const checks = latest.status === "APPROVED" ? [{ type: "FACE_MATCH", score: 0.95, passed: true }] : [];
+    return json(response, 200, checks);
+  }
+  if (url.pathname === "/kyc/submit" && request.method === "POST") {
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    const key = request.headers["x-idempotency-key"];
+    const ids = [payload?.docFrontId, payload?.docBackId, payload?.selfieId, payload?.addressId];
+    if (!key || request.headers["idempotency-key"] || payload?.consent !== true || new Set(ids).size !== 4
+      || ids.some((id, index) => {
+        const upload = onboardingUploads.get(id);
+        return upload?.owner !== user.username || upload.type !== documentTypes[index];
+      })) return json(response, 400, { message: "Invalid verification payload" });
+    if (user.username === "retry-customer") {
+      const attempt = JSON.stringify({ key, payload });
+      if (!retryAttempts.has(user.username)) {
+        retryAttempts.set(user.username, attempt);
+        request.socket.destroy();
+        return;
+      }
+      if (retryAttempts.get(user.username) !== attempt) return json(response, 400, { message: "Different retry payload or key" });
+    }
+    const timedOut = user.username === "timeout-customer";
+    const saved = caseFor(timedOut ? "UNDER_REVIEW" : "PENDING", { ...payload, reviewerNotes: timedOut ? "ml_unavailable" : null });
+    onboardingCases.set(user.username, saved);
+    if (timedOut) {
+      setTimeout(() => {
+        if (!response.destroyed) json(response, 200, { caseId: saved.caseId, status: saved.status });
+      }, 4_000).unref();
+      return;
+    }
+    return json(response, 200, { caseId: saved.caseId, status: saved.status });
+  }
   if (url.pathname === "/kyc/upload" && request.method === "POST") {
     const form = await new Response(await body(request), { headers: { "Content-Type": request.headers["content-type"] } }).formData().catch(() => null);
     const file = form?.get("file");
-    if (!(file instanceof File) || file.type !== "image/png" || form?.get("type") !== "DOC_FRONT" || !kycDocument.equals(Buffer.from(await file.arrayBuffer()))) {
+    const type = form?.get("type");
+    if (!(file instanceof File) || file.type !== "image/png" || !documentTypes.includes(type) || !kycDocument.equals(Buffer.from(await file.arrayBuffer()))) {
       return json(response, 400, { message: "Unexpected KYC upload" });
     }
-    return json(response, 200, { id: documentId });
+    if (user.username === "customer") return json(response, 200, { id: documentId });
+    const id = randomUUID();
+    onboardingUploads.set(id, { owner: user.username, type });
+    return json(response, 200, { id });
   }
   if (url.pathname === `/kyc/file/${documentId}` && request.method === "GET") {
     if (!["CUSTOMER", "ADMIN"].includes(user.role)) return json(response, 403, { message: "Access denied" });
@@ -122,7 +215,10 @@ const server = http.createServer(async (request, response) => {
   }
   if (path === "customers" && request.method === "GET") return json(response, 200, []);
   if (path === "branches" && request.method === "GET") return json(response, 200, []);
-  if (path === "accounts/my" && request.method === "GET") return json(response, 200, [account]);
+  if (path === "accounts/my" && request.method === "GET") {
+    if (user.username === "accounts-error") return json(response, 503, { message: "Accounts service unavailable" });
+    return json(response, 200, user.username === "new-customer" ? [] : [account]);
+  }
   if (path === "accounts/account-1" && request.method === "GET") return json(response, 200, account);
   if (path === "accounts/account-1/transactions" && request.method === "GET") return json(response, 200, []);
   if (path === "transactions/deposit" && request.method === "POST") {

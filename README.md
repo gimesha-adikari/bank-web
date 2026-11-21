@@ -33,6 +33,14 @@ Uploads carry multipart `file` and `type` fields. Core accepts JPEG, PNG, and We
 
 The KYC BFF uses `BANKING_API_TIMEOUT_MS` (15 seconds by default) for reading the request body and contacting core. The browser client also defaults to 15 seconds, and upload and submit accept a `timeoutMs` override. Core can persist a case before its synchronous ML review finishes, and its default ML read timeout is 180 seconds. After an uncertain submit, check `kycApi.me()` before retrying. The typed client supports an optional `X-Idempotency-Key` on submit and returns `null` when the self-case endpoint returns 404.
 
+### Customer onboarding
+
+The customer dashboard redirects to `/customer/onboarding` when bank-core explicitly reports a missing customer record. Account lookup failures and empty account lists are handled independently. The onboarding page reads case status and checks from bank-core and enables customer details only after `APPROVED`. The self-service PUT includes the UUID from `/api/v1/users/me` and the required customer DTO fields. New records use `ACTIVE`, and updates preserve the status returned by bank-core. The server still derives the owner from the authenticated session.
+
+Upload one JPEG, PNG, or WebP image per document type, with a limit of 1 MiB each. The page keeps the draft and its submission key in memory while it is open. If the submission result is uncertain, the page checks for a case before allowing a deliberate retry with the same request and key. Bank-core currently saves the case and its idempotency record separately. Opening a new page loses the in-memory retry details. Use Refresh status to check the latest case before preparing another request.
+
+`NEEDS_MORE_INFO` currently returns the active case from the submit endpoint without replacing documents. The page explains that restriction. A rejected case can start a new verification. Live review depends on bank-core, configured file storage, and either the ML service or a bank reviewer.
+
 ## Development
 
 Copy `.env.example` to `.env.local` and set the server-only backend URL:

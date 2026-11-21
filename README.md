@@ -11,6 +11,8 @@ Production cookies are `__Host-bank-web-auth` and `__Host-bank-web-csrf`; local 
 
 The password-reset page reads the token from the emailed link. It submits the token and new password through the CSRF-protected, URL-encoded POST body. Core checks expiry and prior use when it processes the POST.
 
+After sign-in, bank-web resumes a recognized page only if the user's role can access it. The staff workspace and its account history allow Admin, Manager, and Teller. Staff account opening is Teller-only. Employee and Banned roles land on the public access-denied page. These checks guide browser navigation. Bank-core authorizes every banking request.
+
 Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header. Android remains a direct Bearer client of bank-core.
 
 ## Development

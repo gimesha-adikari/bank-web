@@ -6,6 +6,7 @@ import { authApi } from "@/lib/api/auth";
 import { invalidateCsrfToken, onAuthExpired } from "@/lib/api/http";
 import type { LoginRequest, LoginResponse, Role, UserProfile } from "@/lib/api/contracts";
 import { ApiError } from "@/lib/api/errors";
+import { loginDestination } from "@/lib/auth/navigation";
 
 export type AuthStatus = "booting" | "anonymous" | "authenticated" | "boot-error";
 type AuthContextValue = {
@@ -13,7 +14,7 @@ type AuthContextValue = {
   username: string | null;
   role: Role | null;
   profile: UserProfile | null;
-  signIn: (credentials: LoginRequest) => Promise<LoginResponse>;
+  signIn: (credentials: LoginRequest, returnTo?: string | null) => Promise<LoginResponse>;
   signOut: () => Promise<void>;
   retryBootstrap: () => void;
   setProfile: (profile: UserProfile | null) => void;
@@ -54,14 +55,14 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
     return () => { cancelled = true; };
   }, [bootstrapAttempt, clear]);
 
-  const signIn = useCallback(async (credentials: LoginRequest) => {
+  const signIn = useCallback(async (credentials: LoginRequest, returnTo?: string | null) => {
     const result = await authApi.login(credentials);
     invalidateCsrfToken();
     setUsername(result.username);
     setRole(result.role);
     setProfile(null);
     setStatus("authenticated");
-    router.push(result.role === "ADMIN" ? "/admin" : result.role === "CUSTOMER" ? "/customer" : "/staff");
+    router.replace(loginDestination(result.role, returnTo));
     return result;
   }, [router]);
 

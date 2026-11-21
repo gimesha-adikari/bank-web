@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
+import type { Role } from "@/lib/api/contracts";
 import { ApiError } from "@/lib/api/errors";
 
 const mocks = vi.hoisted(() => ({
@@ -28,22 +29,22 @@ vi.mock("next/navigation", () => ({
 import { AuthProvider, useAuth } from "@/components/auth/AuthProvider";
 import { triggerAuthExpired } from "@/lib/api/http";
 
-function Harness() {
+function Harness({ returnTo }: { returnTo?: string }) {
   const auth = useAuth();
   const [failure, setFailure] = useState<string | null>(null);
   return <div>
     <output data-testid="status">{auth.status}</output>
     <output data-testid="username">{auth.username ?? ""}</output>
     <output data-testid="role">{auth.role ?? ""}</output>
-    <button onClick={() => void auth.signIn({ username: "new-user", password: "secret" })}>Sign in</button>
+    <button onClick={() => void auth.signIn({ username: "new-user", password: "secret" }, returnTo)}>Sign in</button>
     <button onClick={() => void auth.signOut().catch((error) => setFailure(error.message))}>Sign out</button>
     <output data-testid="logout-error">{failure ?? ""}</output>
     <button onClick={auth.retryBootstrap}>Retry session check</button>
   </div>;
 }
 
-function renderAuth() {
-  return render(<AuthProvider><Harness /></AuthProvider>);
+function renderAuth(returnTo?: string) {
+  return render(<AuthProvider><Harness returnTo={returnTo} /></AuthProvider>);
 }
 
 describe("mounted authentication state", () => {
@@ -87,14 +88,32 @@ describe("mounted authentication state", () => {
     expect(screen.getByTestId("username")).toHaveTextContent("");
   });
 
-  it("signs in with identity only and routes by role", async () => {
-    mocks.login.mockResolvedValue({ username: "sam", role: "CUSTOMER" });
-    renderAuth();
+  it.each([
+    { role: "CUSTOMER", expected: "/customer" },
+    { role: "TELLER", expected: "/staff" },
+    { role: "MANAGER", expected: "/staff" },
+    { role: "ADMIN", expected: "/admin" },
+    { role: "EMPLOYEE", returnTo: "/staff", expected: "/unauthorized" },
+    { role: "BANNED", returnTo: "/customer", expected: "/unauthorized" },
+    { role: "CUSTOMER", returnTo: "/customer/accounts?unused=1#section", expected: "/customer/accounts" },
+    { role: "CUSTOMER", returnTo: "/admin", expected: "/customer" },
+    { role: "TELLER", returnTo: "/staff/accounts/new", expected: "/staff/accounts/new" },
+    { role: "TELLER", returnTo: "/accounts/new", expected: "/staff/accounts/new" },
+    { role: "MANAGER", returnTo: "/staff/accounts/new", expected: "/staff" },
+    { role: "ADMIN", returnTo: "/staff/accounts/new", expected: "/admin" },
+    { role: "ADMIN", returnTo: "/staff/accounts/account-1/transactions", expected: "/staff/accounts/account-1/transactions" },
+    { role: "MANAGER", returnTo: "/staff/../admin", expected: "/staff" },
+    { role: "MANAGER", returnTo: "/staff/%2e%2e/admin", expected: "/staff" },
+    { role: "MANAGER", returnTo: "//example.test/staff", expected: "/staff" },
+    { role: "MANAGER", returnTo: "/staff/unknown", expected: "/staff" }
+  ] satisfies { role: Role; returnTo?: string; expected: string }[])("routes $role with returnTo=$returnTo to $expected once", async ({ role, returnTo, expected }) => {
+    mocks.login.mockResolvedValue({ username: "new-user", role });
+    renderAuth(returnTo);
     await waitFor(() => expect(screen.getByTestId("status")).toHaveTextContent("authenticated"));
-    mocks.login.mockResolvedValue({ username: "new-user", role: "CUSTOMER" });
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
     await waitFor(() => expect(screen.getByTestId("username")).toHaveTextContent("new-user"));
-    expect(mocks.push).toHaveBeenCalledWith("/customer");
+    expect(screen.getByTestId("role")).toHaveTextContent(role);
+    expect([...mocks.push.mock.calls, ...mocks.replace.mock.calls]).toEqual([[expected]]);
   });
 
   it("logs out through the cookie-backed API", async () => {

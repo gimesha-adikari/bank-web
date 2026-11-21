@@ -1,4 +1,5 @@
 import { isDecimalString, validateAmount } from "./money";
+import { ApiError } from "@/lib/api/errors";
 
 export const accountOpeningTerms = {
   SAVINGS: { label: "Savings", minimum: "1000" },
@@ -21,4 +22,12 @@ export function validateOpeningDeposit(value: string, type: OpeningAccountType):
   const { minimum } = accountOpeningTerms[type];
   // The backend minimums are whole LKR amounts, so only the whole part is needed here.
   if (BigInt(amount.split(".")[0]) < BigInt(minimum)) return `The minimum opening deposit is ${minimum}.00 LKR.`;
+}
+
+export function isUncertainStaffAccountOpening(error: unknown): error is ApiError {
+  if (!(error instanceof ApiError) || error.authExpired || error.status === 401 || error.status === 403) return false;
+  if (error.kind === "network" || error.kind === "timeout" || error.retryableTransport) return true;
+  if (error.status === 502 && error.code === "BANKING_UPSTREAM_UNAVAILABLE") return true;
+  if (error.status === 504 && error.code === "BANKING_UPSTREAM_TIMEOUT") return true;
+  return error.status >= 500 && !error.code;
 }

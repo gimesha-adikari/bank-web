@@ -12,6 +12,10 @@ const users = [
   ["directory-forbidden", "TELLER", "e2e-directory-forbidden-jwt"],
   ["directory-expired", "TELLER", "e2e-directory-expired-jwt"],
   ["directory-network", "TELLER", "e2e-directory-network-jwt"],
+  ["teller-opening-forbidden", "TELLER", "e2e-teller-opening-forbidden-jwt"],
+  ["teller-opening-expired", "TELLER", "e2e-teller-opening-expired-jwt"],
+  ["teller-opening-timeout", "TELLER", "e2e-teller-opening-timeout-jwt"],
+  ["teller-opening-validation", "TELLER", "e2e-teller-opening-validation-jwt"],
   ...["new-customer", "timeout-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer",
     "opening-approved", "opening-timeout", "opening-network", "opening-branch", "opening-missing", "opening-pending", "opening-auth", "opening-expired",
     "opening-vault", "opening-record-gone", "opening-branches-unavailable", "opening-conflict", "opening-invalid-key",
@@ -35,6 +39,8 @@ const openedAccounts = new Map();
 const accountOpeningClaims = new Map();
 const accountOpeningAttempts = new Map();
 const accountOpeningCreations = new Map();
+const tellerOpeningRequests = [];
+const tellerOpenedAccounts = new Map();
 const openingMinimum = { SAVINGS: 1000n, CHECKING: 0n, FIXED_DEPOSIT: 5000n };
 const branches = [
   { branchId: 21, branchName: "Central Branch", address: "5 Main Street", contactNumber: "0112234567" },
@@ -93,7 +99,8 @@ async function body(request) {
 const server = http.createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", `http://127.0.0.1:${port}`);
   if (url.pathname === "/test/requests" && request.method === "GET") return json(response, 200, {
-    count: requests.length, requests, accountOpeningCreations: Object.fromEntries(accountOpeningCreations)
+    count: requests.length, requests, accountOpeningCreations: Object.fromEntries(accountOpeningCreations),
+    tellerOpeningRequests, tellerOpenedAccountCount: tellerOpenedAccounts.size
   });
   if (url.pathname === "/test/seed-account-opening-conflict" && request.method === "POST") {
     const input = await new Response(await body(request)).json().catch(() => null);
@@ -117,6 +124,8 @@ const server = http.createServer(async (request, response) => {
     correlationId: request.headers["x-correlation-id"] ?? null,
     ...(url.pathname === "/api/v1/accounts" && request.method === "POST"
       ? { idempotencyKey: request.headers["idempotency-key"] ?? null }
+      : /^\/api\/v1\/accounts\/[\da-f-]{36}$/.test(url.pathname) && request.method === "POST"
+        ? { idempotencyKey: request.headers["idempotency-key"] ?? null }
       : {})
   });
   if (url.pathname === "/health") return json(response, 200, { ok: true });
@@ -330,7 +339,47 @@ const server = http.createServer(async (request, response) => {
   }
   if (path === "branches" && request.method === "GET") {
     if (user.username === "opening-branches-unavailable") return json(response, 503, { message: "Branches unavailable" });
-    return json(response, 200, openingCustomer ? branches : []);
+    return json(response, 200, openingCustomer || user.role === "TELLER" ? branches : []);
+  }
+  const tellerOpeningMatch = /^accounts\/([\da-f-]{36})$/.exec(path);
+  if (tellerOpeningMatch && request.method === "POST") {
+    if (user.role !== "TELLER") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "teller-opening-expired") return json(response, 401, { code: "AUTH", message: "Expired" }, { "X-Bank-Auth-Expired": "1" });
+    if (user.username === "teller-opening-forbidden") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    const userId = tellerOpeningMatch[1];
+    tellerOpeningRequests.push({
+      userId, accountType: payload?.accountType ?? null, initialDeposit: payload?.initialDeposit ?? null,
+      branchId: payload?.branchId ?? null, idempotencyKey: request.headers["idempotency-key"] ?? null
+    });
+    const customer = [...customerDirectoryRecords.values()].find((record) => record.userId === userId);
+    if (!customer) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
+    if (user.username === "teller-opening-validation") return json(response, 422, { code: "ERR_MIN_DEPOSIT", message: "Minimum initial deposit for SAVINGS is 1000.00" });
+    const minimums = { SAVINGS: 1000n, CHECKING: 0n, FIXED_DEPOSIT: 5000n };
+    if (!payload || !Object.hasOwn(minimums, payload.accountType) || typeof payload.initialDeposit !== "string"
+      || !/^\d+(?:\.\d+)?$/.test(payload.initialDeposit)) {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid account request" });
+    }
+    if (!Number.isInteger(payload.branchId) || !branches.some((branch) => branch.branchId === payload.branchId)) {
+      return json(response, 404, { code: "ERR_NOT_FOUND", message: "Branch not found" });
+    }
+    const [whole, fraction = ""] = payload.initialDeposit.split(".");
+    if (BigInt(whole) < minimums[payload.accountType]) return json(response, 422, { code: "ERR_MIN_DEPOSIT", message: `Minimum initial deposit for ${payload.accountType}` });
+    if (!/^0+(?:\.0+)?$/.test(payload.initialDeposit) && fraction.length > 2) {
+      return json(response, 422, { code: "ERR_DEPOSIT_INVALID", message: "Initial deposit supports at most two fractional digits" });
+    }
+    const zero = /^0+(?:\.0+)?$/.test(payload.initialDeposit);
+    const account = {
+      accountId: randomUUID(), accountNumber: String(8000000000 + tellerOpenedAccounts.size + 1),
+      accountType: payload.accountType, accountStatus: "ACTIVE",
+      balance: zero ? "0.0000" : `${BigInt(whole)}.${fraction.padEnd(4, "0")}`
+    };
+    tellerOpenedAccounts.set(account.accountId, { account, customer, initialDeposit: payload.initialDeposit });
+    if (user.username === "teller-opening-timeout") {
+      request.socket.destroy();
+      return;
+    }
+    return json(response, 201, account);
   }
   if (path === "accounts" && request.method === "POST") {
     if (user.role !== "CUSTOMER" || user.username === "opening-auth") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
@@ -401,6 +450,12 @@ const server = http.createServer(async (request, response) => {
   if (path === "accounts/account-1/transactions" && request.method === "GET") return json(response, 200, []);
   const accountRead = /^accounts\/([\da-f-]{36})(\/transactions)?$/.exec(path);
   if (accountRead && request.method === "GET") {
+    const tellerOpening = tellerOpenedAccounts.get(accountRead[1]);
+    if (tellerOpening) {
+      if (!accountRead[2]) return json(response, 200, tellerOpening.account);
+      const openingDeposit = { transactionId: "teller-opening-1", type: "DEPOSIT", amount: tellerOpening.initialDeposit, balanceAfter: tellerOpening.account.balance, description: "Opening deposit" };
+      return json(response, 200, /^0+(?:\.0+)?$/.test(tellerOpening.initialDeposit) ? [] : [openingDeposit]);
+    }
     const saved = openedAccounts.get(user.username)?.find(({ accountId }) => accountId === accountRead[1]);
     if (!saved) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Account not found" });
     if (!accountRead[2]) return json(response, 200, saved);

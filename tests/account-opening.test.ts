@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { openingAccountTypes, type OpeningAccountType, validateOpeningDeposit } from "@/lib/finance/account-opening";
+import { openingAccountTypes, isUncertainStaffAccountOpening, type OpeningAccountType, validateOpeningDeposit } from "@/lib/finance/account-opening";
 import { loginDestination } from "@/lib/auth/navigation";
+import { ApiError } from "@/lib/api/errors";
 
 describe("customer account opening", () => {
   it("offers the three account types supported by bank-core", () => {
@@ -34,5 +35,19 @@ describe("customer account opening", () => {
     expect(loginDestination("TELLER", "/customer/accounts/new")).toBe("/staff");
     expect(loginDestination("TELLER", "/staff/accounts/new")).toBe("/staff/accounts/new");
     expect(loginDestination("CUSTOMER", "/staff/accounts/new")).toBe("/customer");
+  });
+
+  it.each([
+    ["network", undefined, 0, true],
+    ["timeout", undefined, 0, true],
+    ["backend", "BANKING_UPSTREAM_UNAVAILABLE", 502, true],
+    ["backend", "BANKING_UPSTREAM_TIMEOUT", 504, true],
+    ["backend", "ERR_BAD_GATEWAY", 502, false],
+    ["backend", "ERR_BACKEND", 504, false],
+    ["backend", "ERR_FORBIDDEN", 403, false],
+    ["backend", "AUTH", 401, false]
+  ] as const)("classifies Teller opening uncertainty by transport evidence (%s, %s, %i)", (kind, code, status, uncertain) => {
+    const failure = new ApiError({ kind, code, status, message: "fixture" });
+    expect(isUncertainStaffAccountOpening(failure)).toBe(uncertain);
   });
 });

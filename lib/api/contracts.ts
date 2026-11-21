@@ -101,3 +101,42 @@ export type FinancialReceipt = {
   replayed?: boolean;
   [key: string]: unknown;
 };
+
+export type KycDocumentType = "DOC_FRONT" | "DOC_BACK" | "SELFIE" | "ADDRESS_PROOF";
+export type KycStatus = "PENDING" | "AUTO_REVIEW" | "UNDER_REVIEW" | "NEEDS_MORE_INFO" | "APPROVED" | "REJECTED" | "SUPERSEDED";
+
+export type KycUploadResponse = { id: string };
+export type KycDocument = { blob: Blob; contentDisposition: string | null };
+export type KycSubmitRequest = {
+  docFrontId: string;
+  docBackId: string;
+  selfieId: string;
+  addressId: string;
+  consent: boolean;
+};
+export type KycSubmitResponse = { caseId: string; status: KycStatus };
+export type KycCase = KycSubmitResponse & {
+  docFrontId: string;
+  docBackId: string;
+  selfieId: string;
+  addressId: string;
+  decisionReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+  reviewerId: string | null;
+  decidedAt: string | null;
+  reviewerNotes: string | null;
+};
+export type KycCheck = { type: string; score: number | null; passed: boolean | null };
+export type KycAdminCheck = KycCheck & {
+  id: string;
+  caseId: string;
+  detailsJson: string | null;
+  createdAt: string;
+};
+export type KycReviewQuery = { status?: KycStatus; page?: number; size?: number };
+export type KycReviewPage = { page: number; size: number; total: number | string; content: KycCase[] };
+export type KycDecisionRequest = {
+  decision: Extract<KycStatus, "APPROVED" | "REJECTED" | "NEEDS_MORE_INFO">;
+  reason?: string | null;
+};

@@ -15,6 +15,14 @@ After sign-in, bank-web resumes a recognized page only if the user's role can ac
 
 Financial amounts remain decimal strings and deposit, withdrawal, and transfer requests use one client-generated `Idempotency-Key` per logical operation. Reversal sends `{ reason }` and no idempotency header. Android remains a direct Bearer client of bank-core.
 
+### KYC transport
+
+The browser uses `/api/kyc` for upload, protected files, submission, and case reads, and `/api/admin/kyc` for review. The BFF maps these specific operations to bank-core's unversioned `/kyc` and `/admin/kyc` paths, preserving any deployment prefix before `/api/v1` in `BANKING_API_BASE_URL`. Core enforces case ownership and Admin access. Protected file responses are non-cacheable.
+
+Uploads carry multipart `file` and `type` fields. Core accepts JPEG, PNG, and WebP for `DOC_FRONT`, `DOC_BACK`, `SELFIE`, and `ADDRESS_PROOF`. The BFF preserves the browser's boundary and bytes and caps the total KYC request body at 11 MiB. The checked-in bank-core configuration uses Spring Boot 3.4.8 defaults of **1 MiB per file and 10 MiB per multipart request**. These limits apply before the controller's 10 MiB file check. Confirm deployment overrides and ingress limits before offering larger uploads.
+
+The KYC BFF uses `BANKING_API_TIMEOUT_MS` (15 seconds by default) for reading the request body and contacting core. The browser client also defaults to 15 seconds, and upload and submit accept a `timeoutMs` override. Core can persist a case before its synchronous ML review finishes, and its default ML read timeout is 180 seconds. After an uncertain submit, check `kycApi.me()` before retrying. The typed client supports an optional `X-Idempotency-Key` on submit and returns `null` when the self-case endpoint returns 404.
+
 ## Development
 
 Copy `.env.example` to `.env.local` and set the server-only backend URL:

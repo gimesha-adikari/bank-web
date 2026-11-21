@@ -173,7 +173,7 @@ async function headersFor(options: RequestOptions, method: string, signal: Abort
   return headers;
 }
 
-export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(path: string, options: RequestOptions, readSuccess: (response: Response) => Promise<T>): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   const method = (options.method ?? "GET").toUpperCase();
@@ -181,9 +181,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     const headers = await headersFor(options, method, controller.signal);
     if (controller.signal.aborted) throw abortError();
     const response = await fetch(path, { ...options, method, headers, body: requestBody(options), signal: controller.signal, credentials: "same-origin" });
+    if (response.ok) return await readSuccess(response);
     const authExpired = response.headers.get("X-Bank-Auth-Expired") === "1";
     const parsed = await readResponse(response);
-    if (response.ok) return parsed as T;
     if (authExpired) {
       triggerAuthExpired();
     }
@@ -196,6 +196,17 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  return request(path, options, (response) => readResponse(response) as Promise<T>);
+}
+
+export function apiGetBinary(path: string): Promise<{ blob: Blob; contentDisposition: string | null }> {
+  return request(path, { method: "GET", headers: { Accept: "image/*, application/octet-stream, application/json" } }, async (response) => ({
+    blob: await response.blob(),
+    contentDisposition: response.headers.get("content-disposition")
+  }));
 }
 
 export function apiGet<T>(path: string, options: Omit<RequestOptions, "method" | "body"> = {}): Promise<T> {

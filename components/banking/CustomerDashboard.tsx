@@ -10,7 +10,7 @@ import { customersApi } from "@/lib/api/customers";
 import { kycApi } from "@/lib/api/kyc";
 import { ApiError } from "@/lib/api/errors";
 import type { Account, Customer, KycStatus } from "@/lib/api/contracts";
-import { CUSTOMER_ONBOARDING } from "@/lib/auth/navigation";
+import { CUSTOMER_ACCOUNT_OPENING, CUSTOMER_ONBOARDING } from "@/lib/auth/navigation";
 import { AccountSummary } from "./AccountSummary";
 
 export function CustomerDashboard() {
@@ -75,8 +75,9 @@ export function CustomerDashboard() {
           {hasRecord && kycStatus === "APPROVED" && <p className="mt-2 muted">Opening an account is your next step.</p>}
           {hasRecord && kycStatus === undefined && !kycError && <p className="mt-2 muted" role="status">Checking your verification status…</p>}
           {hasRecord && kycError && <p className="mt-2 muted">We could not load your verification status.</p>}
-          {hasRecord && <Link href={CUSTOMER_ONBOARDING} className="button secondary mt-4">
-            {kycStatus !== undefined && kycStatus !== "APPROVED" ? "Continue onboarding" : "View onboarding"}
+          {hasRecord && kycStatus === "APPROVED" && <Link href={CUSTOMER_ACCOUNT_OPENING} className="button mt-4">Open an account</Link>}
+          {hasRecord && kycStatus !== "APPROVED" && <Link href={CUSTOMER_ONBOARDING} className="button secondary mt-4">
+            {kycStatus !== undefined ? "Continue onboarding" : "View onboarding"}
           </Link>}
         </div>}
         {hasRecord && !hasNoAccounts && <Link href={CUSTOMER_ONBOARDING} className="w-fit text-sm font-bold text-teal-700">View onboarding</Link>}

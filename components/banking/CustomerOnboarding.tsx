@@ -7,6 +7,7 @@ import type { Customer, KycCase, KycCheck, KycDocumentType, KycStatus, KycSubmit
 import { customersApi } from "@/lib/api/customers";
 import { ApiError } from "@/lib/api/errors";
 import { kycApi } from "@/lib/api/kyc";
+import { CUSTOMER_ACCOUNT_OPENING } from "@/lib/auth/navigation";
 import { CustomerRecordForm } from "./CustomerRecordForm";
 import { KycDocumentUpload } from "./KycDocumentUpload";
 
@@ -270,7 +271,10 @@ export function CustomerOnboarding() {
         {completed && <section className="card grid gap-3">
           <h2 className="text-xl font-black">Onboarding complete</h2>
           <p className="muted">Your verification is approved and your customer record is on file.</p>
-          <Link href="/customer" className="button w-fit">Go to dashboard</Link>
+          <div className="flex flex-wrap gap-3">
+            <Link href={CUSTOMER_ACCOUNT_OPENING} className="button">Open an account</Link>
+            <Link href="/customer" className="button ghost">Go to dashboard</Link>
+          </div>
         </section>}
       </div>
     </>

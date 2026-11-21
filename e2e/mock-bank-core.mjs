@@ -9,7 +9,9 @@ const users = [
   ["admin", "ADMIN", "e2e-admin-jwt"],
   ["employee", "EMPLOYEE", "e2e-employee-jwt"],
   ["banned", "BANNED", "e2e-banned-jwt"],
-  ...["new-customer", "timeout-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer"]
+  ...["new-customer", "timeout-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer",
+    "opening-approved", "opening-timeout", "opening-network", "opening-branch", "opening-missing", "opening-pending", "opening-auth", "opening-expired",
+    "opening-vault", "opening-record-gone", "opening-branches-unavailable"]
     .map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`])
 ].map(([username, role, token]) => ({ username, role, token }));
 const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
@@ -23,6 +25,12 @@ const onboardingUploads = new Map();
 const onboardingCases = new Map();
 const customerRecords = new Map();
 const retryAttempts = new Map();
+const openedAccounts = new Map();
+const openingMinimum = { SAVINGS: 1000n, CHECKING: 0n, FIXED_DEPOSIT: 5000n };
+const branches = [
+  { branchId: 21, branchName: "Central Branch", address: "5 Main Street", contactNumber: "0112234567" },
+  { branchId: 2147483647, branchName: "Harbour Branch", address: "12 Harbour Road" }
+];
 
 function json(response, status, value, headers = {}) {
   response.writeHead(status, { "Content-Type": "application/json", ...headers });
@@ -105,6 +113,7 @@ const server = http.createServer(async (request, response) => {
   }
   if (path === "auth/available" && request.method === "GET") return json(response, 200, "Username available");
   const user = authenticatedUser(request);
+  const openingCustomer = user?.username.startsWith("opening-");
   if (path === "auth/logout" && request.method === "POST") {
     if (!user) return json(response, 401, { code: "AUTH", message: "Expired" });
     await body(request);
@@ -126,7 +135,7 @@ const server = http.createServer(async (request, response) => {
     if (user.username === "lookup-error") return json(response, 503, { message: "Service unavailable" });
     const existing = customerRecords.get(user.username);
     if (existing) return json(response, 200, existing);
-    if (["customer", "accounts-error"].includes(user.username)) {
+    if (["customer", "accounts-error"].includes(user.username) || (openingCustomer && user.username !== "opening-missing")) {
       return json(response, 200, { ...profileFor(user), customerId: "existing-customer", status: "ACTIVE" });
     }
     return json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
@@ -149,6 +158,7 @@ const server = http.createServer(async (request, response) => {
     if (!onboardingCases.has(user.username)) {
       if (user.username === "info-customer") onboardingCases.set(user.username, caseFor("NEEDS_MORE_INFO", { decisionReason: "Please clarify your address." }));
       if (user.username === "rejected-customer") onboardingCases.set(user.username, caseFor("REJECTED", { decisionReason: "Document could not be verified." }));
+      if (openingCustomer) onboardingCases.set(user.username, caseFor(user.username === "opening-pending" ? "UNDER_REVIEW" : "APPROVED"));
     }
     const latest = onboardingCases.get(user.username);
     if (!latest) return json(response, 404, { status: 404, error: "Not Found" });
@@ -214,13 +224,61 @@ const server = http.createServer(async (request, response) => {
       : json(response, 403, { message: "Access denied" });
   }
   if (path === "customers" && request.method === "GET") return json(response, 200, []);
-  if (path === "branches" && request.method === "GET") return json(response, 200, []);
+  if (path === "branches" && request.method === "GET") {
+    if (user.username === "opening-branches-unavailable") return json(response, 503, { message: "Branches unavailable" });
+    return json(response, 200, openingCustomer ? branches : []);
+  }
+  if (path === "accounts" && request.method === "POST") {
+    if (user.role !== "CUSTOMER" || user.username === "opening-auth") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "opening-expired") return json(response, 401, { code: "AUTH", message: "Expired" });
+    if (["opening-record-gone", "opening-missing"].includes(user.username)) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    if (!payload || !Object.hasOwn(openingMinimum, payload.accountType) || typeof payload.initialDeposit !== "string"
+      || !/^\d+(\.\d+)?$/.test(payload.initialDeposit) || request.headers["idempotency-key"]) {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid account request" });
+    }
+    if (!branches.some(({ branchId }) => branchId === payload.branchId)
+      || (user.username === "opening-branch" && payload.branchId === branches[1].branchId)) {
+      return json(response, 404, { code: "ERR_NOT_FOUND", message: "Branch not found" });
+    }
+    const [whole, fraction = ""] = payload.initialDeposit.split(".");
+    if (BigInt(whole) < openingMinimum[payload.accountType]) return json(response, 422, { code: "ERR_MIN_DEPOSIT", message: "Opening deposit below minimum" });
+    const zero = /^0+(\.0+)?$/.test(payload.initialDeposit);
+    if (!zero && fraction.length > 2) return json(response, 422, { code: "ERR_DEPOSIT_INVALID", message: "Too many fractional digits" });
+    if (user.username === "opening-vault") return json(response, 422, { code: "ERR_VAULT_ACCOUNT_NOT_FOUND", message: "Missing internal ledger fixture" });
+    if (user.username === "opening-network") {
+      request.socket.destroy();
+      return;
+    }
+    const previous = openedAccounts.get(user.username) ?? [];
+    const saved = {
+      accountId: randomUUID(), accountNumber: String(1000000000 + users.indexOf(user) * 10 + previous.length),
+      accountType: payload.accountType, accountStatus: "ACTIVE", balance: zero ? "0.0000" : `${BigInt(whole)}.${fraction.padEnd(4, "0")}`
+    };
+    openedAccounts.set(user.username, [...previous, saved]);
+    if (user.username === "opening-timeout") {
+      setTimeout(() => {
+        if (!response.destroyed) json(response, 201, saved);
+      }, 4_000).unref();
+      return;
+    }
+    return json(response, 201, saved);
+  }
   if (path === "accounts/my" && request.method === "GET") {
     if (user.username === "accounts-error") return json(response, 503, { message: "Accounts service unavailable" });
+    if (openingCustomer) return json(response, 200, openedAccounts.get(user.username) ?? []);
     return json(response, 200, user.username === "new-customer" ? [] : [account]);
   }
   if (path === "accounts/account-1" && request.method === "GET") return json(response, 200, account);
   if (path === "accounts/account-1/transactions" && request.method === "GET") return json(response, 200, []);
+  const accountRead = /^accounts\/([\da-f-]{36})(\/transactions)?$/.exec(path);
+  if (accountRead && request.method === "GET") {
+    const saved = openedAccounts.get(user.username)?.find(({ accountId }) => accountId === accountRead[1]);
+    if (!saved) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Account not found" });
+    if (!accountRead[2]) return json(response, 200, saved);
+    const openingDeposit = { transactionId: "opening-1", type: "DEPOSIT", amount: saved.balance, balanceAfter: saved.balance, description: "Opening deposit" };
+    return json(response, 200, saved.balance === "0.0000" ? [] : [openingDeposit]);
+  }
   if (path === "transactions/deposit" && request.method === "POST") {
     let amount;
     try {

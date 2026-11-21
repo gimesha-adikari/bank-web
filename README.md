@@ -41,6 +41,12 @@ Upload one JPEG, PNG, or WebP image per document type, with a limit of 1 MiB eac
 
 `NEEDS_MORE_INFO` currently returns the active case from the submit endpoint without replacing documents. The page explains that restriction. A rejected case can start a new verification. Live review depends on bank-core, configured file storage, and either the ML service or a bank reviewer.
 
+### Customer account opening
+
+The web form requires an existing customer record and approved KYC. Bank-core's customer endpoint requires the CUSTOMER role and checks the customer record, branch, account type, and deposit. The three opening minimums are 1,000.00 LKR for savings, 0.00 LKR for checking, and 5,000.00 LKR for fixed deposit. The form submits decimal text and the selected integer branch ID. Bank-core posts funded openings through its configured LKR system vault.
+
+The account-opening endpoint has no client idempotency key. After an uncertain result the page reloads the account list and offers read-only refreshes. An empty list can precede completion of the original request. Check the bank-core account list before initiating another opening. Confirmed openings show the server's opening balance and refresh the account by ID.
+
 ## Development
 
 Copy `.env.example` to `.env.local` and set the server-only backend URL:

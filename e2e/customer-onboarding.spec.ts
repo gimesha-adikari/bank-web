@@ -80,6 +80,7 @@ test("a new customer verifies four documents, sees approval, and completes their
   await save.click();
   await expect(page.getByText("Customer details saved.")).toBeVisible();
   await expect(page.getByText("Onboarding complete", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open an account", exact: true })).toHaveAttribute("href", "/customer/accounts/new");
   await expect.poll(() => upstreamCalls(request, "/api/v1/customers/me", "GET")).toBe(recordReads + 1);
   await expect(save).toBeEnabled();
   await page.getByLabel("Phone", { exact: true }).fill("0712345679");
@@ -91,6 +92,7 @@ test("a new customer verifies four documents, sees approval, and completes their
   await page.getByRole("link", { name: "Go to dashboard" }).click();
   await expect(page).toHaveURL(/\/customer$/);
   await expect(page.getByText("Opening an account is your next step.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open an account", exact: true })).toHaveAttribute("href", "/customer/accounts/new");
 });
 
 test("a timeout checks for a persisted case without submitting again", async ({ page, request }) => {

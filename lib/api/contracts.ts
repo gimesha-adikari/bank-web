@@ -45,7 +45,13 @@ export type Account = {
 };
 export type AccountRequest = { accountType: AccountType; initialDeposit: string; branchId: number };
 
-export type Branch = { branchId: number; branchName: string; [key: string]: unknown };
+export type Branch = {
+  branchId: number;
+  branchName: string;
+  address?: string;
+  contactNumber?: string | null;
+  [key: string]: unknown;
+};
 export type CustomerGender = "MALE" | "FEMALE" | "OTHER";
 export type CustomerStatus = "ACTIVE" | "INACTIVE" | "PENDING" | "RESIGNED";
 export type Customer = {

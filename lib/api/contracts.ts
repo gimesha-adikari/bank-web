@@ -44,6 +44,16 @@ export type Account = {
   updatedAt?: string;
 };
 export type AccountRequest = { accountType: AccountType; initialDeposit: string; branchId: number };
+export type AccountTransactionType = "DEPOSIT" | "WITHDRAWAL" | "TRANSFER_IN" | "TRANSFER_OUT";
+export type AccountTransaction = {
+  transactionId: string;
+  accountId: string;
+  type: AccountTransactionType;
+  amount: string;
+  balanceAfter: string;
+  description: string | null;
+  createdAt: string;
+};
 
 export type Branch = {
   branchId: number;

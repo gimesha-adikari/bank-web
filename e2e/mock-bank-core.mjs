@@ -12,6 +12,8 @@ const users = [
   ["directory-forbidden", "TELLER", "e2e-directory-forbidden-jwt"],
   ["directory-expired", "TELLER", "e2e-directory-expired-jwt"],
   ["directory-network", "TELLER", "e2e-directory-network-jwt"],
+  ...["account-directory-forbidden", "account-directory-expired", "account-directory-network", "account-update-forbidden", "account-update-conflict", "account-update-validation", "account-update-timeout", "account-close-forbidden", "account-close-conflict", "account-close-timeout"]
+    .map((username) => [username, "TELLER", `e2e-${username}-jwt`]),
   ["teller-opening-forbidden", "TELLER", "e2e-teller-opening-forbidden-jwt"],
   ["teller-opening-expired", "TELLER", "e2e-teller-opening-expired-jwt"],
   ["teller-opening-timeout", "TELLER", "e2e-teller-opening-timeout-jwt"],
@@ -41,6 +43,18 @@ const accountOpeningAttempts = new Map();
 const accountOpeningCreations = new Map();
 const tellerOpeningRequests = [];
 const tellerOpenedAccounts = new Map();
+const staffAccountRecords = new Map([
+  ["40000000-0000-4000-8000-000000000001", { accountId: "40000000-0000-4000-8000-000000000001", accountNumber: "1000000001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "1250.1234", createdAt: "2026-01-02T03:04:05", updatedAt: "2026-01-03T04:05:06" }],
+  ["40000000-0000-4000-8000-000000000002", { accountId: "40000000-0000-4000-8000-000000000002", accountNumber: "1000000002", accountType: "CHECKING", accountStatus: "ACTIVE", balance: "50.5000", createdAt: "2026-01-04T03:04:05", updatedAt: "2026-01-04T03:04:05" }],
+  ["40000000-0000-4000-8000-000000000003", { accountId: "40000000-0000-4000-8000-000000000003", accountNumber: "1000000003", accountType: "FIXED_DEPOSIT", accountStatus: "CLOSED", balance: "0.0000", createdAt: "2026-01-05T03:04:05", updatedAt: "2026-01-06T03:04:05" }]
+]);
+const staffAccountHistories = new Map([
+  ["40000000-0000-4000-8000-000000000001", [{ transactionId: "50000000-0000-4000-8000-000000000001", accountId: "40000000-0000-4000-8000-000000000001", type: "TRANSFER_OUT", amount: "15.2300", balanceAfter: "1250.1234", description: "Sample account transfer", createdAt: "2026-01-07T08:09:10" }]],
+  ["40000000-0000-4000-8000-000000000002", []],
+  ["40000000-0000-4000-8000-000000000003", []]
+]);
+const staffAccountUpdates = [];
+const staffAccountClosures = [];
 const openingMinimum = { SAVINGS: 1000n, CHECKING: 0n, FIXED_DEPOSIT: 5000n };
 const branches = [
   { branchId: 21, branchName: "Central Branch", address: "5 Main Street", contactNumber: "0112234567" },
@@ -100,7 +114,8 @@ const server = http.createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", `http://127.0.0.1:${port}`);
   if (url.pathname === "/test/requests" && request.method === "GET") return json(response, 200, {
     count: requests.length, requests, accountOpeningCreations: Object.fromEntries(accountOpeningCreations),
-    tellerOpeningRequests, tellerOpenedAccountCount: tellerOpenedAccounts.size
+    tellerOpeningRequests, tellerOpenedAccountCount: tellerOpenedAccounts.size,
+    staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords)
   });
   if (url.pathname === "/test/seed-account-opening-conflict" && request.method === "POST") {
     const input = await new Response(await body(request)).json().catch(() => null);
@@ -339,7 +354,7 @@ const server = http.createServer(async (request, response) => {
   }
   if (path === "branches" && request.method === "GET") {
     if (user.username === "opening-branches-unavailable") return json(response, 503, { message: "Branches unavailable" });
-    return json(response, 200, openingCustomer || user.role === "TELLER" ? branches : []);
+    return json(response, 200, branches);
   }
   const tellerOpeningMatch = /^accounts\/([\da-f-]{36})$/.exec(path);
   if (tellerOpeningMatch && request.method === "POST") {
@@ -380,6 +395,62 @@ const server = http.createServer(async (request, response) => {
       return;
     }
     return json(response, 201, account);
+  }
+  if (path === "accounts" && request.method === "GET") {
+    if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "account-directory-expired") return json(response, 401, { code: "AUTH", message: "Expired" }, { "X-Bank-Auth-Expired": "1" });
+    if (user.username === "account-directory-forbidden") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "account-directory-network") {
+      request.socket.destroy();
+      return;
+    }
+    return json(response, 200, [...staffAccountRecords.values()]);
+  }
+  const staffAccountPath = /^accounts\/([\da-f-]{36})(\/transactions)?$/.exec(path);
+  const staffAccountId = staffAccountPath?.[1];
+  if (staffAccountId && request.method === "GET" && staffAccountRecords.has(staffAccountId)) {
+    if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    return staffAccountPath[2]
+      ? json(response, 200, staffAccountHistories.get(staffAccountId) ?? [])
+      : json(response, 200, staffAccountRecords.get(staffAccountId));
+  }
+  if (staffAccountId && !staffAccountPath[2] && request.method === "PUT") {
+    if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "account-update-forbidden") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "account-update-conflict") return json(response, 409, { code: "ERR_CONFLICT", message: "Account changed" });
+    if (user.username === "account-update-validation") return json(response, 422, { code: "ERR_VALIDATION", message: "Invalid account update", errors: { branchId: "Unknown branch" } });
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    const current = staffAccountRecords.get(staffAccountId);
+    if (!current) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Account not found" });
+    const accountTypes = ["SAVINGS", "CHECKING", "FIXED_DEPOSIT"];
+    const validAmount = typeof payload?.initialDeposit === "string" && /^\d+(?:\.\d+)?$/.test(payload.initialDeposit);
+    if (!payload || !accountTypes.includes(payload.accountType) || !validAmount || !Number.isInteger(payload.branchId)
+      || !branches.some((branch) => branch.branchId === payload.branchId)) {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid account update" });
+    }
+    staffAccountUpdates.push({ accountId: staffAccountId, accountType: payload.accountType, initialDeposit: payload.initialDeposit, branchId: payload.branchId, idempotencyKey: request.headers["idempotency-key"] ?? null });
+    const updated = { ...current, accountType: payload.accountType, updatedAt: "2026-02-01T00:00:00" };
+    staffAccountRecords.set(staffAccountId, updated);
+    if (user.username === "account-update-timeout") {
+      request.socket.destroy();
+      return;
+    }
+    return json(response, 200, updated);
+  }
+  if (staffAccountId && !staffAccountPath[2] && request.method === "DELETE") {
+    if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "account-close-forbidden") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (user.username === "account-close-conflict") return json(response, 409, { code: "ERR_CONFLICT", message: "Account changed" });
+    const current = staffAccountRecords.get(staffAccountId);
+    if (!current) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Account not found" });
+    staffAccountClosures.push({ accountId: staffAccountId, balanceBefore: current.balance });
+    staffAccountRecords.set(staffAccountId, { ...current, accountStatus: "CLOSED", updatedAt: "2026-02-02T00:00:00" });
+    if (user.username === "account-close-timeout") {
+      request.socket.destroy();
+      return;
+    }
+    response.writeHead(204);
+    return response.end();
   }
   if (path === "accounts" && request.method === "POST") {
     if (user.role !== "CUSTOMER" || user.username === "opening-auth") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
@@ -453,13 +524,13 @@ const server = http.createServer(async (request, response) => {
     const tellerOpening = tellerOpenedAccounts.get(accountRead[1]);
     if (tellerOpening) {
       if (!accountRead[2]) return json(response, 200, tellerOpening.account);
-      const openingDeposit = { transactionId: "teller-opening-1", type: "DEPOSIT", amount: tellerOpening.initialDeposit, balanceAfter: tellerOpening.account.balance, description: "Opening deposit" };
+      const openingDeposit = { transactionId: "50000000-0000-4000-8000-000000000011", accountId: tellerOpening.account.accountId, type: "DEPOSIT", amount: tellerOpening.initialDeposit, balanceAfter: tellerOpening.account.balance, description: "Opening deposit", createdAt: "2026-01-08T09:10:11" };
       return json(response, 200, /^0+(?:\.0+)?$/.test(tellerOpening.initialDeposit) ? [] : [openingDeposit]);
     }
     const saved = openedAccounts.get(user.username)?.find(({ accountId }) => accountId === accountRead[1]);
     if (!saved) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Account not found" });
     if (!accountRead[2]) return json(response, 200, saved);
-    const openingDeposit = { transactionId: "opening-1", type: "DEPOSIT", amount: saved.balance, balanceAfter: saved.balance, description: "Opening deposit" };
+    const openingDeposit = { transactionId: "50000000-0000-4000-8000-000000000012", accountId: saved.accountId, type: "DEPOSIT", amount: saved.balance, balanceAfter: saved.balance, description: "Opening deposit", createdAt: "2026-01-08T09:10:11" };
     return json(response, 200, saved.balance === "0.0000" ? [] : [openingDeposit]);
   }
   if (path === "transactions/deposit" && request.method === "POST") {

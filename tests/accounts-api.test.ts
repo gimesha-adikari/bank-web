@@ -8,7 +8,7 @@ const account = {
   accountStatus: "ACTIVE", balance: "1000.0500"
 };
 
-describe("customer account-opening API", () => {
+describe("accounts API", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     invalidateCsrfToken();
@@ -34,5 +34,55 @@ describe("customer account-opening API", () => {
       '{"accountType":"SAVINGS","initialDeposit":"1000.05","branchId":21}'
     );
     expect(headers.get("X-CSRF-Token")).toBe(csrf);
+  });
+
+  it("loads the unpaginated staff directory and account-scoped history from their exact endpoints", async () => {
+    const transactions = [{
+      transactionId: "50000000-0000-4000-8000-000000000001", accountId: account.accountId,
+      type: "TRANSFER_OUT", amount: "15.2300", balanceAfter: "984.8200", description: "Transfer", createdAt: "2026-01-02T03:04:05"
+    }];
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(Response.json([account]))
+      .mockResolvedValueOnce(Response.json(account))
+      .mockResolvedValueOnce(Response.json(transactions));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(accountsApi.listStaffAccounts()).resolves.toEqual([account]);
+    await expect(accountsApi.byId(account.accountId)).resolves.toEqual(account);
+    await expect(accountsApi.history(account.accountId)).resolves.toEqual(transactions);
+
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "/api/v1/accounts",
+      "/api/v1/accounts/account-1",
+      "/api/v1/accounts/account-1/transactions"
+    ]);
+  });
+
+  it("updates accounts with the exact DTO and CSRF, then closes with a CSRF-protected DELETE", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(Response.json({ token: csrf }))
+      .mockResolvedValueOnce(Response.json(account))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const update = { accountType: "FIXED_DEPOSIT", initialDeposit: "1000.0500", branchId: 22 } as const;
+
+    await expect(accountsApi.update(account.accountId, update)).resolves.toEqual(account);
+    await expect(accountsApi.close(account.accountId)).resolves.toBeUndefined();
+
+    const [, putOptions] = fetchMock.mock.calls[1] as [string, RequestInit];
+    const [, deleteOptions] = fetchMock.mock.calls[2] as [string, RequestInit];
+    expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/v1/accounts/account-1");
+    expect(putOptions.method).toBe("PUT");
+    expect(JSON.parse(String(putOptions.body))).toEqual(update);
+    expect(new Headers(putOptions.headers).get("X-CSRF-Token")).toBe(csrf);
+    expect(fetchMock.mock.calls[2]?.[0]).toBe("/api/v1/accounts/account-1");
+    expect(deleteOptions.method).toBe("DELETE");
+    expect(new Headers(deleteOptions.headers).get("X-CSRF-Token")).toBe(csrf);
+    expect(deleteOptions.body).toBeUndefined();
+  });
+
+  it.each([401, 403, 404, 409, 422, 502, 504])("preserves backend status %i for account management", async (status) => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(Response.json({ code: "ERR_BACKEND" }, { status })));
+    await expect(accountsApi.byId(account.accountId)).rejects.toMatchObject({ status });
   });
 });

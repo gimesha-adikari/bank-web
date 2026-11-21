@@ -1,11 +1,14 @@
 import { apiGet, apiJson } from "./http";
-import type { Account, AccountRequest, Branch, Customer } from "./contracts";
+import type { Account, AccountRequest, AccountTransaction, Branch, Customer } from "./contracts";
 
 export const accountsApi = {
   mine: () => apiGet<Account[]>("/api/v1/accounts/my"),
+  listStaffAccounts: () => apiGet<Account[]>("/api/v1/accounts"),
   byId: (accountId: string) => apiGet<Account>(`/api/v1/accounts/${encodeURIComponent(accountId)}`),
-  history: (accountId: string) => apiGet<unknown[]>(`/api/v1/accounts/${encodeURIComponent(accountId)}/transactions`),
+  history: (accountId: string) => apiGet<AccountTransaction[]>(`/api/v1/accounts/${encodeURIComponent(accountId)}/transactions`),
   branches: () => apiGet<Branch[]>("/api/v1/branches?page=1&limit=100"),
+  update: (accountId: string, body: AccountRequest) => apiJson<Account>(`/api/v1/accounts/${encodeURIComponent(accountId)}`, "PUT", body),
+  close: (accountId: string) => apiJson<void>(`/api/v1/accounts/${encodeURIComponent(accountId)}`, "DELETE"),
   createCustomerAccount: (body: AccountRequest, idempotencyKey: string) => apiJson<Account>("/api/v1/accounts", "POST", body, {
     headers: { "Idempotency-Key": idempotencyKey }
   }),

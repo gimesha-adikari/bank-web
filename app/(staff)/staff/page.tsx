@@ -10,6 +10,11 @@ export default function StaffPage() {
   return <>
     <SectionHeading eyebrow="Staff workspace" title="Operational banking" />
     <div className="grid gap-4 md:grid-cols-2">
+      <div className="card">
+        <h2 className="text-xl font-black">Account management</h2>
+        <p className="mt-2 muted">Browse account records, inspect account details, update supported fields, close accounts and review account-scoped history.</p>
+        <Link href="/staff/accounts" className="button secondary mt-5">Browse accounts</Link>
+      </div>
       {allowsRole(role, PAGE_ROLES.teller) && <div className="card">
         <h2 className="text-xl font-black">Account opening</h2>
         <p className="mt-2 muted">Open an account through the server-authorized teller flow.</p>

@@ -9,10 +9,14 @@ const users = [
   ["admin", "ADMIN", "e2e-admin-jwt"],
   ["employee", "EMPLOYEE", "e2e-employee-jwt"],
   ["banned", "BANNED", "e2e-banned-jwt"],
+  ["directory-forbidden", "TELLER", "e2e-directory-forbidden-jwt"],
+  ["directory-expired", "TELLER", "e2e-directory-expired-jwt"],
+  ["directory-network", "TELLER", "e2e-directory-network-jwt"],
   ...["new-customer", "timeout-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer",
     "opening-approved", "opening-timeout", "opening-network", "opening-branch", "opening-missing", "opening-pending", "opening-auth", "opening-expired",
     "opening-vault", "opening-record-gone", "opening-branches-unavailable", "opening-conflict", "opening-invalid-key",
-    "opening-kyc-rejected", "opening-network-validation"]
+    "opening-kyc-rejected", "opening-network-validation", "directory-linked", "directory-new", "directory-missing",
+    "directory-conflict", "directory-invalid"]
     .map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`])
 ].map(([username, role, token]) => ({ username, role, token }));
 const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
@@ -25,6 +29,7 @@ const documentTypes = ["DOC_FRONT", "DOC_BACK", "SELFIE", "ADDRESS_PROOF"];
 const onboardingUploads = new Map();
 const onboardingCases = new Map();
 const customerRecords = new Map();
+const customerDirectoryRecords = new Map();
 const retryAttempts = new Map();
 const openedAccounts = new Map();
 const accountOpeningClaims = new Map();
@@ -46,11 +51,34 @@ function authenticatedUser(request) {
 }
 
 function profileFor(user) {
-  return {
+  const profile = {
     userId: `0ce3cd10-6395-4acd-9a40-${String(users.indexOf(user) + 1).padStart(12, "0")}`,
     username: user.username, firstName: "Test", lastName: "", email: `${user.username}@example.test`, roleName: user.role
   };
+  if (user.username === "directory-linked") return { ...profile, firstName: "Ava", lastName: "Martin", email: "ava.martin@example.test", address: "10 Sample Road" };
+  if (user.username === "directory-new") return { ...profile, firstName: "Grace", lastName: "Hopper", email: "grace.hopper@example.test", address: "20 Synthetic Street" };
+  if (user.username === "directory-missing") return { ...profile, firstName: "Vanishing", lastName: "Identity", email: "vanishing@example.test" };
+  if (user.username === "directory-conflict") return { ...profile, firstName: "Duplicate", lastName: "Identity", email: "duplicate@example.test" };
+  if (user.username === "directory-invalid") return { ...profile, firstName: "Invalid", lastName: "Details", email: "invalid.details@example.test" };
+  return profile;
 }
+
+function initialDirectoryCustomer(username, customerId) {
+  const user = users.find((candidate) => candidate.username === username);
+  const profile = profileFor(user);
+  return {
+    customerId, userId: profile.userId, username: user.username, firstName: profile.firstName, lastName: profile.lastName,
+    gender: "OTHER", email: profile.email, phone: "0711111111", address: profile.address ?? "",
+    dateOfBirth: "1990-02-03", status: "ACTIVE", createdAt: "2026-01-01T00:00:00"
+  };
+}
+
+customerDirectoryRecords.set("directory-linked", initialDirectoryCustomer("directory-linked", "30000000-0000-4000-8000-000000000001"));
+customerDirectoryRecords.set("directory-other", {
+  customerId: "30000000-0000-4000-8000-000000000002", userId: null, username: null, firstName: "Morgan", lastName: "Reed",
+  gender: "FEMALE", email: "morgan.reed@example.test", phone: "0722222222", address: "30 Example Lane",
+  dateOfBirth: "1984-10-12", status: "PENDING", createdAt: "2026-01-02T00:00:00"
+});
 
 function caseFor(status, fields = {}) {
   return { caseId: randomUUID(), status, decisionReason: null, reviewerNotes: null, ...fields };
@@ -160,6 +188,13 @@ const server = http.createServer(async (request, response) => {
   }
   if (!user || (path === "expired" && request.method === "GET")) return json(response, 401, { code: "AUTH", message: "Expired" });
   if (path === "users/me" && request.method === "GET") return json(response, 200, profileFor(user));
+  if (path === "users/all" && request.method === "GET") {
+    if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    const search = (url.searchParams.get("search") ?? "").toLowerCase();
+    return json(response, 200, users.filter((candidate) => candidate.role === "CUSTOMER").map(profileFor).filter((profile) =>
+      !search || [profile.firstName, profile.lastName, profile.email].some((value) => value?.toLowerCase().includes(search))
+    ));
+  }
   if (path === "customers/me" && request.method === "GET") {
     if (user.username === "lookup-error") return json(response, 503, { message: "Service unavailable" });
     const existing = customerRecords.get(user.username);
@@ -252,7 +287,47 @@ const server = http.createServer(async (request, response) => {
       ? json(response, 200, { page: Number(url.searchParams.get("page") ?? "0"), size: 20, total: 0, content: [] })
       : json(response, 403, { message: "Access denied" });
   }
-  if (path === "customers" && request.method === "GET") return json(response, 200, []);
+  if (path === "customers" || path.startsWith("customers/")) {
+    if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    if (["directory-expired", "directory-forbidden", "directory-network"].includes(user.username)) {
+      if (user.username === "directory-expired") return json(response, 401, { code: "AUTH", message: "Expired" }, { "X-Bank-Auth-Expired": "1" });
+      if (user.username === "directory-forbidden") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+      request.socket.destroy();
+      return;
+    }
+    if (path === "customers" && request.method === "GET") return json(response, 200, [...customerDirectoryRecords.values()]);
+    if (path === "customers" && request.method === "POST") {
+      const payload = await new Response(await body(request)).json().catch(() => null);
+      const linkedUser = users.find((candidate) => profileFor(candidate).userId === payload?.userId);
+      if (!linkedUser || linkedUser.role !== "CUSTOMER") return json(response, 404, { code: "ERR_NOT_FOUND", message: "User not found" });
+      if ([...customerDirectoryRecords.values()].some((record) => record.userId === payload.userId)) return json(response, 409, { code: "ERR_CONFLICT", message: "Customer already exists" });
+      if (linkedUser.username === "directory-missing") return json(response, 404, { code: "ERR_NOT_FOUND", message: "User not found" });
+      if (linkedUser.username === "directory-conflict") return json(response, 409, { code: "ERR_CONFLICT", message: "Customer already exists" });
+      if (linkedUser.username === "directory-invalid") return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid customer details", errors: { dateOfBirth: "must be a valid date" } });
+      if (!payload.firstName?.trim() || !payload.lastName?.trim() || !payload.email?.includes("@") || !payload.phone?.trim()
+        || !["MALE", "FEMALE", "OTHER"].includes(payload.gender) || !/^\d{4}-\d{2}-\d{2}$/.test(payload.dateOfBirth)
+        || !["ACTIVE", "INACTIVE", "PENDING", "RESIGNED"].includes(payload.status)) {
+        return json(response, 400, { code: "ERR_VALIDATION", message: "Invalid customer details" });
+      }
+      const saved = { ...payload, customerId: randomUUID(), username: linkedUser.username, createdAt: new Date().toISOString() };
+      customerDirectoryRecords.set(`created-${payload.userId}`, saved);
+      return json(response, 201, saved);
+    }
+    if (path === "customers" && request.method === "PUT") {
+      const payload = await new Response(await body(request)).json().catch(() => null);
+      const entry = [...customerDirectoryRecords.entries()].find(([, record]) => record.userId === payload?.userId);
+      if (!entry) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
+      const [key, current] = entry;
+      const saved = { ...current, ...payload, customerId: current.customerId, username: current.username };
+      customerDirectoryRecords.set(key, saved);
+      return json(response, 200, saved);
+    }
+    const detailMatch = /^customers\/([\da-f-]{36})$/.exec(path);
+    if (detailMatch && request.method === "GET") {
+      const record = [...customerDirectoryRecords.values()].find((candidate) => candidate.customerId === detailMatch[1]);
+      return record ? json(response, 200, record) : json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
+    }
+  }
   if (path === "branches" && request.method === "GET") {
     if (user.username === "opening-branches-unavailable") return json(response, 503, { message: "Branches unavailable" });
     return json(response, 200, openingCustomer ? branches : []);

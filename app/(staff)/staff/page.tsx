@@ -16,6 +16,11 @@ export default function StaffPage() {
         <Link href={TELLER_ACCOUNT_OPENING} className="button mt-5">Open an account</Link>
       </div>}
       <div className="card">
+        <h2 className="text-xl font-black">Customer records</h2>
+        <p className="mt-2 muted">Search, review, and maintain customer records linked to existing customer users.</p>
+        <Link href="/staff/customers" className="button secondary mt-5">Browse customers</Link>
+      </div>
+      <div className="card">
         <h2 className="text-xl font-black">Authority boundary</h2>
         <p className="mt-2 muted">Customer ownership, thresholds, and balances are decided by BankingSystem.</p>
       </div>

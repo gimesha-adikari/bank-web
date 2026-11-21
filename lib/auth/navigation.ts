@@ -21,11 +21,14 @@ const pageRoles = new Map<string, readonly Role[]>([
   ["/customer/transactions/withdraw", PAGE_ROLES.customer],
   ["/customer/transactions/transfer", PAGE_ROLES.customer],
   ["/staff", PAGE_ROLES.staff],
+  ["/staff/customers", PAGE_ROLES.staff],
+  ["/staff/customers/new", PAGE_ROLES.staff],
   [TELLER_ACCOUNT_OPENING, PAGE_ROLES.teller],
   ["/admin", PAGE_ROLES.admin]
 ]);
 
 const historyPages = [
+  { path: /^\/staff\/customers\/[\w-]+$/, roles: PAGE_ROLES.staff },
   { path: /^\/customer\/accounts\/[\w-]+\/transactions$/, roles: PAGE_ROLES.customer },
   { path: /^\/staff\/accounts\/[\w-]+\/transactions$/, roles: PAGE_ROLES.staff }
 ];

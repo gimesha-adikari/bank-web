@@ -27,6 +27,7 @@ export function AppHeader() {
           <Link href="/customer/profile">Profile</Link>
         </>}
         {allowsRole(role, PAGE_ROLES.admin) && <>
+          <Link href="/admin/users">Users &amp; access</Link>
           <Link href="/admin/kyc">KYC review</Link>
           <Link href="/staff">Staff workspace</Link>
         </>}

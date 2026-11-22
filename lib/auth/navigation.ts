@@ -28,6 +28,7 @@ const pageRoles = new Map<string, readonly Role[]>([
   ["/staff/tellers", PAGE_ROLES.manager],
   [TELLER_ACCOUNT_OPENING, PAGE_ROLES.teller],
   ["/admin", PAGE_ROLES.admin],
+  ["/admin/users", PAGE_ROLES.admin],
   ["/admin/kyc", PAGE_ROLES.admin]
 ]);
 

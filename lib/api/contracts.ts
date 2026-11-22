@@ -130,6 +130,63 @@ export type TellerRequest = {
   department?: string;
 };
 
+export type AdminAccessRole = {
+  roleId: string;
+  roleName: string;
+  description: string | null;
+  permissions?: string | null;
+};
+export type AdminUserDirectoryEntry = {
+  userId: string;
+  username: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  role: { roleId: string; roleName: string; description: string | null } | null;
+  isActive: boolean | null;
+  lastLoginAt: string | null;
+  createdAt: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  postalCode: string | null;
+  homeNumber: string | null;
+  workNumber: string | null;
+  officeNumber: string | null;
+  mobileNumber: string | null;
+  emailVerified: boolean;
+};
+export type AdminEmployeeRecord = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  roleName: string | null;
+  status: EmployeeStatus | null;
+  department: string | null;
+  phone: string;
+  address: string;
+  gender: TellerGender | null;
+  dateOfBirth: string | null;
+  hireDate: string | null;
+  managerId: string | null;
+  userId: string | null;
+};
+export type AdminManagerDirectoryEntry = { employeeId: string; firstName: string; lastName: string };
+export type AdminRoleUpdateRequest = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  roleName: string;
+  department: string;
+  managerId?: string;
+  status: EmployeeStatus;
+  gender: TellerGender;
+  dateOfBirth: string;
+};
+
 export type TransactionType = "DEPOSIT" | "WITHDRAWAL" | "TRANSFER_IN" | "TRANSFER_OUT" | string;
 export type Transaction = {
   transactionId?: string;

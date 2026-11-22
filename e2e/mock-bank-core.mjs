@@ -12,6 +12,13 @@ const users = [
   ["kyc-review-admin", "ADMIN", "e2e-kyc-review-admin-jwt"],
   ["kyc-review-decisions", "ADMIN", "e2e-kyc-review-decisions-jwt"],
   ["kyc-review-timeout", "ADMIN", "e2e-kyc-review-timeout-jwt"],
+  ...["admin-access-directory", "admin-access-role-change", "admin-access-timeout", "admin-access-validation"]
+    .map((username) => [username, "ADMIN", `e2e-${username}-jwt`]),
+  ["alex.customer", "CUSTOMER", "e2e-alex-customer-jwt"],
+  ["teller.jordan", "TELLER", "e2e-teller-jordan-jwt"],
+  ["inactive.customer", "CUSTOMER", "e2e-inactive-customer-jwt"],
+  ["timeout.customer", "CUSTOMER", "e2e-timeout-customer-jwt"],
+  ["manager.lee", "MANAGER", "e2e-manager-lee-jwt"],
   ["directory-forbidden", "TELLER", "e2e-directory-forbidden-jwt"],
   ["directory-expired", "TELLER", "e2e-directory-expired-jwt"],
   ["directory-network", "TELLER", "e2e-directory-network-jwt"],
@@ -39,6 +46,15 @@ const managerTellerIds = {
   sam: "0ce3cd10-6395-4acd-9a40-000000000903",
   ava: "0ce3cd10-6395-4acd-9a40-000000000904"
 };
+const adminAccessIds = {
+  alex: "0ce3cd10-6395-4acd-9a40-000000000921",
+  teller: "0ce3cd10-6395-4acd-9a40-000000000922",
+  inactive: "0ce3cd10-6395-4acd-9a40-000000000923",
+  timeout: "0ce3cd10-6395-4acd-9a40-000000000924",
+  manager: "0ce3cd10-6395-4acd-9a40-000000000925",
+  managerEmployee: "eeeeeeee-eeee-4eee-8eee-eeeeeeee0091",
+  alexEmployee: "eeeeeeee-eeee-4eee-8eee-eeeeeeee0092"
+};
 const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
 const documentId = "85baf41c-42a5-4e47-ae18-bfbca3acf998";
 const kycDocument = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 255]);
@@ -46,6 +62,14 @@ const requests = [];
 const tellerMutations = [];
 const tellerReads = [];
 const tellerEmployees = new Map();
+const adminAccessMutations = [];
+const adminAccessReads = [];
+const adminAccessRoles = ["ADMIN", "MANAGER", "TELLER", "EMPLOYEE", "CUSTOMER", "BANNED"]
+  .map((roleName) => ({ roleId: `role-${roleName.toLowerCase()}`, roleName, description: `${roleName} role`, permissions: null }));
+const adminAccessEmployees = [
+  { firstName: "Jordan", lastName: "Teller", email: "teller.jordan@example.test", roleName: "TELLER", status: "ACTIVE", department: "Branch Operations", phone: "0722222000", address: "5 Synthetic Road", gender: "OTHER", dateOfBirth: "1991-07-08", hireDate: "2025-01-02T09:00:00", managerId: adminAccessIds.managerEmployee, userId: adminAccessIds.teller },
+  { firstName: "Lee", lastName: "Manager", email: "manager.lee@example.test", roleName: "MANAGER", status: "ACTIVE", department: "Operations", phone: "0722223000", address: "6 Synthetic Road", gender: "OTHER", dateOfBirth: "1988-04-12", hireDate: "2024-04-02T09:00:00", managerId: null, userId: adminAccessIds.manager }
+];
 const delayedDepositReceipts = new Map();
 const usedVerificationTokens = new Set();
 const documentTypes = ["DOC_FRONT", "DOC_BACK", "SELFIE", "ADDRESS_PROOF"];
@@ -104,6 +128,14 @@ function profileFor(user) {
   if (user.username === "directory-missing") return { ...profile, firstName: "Vanishing", lastName: "Identity", email: "vanishing@example.test" };
   if (user.username === "directory-conflict") return { ...profile, firstName: "Duplicate", lastName: "Identity", email: "duplicate@example.test" };
   if (user.username === "directory-invalid") return { ...profile, firstName: "Invalid", lastName: "Details", email: "invalid.details@example.test" };
+  const adminAccessProfiles = {
+    "alex.customer": { userId: adminAccessIds.alex, firstName: "Alex", lastName: "Customer", email: "alex.customer@example.test", address: "1 Synthetic Road", mobileNumber: "0712345678" },
+    "teller.jordan": { userId: adminAccessIds.teller, firstName: "Jordan", lastName: "Teller", email: "teller.jordan@example.test", address: "5 Synthetic Road", mobileNumber: "0722222000" },
+    "inactive.customer": { userId: adminAccessIds.inactive, firstName: "Inez", lastName: "Inactive", email: "inactive.customer@example.test", address: "2 Synthetic Road", mobileNumber: "0712345000" },
+    "timeout.customer": { userId: adminAccessIds.timeout, firstName: "Toby", lastName: "Timeout", email: "timeout.customer@example.test", address: "3 Synthetic Road", mobileNumber: "0722222222" },
+    "manager.lee": { userId: adminAccessIds.manager, firstName: "Lee", lastName: "Manager", email: "manager.lee@example.test", address: "6 Synthetic Road", mobileNumber: "0722223000" }
+  };
+  if (adminAccessProfiles[user.username]) return { ...profile, ...adminAccessProfiles[user.username] };
   const fixedUserIds = {
     "nina-candidate": managerTellerIds.nina,
     "nina-timeout": managerTellerIds.ninaTimeout,
@@ -122,7 +154,7 @@ function userDirectoryFor(user) {
     userId: profile.userId, username: user.username, email: profile.email,
     firstName: profile.firstName, lastName: profile.lastName,
     role: { roleId: `role-${user.role.toLowerCase()}`, roleName: user.role, description: null },
-    isActive: true, address: profile.address ?? null, mobileNumber: profile.mobileNumber ?? null,
+    isActive: user.username === "inactive.customer" ? false : true, address: profile.address ?? null, mobileNumber: profile.mobileNumber ?? null,
     emailVerified: true
   };
 }
@@ -185,8 +217,9 @@ const server = http.createServer(async (request, response) => {
     tellerOpeningRequests, tellerOpenedAccountCount: tellerOpenedAccounts.size,
     staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords),
     adminReviewDecisions, adminReviewAttempts, tellerMutations, tellerReads,
+    adminAccessMutations, adminAccessReads,
     tellerUsers: users.map(userDirectoryFor),
-    ids: managerTellerIds
+    ids: { ...managerTellerIds, ...adminAccessIds }
   });
   if (url.pathname === "/test/seed-account-opening-conflict" && request.method === "POST") {
     const input = await new Response(await body(request)).json().catch(() => null);
@@ -282,6 +315,83 @@ const server = http.createServer(async (request, response) => {
     return user ? json(response, 200, { username: user.username, role: user.role }) : json(response, 401, { code: "AUTH", message: "Expired" });
   }
   if (!user || (path === "expired" && request.method === "GET")) return json(response, 401, { code: "AUTH", message: "Expired" });
+  if (path === "access-control/roles" && request.method === "GET") {
+    adminAccessReads.push({ method: request.method, path: url.pathname, username: user.username });
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    return json(response, 200, adminAccessRoles);
+  }
+  if (path === "access-control/employees" && request.method === "GET") {
+    adminAccessReads.push({ method: request.method, path: url.pathname, username: user.username });
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    return json(response, 200, adminAccessEmployees);
+  }
+  if (path === "access-control/employees/managers" && request.method === "GET") {
+    adminAccessReads.push({ method: request.method, path: url.pathname, username: user.username });
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    return json(response, 200, adminAccessEmployees.filter((employee) => employee.roleName === "MANAGER").map((employee) => ({
+      employeeId: employee.userId === adminAccessIds.manager ? adminAccessIds.managerEmployee : adminAccessIds.alexEmployee,
+      firstName: employee.firstName, lastName: employee.lastName
+    })));
+  }
+  if (path === "access-control/users" && request.method === "GET") {
+    adminAccessReads.push({ method: request.method, path: url.pathname, username: user.username });
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    return json(response, 200, users.map(userDirectoryFor));
+  }
+  const adminAccessUser = /^access-control\/users\/([^/]+)$/.exec(path);
+  if (adminAccessUser && request.method === "GET") {
+    adminAccessReads.push({ method: request.method, path: url.pathname, username: user.username });
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    const username = decodeURIComponent(adminAccessUser[1]);
+    const target = users.find((candidate) => candidate.username === username);
+    return target ? json(response, 200, userDirectoryFor(target)) : json(response, 404, { code: "ERR_NOT_FOUND", message: "User not found" });
+  }
+  const adminRoleUpdate = /^access-control\/roles\/([\da-f-]{36})$/.exec(path);
+  if (adminRoleUpdate && request.method === "PUT") {
+    if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    adminAccessMutations.push({ actor: user.username, method: request.method, path: url.pathname, body: payload, idempotencyKey: request.headers["idempotency-key"] ?? null });
+    const target = users.find((candidate) => profileFor(candidate).userId === adminRoleUpdate[1]);
+    if (!target) return json(response, 404, { code: "ERR_NOT_FOUND", message: "User not found" });
+    if (!payload || !payload.firstName || !payload.lastName || !payload.email || !payload.phone || !payload.address
+      || !payload.roleName || payload.department === undefined || !payload.status || !payload.gender || !payload.dateOfBirth) {
+      return json(response, 400, { code: "ERR_VALIDATION", errors: { roleName: "Role profile fields are required" } });
+    }
+    if (!adminAccessRoles.some((role) => role.roleName === payload.roleName)) {
+      return json(response, 404, { code: "ERR_NOT_FOUND", message: "Role not found" });
+    }
+    if (user.username === "admin-access-validation") return json(response, 400, { code: "ERR_VALIDATION", errors: { phone: "Invalid phone" } });
+    const beforeRole = target.role;
+    if (payload.roleName === "CUSTOMER") {
+      const employee = adminAccessEmployees.find((candidate) => candidate.userId === adminRoleUpdate[1]);
+      if (employee) {
+        employee.status = "INACTIVE";
+        employee.userId = null;
+      }
+      target.role = "CUSTOMER";
+    } else {
+      const existing = adminAccessEmployees.find((candidate) => candidate.email === profileFor(target).email);
+      if (existing && existing.userId && existing.userId !== adminRoleUpdate[1]) {
+        return json(response, 409, { code: "ERR_CONFLICT", message: "Employee email is assigned to another login" });
+      }
+      const employee = existing ?? {};
+      Object.assign(employee, {
+        firstName: payload.firstName, lastName: payload.lastName, email: payload.email, roleName: payload.roleName,
+        phone: payload.phone, address: payload.address, department: payload.department, status: payload.status,
+        gender: payload.gender, dateOfBirth: payload.dateOfBirth, managerId: payload.managerId ?? employee.managerId ?? null,
+        hireDate: employee.hireDate ?? new Date().toISOString(), userId: adminRoleUpdate[1]
+      });
+      if (!existing) adminAccessEmployees.push(employee);
+      target.role = payload.roleName;
+    }
+    if (user.username === "admin-access-timeout" && adminRoleUpdate[1] === adminAccessIds.timeout) {
+      request.socket.destroy();
+      return;
+    }
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end(beforeRole === target.role ? "User role and employee status updated successfully" : "User role and employee status updated successfully");
+    return;
+  }
   if (path === "tellers" && request.method === "GET") {
     tellerReads.push({ method: "GET", path: url.pathname, query: url.searchParams.toString(), username: user.username });
     if (user.role !== "MANAGER") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });

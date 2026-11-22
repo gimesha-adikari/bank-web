@@ -95,8 +95,9 @@ test("a new customer verifies four documents, sees approval, and completes their
   await expect(page.getByRole("link", { name: "Open an account", exact: true })).toHaveAttribute("href", "/customer/accounts/new");
 });
 
-test("a timeout checks for a persisted case without submitting again", async ({ page, request }) => {
-  await signIn(page, "timeout-customer", onboarding);
+test("a timeout checks for a persisted case without submitting again", async ({ page, request }, testInfo) => {
+  const username = `timeout-customer-r${testInfo.repeatEachIndex}-t${testInfo.retry}`;
+  await signIn(page, username, onboarding);
   await uploadDocuments(page);
   await page.getByRole("checkbox", { name: /consent/i }).check();
   const before = await upstreamCalls(request, "/kyc/submit", "POST");

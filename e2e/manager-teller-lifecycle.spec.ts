@@ -78,7 +78,7 @@ test("Manager assigns an existing customer login using its user UUID and the bac
     address: "1 Synthetic Avenue", gender: "OTHER", dateOfBirth: "1991-05-06", department: "Branch Operations"
   });
   expect(created.idempotencyKey).toBeNull();
-  expect(await page.getByText("TELLER", { exact: true }).count()).toBeGreaterThan(0);
+  await expect(page.getByText("TELLER", { exact: true })).toBeVisible();
 });
 
 test("Manager updates by linked user UUID and deliberately removes a Teller assignment", async ({ page }) => {

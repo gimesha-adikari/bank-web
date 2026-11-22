@@ -2,6 +2,12 @@ import http from "node:http";
 import { randomUUID } from "node:crypto";
 
 const port = Number(process.env.MOCK_BANK_CORE_PORT ?? "38080");
+const timeoutCustomerUsers = Array.from({ length: 3 }, (_, repeatIndex) =>
+  Array.from({ length: 3 }, (_, retryIndex) => {
+    const username = `timeout-customer-r${repeatIndex}-t${retryIndex}`;
+    return [username, "CUSTOMER", `e2e-${username}-jwt`];
+  })
+).flat();
 const users = [
   ["customer", "CUSTOMER", "e2e-sentinel-jwt"],
   ["teller", "TELLER", "e2e-teller-jwt"],
@@ -17,7 +23,7 @@ const users = [
   ["alex.customer", "CUSTOMER", "e2e-alex-customer-jwt"],
   ["teller.jordan", "TELLER", "e2e-teller-jordan-jwt"],
   ["inactive.customer", "CUSTOMER", "e2e-inactive-customer-jwt"],
-  ["timeout.customer", "CUSTOMER", "e2e-timeout-customer-jwt"],
+  ["timeout.customer", "CUSTOMER", "e2e-timeout-dot-customer-jwt"],
   ["manager.lee", "MANAGER", "e2e-manager-lee-jwt"],
   ["directory-forbidden", "TELLER", "e2e-directory-forbidden-jwt"],
   ["directory-expired", "TELLER", "e2e-directory-expired-jwt"],
@@ -28,7 +34,7 @@ const users = [
   ["teller-opening-expired", "TELLER", "e2e-teller-opening-expired-jwt"],
   ["teller-opening-timeout", "TELLER", "e2e-teller-opening-timeout-jwt"],
   ["teller-opening-validation", "TELLER", "e2e-teller-opening-validation-jwt"],
-  ...["new-customer", "timeout-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer",
+  ...["new-customer", "info-customer", "rejected-customer", "lookup-error", "denied-customer", "accounts-error", "retry-customer",
     "opening-approved", "opening-timeout", "opening-network", "opening-branch", "opening-missing", "opening-pending", "opening-auth", "opening-expired",
     "opening-vault", "opening-record-gone", "opening-branches-unavailable", "opening-conflict", "opening-invalid-key",
     "opening-kyc-rejected", "opening-network-validation", "directory-linked", "directory-new", "directory-missing",
@@ -38,8 +44,12 @@ const users = [
     .map((username) => [username, "MANAGER", `e2e-${username}-jwt`]),
   ["nina-candidate", "CUSTOMER", "e2e-nina-candidate-jwt"],
   ["nina-timeout", "CUSTOMER", "e2e-nina-timeout-jwt"],
-  ["sam-teller", "TELLER", "e2e-sam-teller-jwt"]
+  ["sam-teller", "TELLER", "e2e-sam-teller-jwt"],
+  ...timeoutCustomerUsers
 ].map(([username, role, token]) => ({ username, role, token }));
+if (new Set(users.map(({ token }) => token)).size !== users.length) {
+  throw new Error("Mock bank-core fixture contains duplicate user tokens");
+}
 const managerTellerIds = {
   nina: "0ce3cd10-6395-4acd-9a40-000000000901",
   ninaTimeout: "0ce3cd10-6395-4acd-9a40-000000000902",
@@ -523,7 +533,7 @@ const server = http.createServer(async (request, response) => {
       }
       if (retryAttempts.get(user.username) !== attempt) return json(response, 400, { message: "Different retry payload or key" });
     }
-    const timedOut = user.username === "timeout-customer";
+    const timedOut = user.username.startsWith("timeout-customer-r");
     const saved = caseFor(timedOut ? "UNDER_REVIEW" : "PENDING", { ...payload, reviewerNotes: timedOut ? "ml_unavailable" : null });
     onboardingCases.set(user.username, saved);
     if (timedOut) {

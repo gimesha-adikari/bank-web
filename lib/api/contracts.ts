@@ -91,6 +91,45 @@ export type CustomerRecordRequest = {
   status: CustomerStatus;
 };
 
+export type EmployeeStatus = "ACTIVE" | "INACTIVE" | "PENDING" | "RESIGNED";
+export type TellerGender = "MALE" | "FEMALE" | "OTHER";
+export type TellerEmployee = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  roleName: string | null;
+  status: EmployeeStatus | null;
+  department: string | null;
+  phone: string;
+  address: string;
+  gender: TellerGender | null;
+  dateOfBirth: string | null;
+  hireDate: string | null;
+  managerId: string | null;
+  userId: string | null;
+};
+export type TellerUserDirectoryEntry = {
+  userId: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: { roleId: string; roleName: string; description: string | null } | null;
+  isActive: boolean | null;
+  address: string | null;
+  mobileNumber: string | null;
+};
+export type TellerRequest = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  gender: TellerGender;
+  dateOfBirth: string;
+  department?: string;
+};
+
 export type TransactionType = "DEPOSIT" | "WITHDRAWAL" | "TRANSFER_IN" | "TRANSFER_OUT" | string;
 export type Transaction = {
   transactionId?: string;

@@ -3,6 +3,7 @@ import type { Role } from "@/lib/api/contracts";
 export const PAGE_ROLES = {
   customer: ["CUSTOMER"],
   staff: ["ADMIN", "MANAGER", "TELLER"],
+  manager: ["MANAGER"],
   admin: ["ADMIN"],
   teller: ["TELLER"]
 } as const;
@@ -24,6 +25,7 @@ const pageRoles = new Map<string, readonly Role[]>([
   ["/staff/accounts", PAGE_ROLES.staff],
   ["/staff/customers", PAGE_ROLES.staff],
   ["/staff/customers/new", PAGE_ROLES.staff],
+  ["/staff/tellers", PAGE_ROLES.manager],
   [TELLER_ACCOUNT_OPENING, PAGE_ROLES.teller],
   ["/admin", PAGE_ROLES.admin],
   ["/admin/kyc", PAGE_ROLES.admin]

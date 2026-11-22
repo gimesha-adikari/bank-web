@@ -25,6 +25,11 @@ export default function StaffPage() {
         <p className="mt-2 muted">Search, review, and maintain customer records linked to existing customer users.</p>
         <Link href="/staff/customers" className="button secondary mt-5">Browse customers</Link>
       </div>
+      {allowsRole(role, PAGE_ROLES.manager) && <div className="card">
+        <h2 className="text-xl font-black">Teller lifecycle</h2>
+        <p className="mt-2 muted">Review Teller employee records, assign eligible existing customer logins, update profiles, or remove a Teller assignment.</p>
+        <Link href="/staff/tellers" className="button secondary mt-5">Manage Tellers</Link>
+      </div>}
       <div className="card">
         <h2 className="text-xl font-black">Authority boundary</h2>
         <p className="mt-2 muted">Customer ownership, thresholds, and balances are decided by BankingSystem.</p>

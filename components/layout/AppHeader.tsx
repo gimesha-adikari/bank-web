@@ -34,6 +34,7 @@ export function AppHeader() {
           <Link href="/staff/accounts">Accounts</Link>
           <Link href="/staff/customers">Customers</Link>
         </>}
+        {allowsRole(role, PAGE_ROLES.manager) && <Link href="/staff/tellers">Tellers</Link>}
         {allowsRole(role, PAGE_ROLES.teller) && <Link href={TELLER_ACCOUNT_OPENING}>Open account</Link>}
         <span className="muted">{username}</span>
         <button className="button ghost" disabled={pending} onClick={() => void handleSignOut()}>Sign out</button>

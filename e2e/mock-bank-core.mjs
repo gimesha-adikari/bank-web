@@ -26,12 +26,26 @@ const users = [
     "opening-vault", "opening-record-gone", "opening-branches-unavailable", "opening-conflict", "opening-invalid-key",
     "opening-kyc-rejected", "opening-network-validation", "directory-linked", "directory-new", "directory-missing",
     "directory-conflict", "directory-invalid"]
-    .map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`])
+    .map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`]),
+  ...["manager-teller-directory", "manager-teller-create", "manager-teller-change", "manager-teller-create-timeout"]
+    .map((username) => [username, "MANAGER", `e2e-${username}-jwt`]),
+  ["nina-candidate", "CUSTOMER", "e2e-nina-candidate-jwt"],
+  ["nina-timeout", "CUSTOMER", "e2e-nina-timeout-jwt"],
+  ["sam-teller", "TELLER", "e2e-sam-teller-jwt"]
 ].map(([username, role, token]) => ({ username, role, token }));
+const managerTellerIds = {
+  nina: "0ce3cd10-6395-4acd-9a40-000000000901",
+  ninaTimeout: "0ce3cd10-6395-4acd-9a40-000000000902",
+  sam: "0ce3cd10-6395-4acd-9a40-000000000903",
+  ava: "0ce3cd10-6395-4acd-9a40-000000000904"
+};
 const account = { accountId: "account-1", accountNumber: "100001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" };
 const documentId = "85baf41c-42a5-4e47-ae18-bfbca3acf998";
 const kycDocument = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 255]);
 const requests = [];
+const tellerMutations = [];
+const tellerReads = [];
+const tellerEmployees = new Map();
 const delayedDepositReceipts = new Map();
 const usedVerificationTokens = new Set();
 const documentTypes = ["DOC_FRONT", "DOC_BACK", "SELFIE", "ADDRESS_PROOF"];
@@ -90,7 +104,51 @@ function profileFor(user) {
   if (user.username === "directory-missing") return { ...profile, firstName: "Vanishing", lastName: "Identity", email: "vanishing@example.test" };
   if (user.username === "directory-conflict") return { ...profile, firstName: "Duplicate", lastName: "Identity", email: "duplicate@example.test" };
   if (user.username === "directory-invalid") return { ...profile, firstName: "Invalid", lastName: "Details", email: "invalid.details@example.test" };
+  const fixedUserIds = {
+    "nina-candidate": managerTellerIds.nina,
+    "nina-timeout": managerTellerIds.ninaTimeout,
+    "sam-teller": managerTellerIds.sam
+  };
+  if (fixedUserIds[user.username]) profile.userId = fixedUserIds[user.username];
+  if (user.username === "nina-candidate") return { ...profile, firstName: "Nina", lastName: "Candidate", email: "nina.candidate@example.test", address: "1 Candidate Road", mobileNumber: "0711112222" };
+  if (user.username === "nina-timeout") return { ...profile, firstName: "Nina", lastName: "Timeout", email: "nina.timeout@example.test", address: "2 Candidate Road", mobileNumber: "0711113333" };
+  if (user.username === "sam-teller") return { ...profile, firstName: "Sam", lastName: "Teller", email: "sam.teller@example.test", address: "3 Teller Road", mobileNumber: "0722222222" };
   return profile;
+}
+
+function userDirectoryFor(user) {
+  const profile = profileFor(user);
+  return {
+    userId: profile.userId, username: user.username, email: profile.email,
+    firstName: profile.firstName, lastName: profile.lastName,
+    role: { roleId: `role-${user.role.toLowerCase()}`, roleName: user.role, description: null },
+    isActive: true, address: profile.address ?? null, mobileNumber: profile.mobileNumber ?? null,
+    emailVerified: true
+  };
+}
+
+function initialTeller(name, email, userId, status = "ACTIVE") {
+  const [firstName, ...lastParts] = name.split(" ");
+  return {
+    firstName, lastName: lastParts.join(" "), email, roleName: "TELLER", status,
+    department: "Branch Operations", phone: "0712345000", address: "4 Teller Street",
+    gender: "OTHER", dateOfBirth: "1990-01-02", hireDate: "2025-01-15T10:00:00",
+    managerId: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", userId
+  };
+}
+
+function tellerEmployeesFor(username) {
+  if (tellerEmployees.has(username)) return tellerEmployees.get(username);
+  let records = [];
+  if (username === "manager-teller-directory") {
+    records = [
+      initialTeller("Ava Teller", "ava.teller@example.test", managerTellerIds.ava),
+      initialTeller("Former Teller", "former.teller@example.test", null, "INACTIVE")
+    ];
+  }
+  if (username === "manager-teller-change") records = [initialTeller("Sam Teller", "sam.teller@example.test", managerTellerIds.sam)];
+  tellerEmployees.set(username, records);
+  return records;
 }
 
 function initialDirectoryCustomer(username, customerId) {
@@ -126,7 +184,9 @@ const server = http.createServer(async (request, response) => {
     count: requests.length, requests, accountOpeningCreations: Object.fromEntries(accountOpeningCreations),
     tellerOpeningRequests, tellerOpenedAccountCount: tellerOpenedAccounts.size,
     staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords),
-    adminReviewDecisions, adminReviewAttempts
+    adminReviewDecisions, adminReviewAttempts, tellerMutations, tellerReads,
+    tellerUsers: users.map(userDirectoryFor),
+    ids: managerTellerIds
   });
   if (url.pathname === "/test/seed-account-opening-conflict" && request.method === "POST") {
     const input = await new Response(await body(request)).json().catch(() => null);
@@ -222,6 +282,70 @@ const server = http.createServer(async (request, response) => {
     return user ? json(response, 200, { username: user.username, role: user.role }) : json(response, 401, { code: "AUTH", message: "Expired" });
   }
   if (!user || (path === "expired" && request.method === "GET")) return json(response, 401, { code: "AUTH", message: "Expired" });
+  if (path === "tellers" && request.method === "GET") {
+    tellerReads.push({ method: "GET", path: url.pathname, query: url.searchParams.toString(), username: user.username });
+    if (user.role !== "MANAGER") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    return json(response, 200, tellerEmployeesFor(user.username));
+  }
+  if (path === "tellers/users" && request.method === "GET") {
+    if (user.role !== "MANAGER") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    return json(response, 200, users.map(userDirectoryFor));
+  }
+  const tellerUpdate = /^tellers\/([\da-f-]{36})$/.exec(path);
+  if ((path === "tellers" && request.method === "POST") || (tellerUpdate && ["PUT", "DELETE"].includes(request.method))) {
+    if (user.role !== "MANAGER") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });
+    const targetId = request.method === "POST" ? url.searchParams.get("userId") : tellerUpdate?.[1];
+    if (request.method === "DELETE") {
+      tellerMutations.push({ method: request.method, path: url.pathname, query: url.searchParams.toString(), body: null, idempotencyKey: request.headers["idempotency-key"] ?? null });
+      const employees = tellerEmployeesFor(user.username);
+      const employee = employees.find((entry) => entry.userId === targetId);
+      if (!employee) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Employee not found" });
+      const targetUser = users.find((entry) => profileFor(entry).userId === targetId);
+      if (!targetUser) return json(response, 404, { code: "ERR_NOT_FOUND", message: "User not found" });
+      employee.status = "INACTIVE";
+      employee.userId = null;
+      targetUser.role = "CUSTOMER";
+      if (user.username === "manager-teller-delete-timeout") {
+        request.socket.destroy();
+        return;
+      }
+      response.writeHead(204);
+      return response.end();
+    }
+
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    tellerMutations.push({ method: request.method, path: url.pathname, query: url.searchParams.toString(), body: payload, idempotencyKey: request.headers["idempotency-key"] ?? null });
+    const targetUser = users.find((entry) => profileFor(entry).userId === targetId);
+    if (!targetUser) return json(response, 404, { code: "ERR_NOT_FOUND", message: "User not found" });
+    if (targetUser.role === "ADMIN") return json(response, 409, { code: "ERR_CONFLICT", message: "Admin cannot be assigned as a teller" });
+    if (!payload || !payload.email?.includes("@") || !payload.firstName?.trim() || !payload.lastName?.trim()
+      || !payload.phone?.trim() || !payload.address?.trim() || payload.address.length > 255
+      || !["MALE", "FEMALE", "OTHER"].includes(payload.gender)
+      || !/^\d{4}-\d{2}-\d{2}$/.test(payload.dateOfBirth) || payload.dateOfBirth >= new Date().toISOString().slice(0, 10)) {
+      return json(response, 400, { code: "ERR_VALIDATION", errors: { dateOfBirth: "must be a past date" } });
+    }
+    const employees = tellerEmployeesFor(user.username);
+    let employee = employees.find((entry) => entry.userId === targetId)
+      ?? employees.find((entry) => entry.email === payload.email);
+    if (employee?.userId && employee.userId !== targetId) return json(response, 409, { code: "ERR_CONFLICT", message: "Email address is unavailable" });
+    if (employees.some((entry) => entry.email === payload.email && entry !== employee)) return json(response, 409, { code: "ERR_CONFLICT", message: "Email address is unavailable" });
+    if (!employee) {
+      employee = {
+        ...payload, roleName: "TELLER", status: "ACTIVE", hireDate: new Date().toISOString(),
+        managerId: null, userId: targetId
+      };
+      employees.push(employee);
+    } else {
+      Object.assign(employee, payload, { roleName: "TELLER", status: "ACTIVE", userId: targetId });
+    }
+    targetUser.role = "TELLER";
+    if (user.username === "manager-teller-create-timeout" && request.method === "POST") {
+      request.socket.destroy();
+      return;
+    }
+    response.writeHead(request.method === "POST" ? 201 : 200, { "Content-Type": "text/plain" });
+    return response.end(request.method === "POST" ? "Teller assigned successfully" : "Teller updated");
+  }
   if (path === "users/me" && request.method === "GET") return json(response, 200, profileFor(user));
   if (path === "users/all" && request.method === "GET") {
     if (!["ADMIN", "MANAGER", "TELLER"].includes(user.role)) return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });

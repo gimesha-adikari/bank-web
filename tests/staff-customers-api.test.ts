@@ -38,7 +38,26 @@ describe("staff customer API", () => {
     await customersApi.searchCustomerUsers("Ada & Co");
 
     expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/v1/customers/customer-record-1");
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({ cache: "no-store" });
     expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/v1/users/all?search=Ada+%26+Co");
+  });
+
+  it("sends a CSRF-protected customer DELETE and requires a 204 response", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(Response.json({ token: csrf }))
+      .mockResolvedValueOnce(Response.json({ message: "Unexpected success response" }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(customersApi.deleteStaffCustomer(customer.customerId)).rejects.toMatchObject({ kind: "parse", status: 200 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const [, options] = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/v1/customers/customer-record-1");
+    expect(options).toMatchObject({ method: "DELETE", redirect: "error", body: undefined });
+    expect(new Headers(options.headers).get("x-csrf-token")).toBe(csrf);
+
+    await expect(customersApi.deleteStaffCustomer(customer.customerId)).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it("creates and updates records with the exact required DTO and CSRF protection", async () => {

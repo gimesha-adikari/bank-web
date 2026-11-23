@@ -45,7 +45,11 @@ const users = [
   ["nina-candidate", "CUSTOMER", "e2e-nina-candidate-jwt"],
   ["nina-timeout", "CUSTOMER", "e2e-nina-timeout-jwt"],
   ["sam-teller", "TELLER", "e2e-sam-teller-jwt"],
-  ...timeoutCustomerUsers
+  ...timeoutCustomerUsers,
+  ...["admin-customer-delete", "admin-customer-delete-conflict", "admin-customer-delete-timeout-persisted", "admin-customer-delete-timeout-present"]
+    .map((username) => [username, "ADMIN", `e2e-${username}-jwt`]),
+  ["a3-stale-customer", "CUSTOMER", "e2e-a3-stale-customer-jwt"],
+  ["a3-absent-customer", "CUSTOMER", "e2e-a3-absent-customer-jwt"]
 ].map(([username, role, token]) => ({ username, role, token }));
 if (new Set(users.map(({ token }) => token)).size !== users.length) {
   throw new Error("Mock bank-core fixture contains duplicate user tokens");
@@ -94,6 +98,7 @@ const adminReviewDocumentIds = new Set([
 ]);
 const customerRecords = new Map();
 const customerDirectoryRecords = new Map();
+const customerDeletionAttempts = [];
 const retryAttempts = new Map();
 const openedAccounts = new Map();
 const accountOpeningClaims = new Map();
@@ -209,6 +214,20 @@ customerDirectoryRecords.set("directory-other", {
   gender: "FEMALE", email: "morgan.reed@example.test", phone: "0722222222", address: "30 Example Lane",
   dateOfBirth: "1984-10-12", status: "PENDING", createdAt: "2026-01-02T00:00:00"
 });
+const deletionCustomerFixtures = [
+  ["admin-customer-delete", "30000000-0000-4000-8000-000000000003", "Dana", "Safe"],
+  ["admin-customer-delete-conflict", "30000000-0000-4000-8000-000000000004", "Casey", "Dependent"],
+  ["admin-customer-delete-timeout-persisted", "30000000-0000-4000-8000-000000000005", "Pat", "Persisted"],
+  ["admin-customer-delete-timeout-present", "30000000-0000-4000-8000-000000000006", "Riley", "Uncertain"],
+  ["a3-stale-customer", "30000000-0000-4000-8000-000000000007", "Ari", "Updated"],
+  ["a3-absent-customer", "30000000-0000-4000-8000-000000000008", "Sam", "Removed"]
+];
+for (const [username, customerId, firstName, lastName] of deletionCustomerFixtures) {
+  const record = initialDirectoryCustomer(username, customerId);
+  record.firstName = firstName;
+  record.lastName = lastName;
+  customerDirectoryRecords.set(customerId, record);
+}
 
 function caseFor(status, fields = {}) {
   return { caseId: randomUUID(), status, decisionReason: null, reviewerNotes: null, ...fields };
@@ -228,6 +247,7 @@ const server = http.createServer(async (request, response) => {
     staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords),
     adminReviewDecisions, adminReviewAttempts, tellerMutations, tellerReads,
     adminAccessMutations, adminAccessReads,
+    customerDeletionAttempts,
     tellerUsers: users.map(userDirectoryFor),
     ids: { ...managerTellerIds, ...adminAccessIds }
   });
@@ -665,6 +685,27 @@ const server = http.createServer(async (request, response) => {
     if (detailMatch && request.method === "GET") {
       const record = [...customerDirectoryRecords.values()].find((candidate) => candidate.customerId === detailMatch[1]);
       return record ? json(response, 200, record) : json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
+    }
+    if (detailMatch && request.method === "DELETE") {
+      if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Admin role required" });
+      customerDeletionAttempts.push({ actor: user.username, customerId: detailMatch[1] });
+      const entry = [...customerDirectoryRecords.entries()].find(([, record]) => record.customerId === detailMatch[1]);
+      if (!entry) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Customer not found" });
+      if (user.username === "admin-customer-delete-conflict") {
+        return json(response, 409, { code: "ERR_CONFLICT", message: "Customer has dependent records and cannot be deleted" });
+      }
+      if (user.username === "admin-customer-delete-timeout-persisted") {
+        customerDirectoryRecords.delete(entry[0]);
+        request.socket.destroy();
+        return;
+      }
+      if (user.username === "admin-customer-delete-timeout-present") {
+        // Leave the upstream response open until the Next.js deadline expires.
+        return;
+      }
+      customerDirectoryRecords.delete(entry[0]);
+      response.writeHead(204);
+      return response.end();
     }
   }
   if (path === "branches" && request.method === "GET") {

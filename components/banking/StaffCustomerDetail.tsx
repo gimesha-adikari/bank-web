@@ -7,6 +7,7 @@ import { SectionHeading } from "@/components/layout/ProtectedLayout";
 import { ApiError } from "@/lib/api/errors";
 import { customersApi } from "@/lib/api/customers";
 import type { Customer, CustomerRecordRequest } from "@/lib/api/contracts";
+import { StaffCustomerDeletion } from "./StaffCustomerDeletion";
 import { StaffCustomerRecordFields, type CustomerEditableFields } from "./StaffCustomerRecordFields";
 
 function recordFields(customer: Customer): CustomerEditableFields {
@@ -145,6 +146,17 @@ export function StaffCustomerDetail({ customerId }: Readonly<{ customerId: strin
         </form>}
         {notice && <p className="success-box" role="status">{notice}</p>}
         {!editing && saveError && <p className="error-box" role="alert">{saveError}</p>}
+        {role === "ADMIN" && <StaffCustomerDeletion key={customerId} customerId={customerId} customer={customer} disabled={editing}
+          onReadback={(record) => {
+            setLoadedCustomer({ customerId, record });
+            setFields(recordFields(record));
+            setNotice(undefined);
+          }}
+          onMissing={(message) => {
+            setLoadedCustomer(undefined);
+            setFields(undefined);
+            setLoadError({ customerId, message });
+          }} />}
       </div>}
     </>
   );

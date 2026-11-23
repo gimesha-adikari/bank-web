@@ -216,3 +216,11 @@ export function apiGet<T>(path: string, options: Omit<RequestOptions, "method" |
 export function apiJson<T>(path: string, method: "POST" | "PUT" | "PATCH" | "DELETE", body?: unknown, options: Omit<RequestOptions, "method" | "body"> = {}): Promise<T> {
   return apiRequest<T>(path, { ...options, method, body });
 }
+
+export function apiDeleteNoContent(path: string): Promise<void> {
+  return request(path, { method: "DELETE", redirect: "error" }, async (response) => {
+    if (response.status !== 204) {
+      throw new ApiError({ kind: "parse", status: response.status, message: "Unexpected response to DELETE." });
+    }
+  });
+}

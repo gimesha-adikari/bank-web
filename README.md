@@ -47,6 +47,12 @@ The web form requires an existing customer record and approved KYC. Bank-core's 
 
 The account-opening endpoint has no client idempotency key. After an uncertain result the page reloads the account list and offers read-only refreshes. An empty list can precede completion of the original request. Check the bank-core account list before initiating another opening. Confirmed openings show the server's opening balance and refresh the account by ID.
 
+### Admin customer deletion
+
+Admins can delete a customer record from its staff detail page by typing the exact customer UUID. The page fetches the record from bank-core before submitting DELETE. If the record has changed, review the refreshed record and confirm again. The read and the DELETE are separate requests. Bank-core keeps the linked login and KYC records and enforces dependency constraints during deletion. Any account, including a closed account with zero balance, or other protected dependent record blocks deletion.
+
+If the DELETE outcome is uncertain, the page reads the customer record once. An authoritative missing-record response returns the Admin to the directory. If the record is still present or the read fails, the detail page shows the uncertainty and disables deletion for that visit. A present record can precede completion of the original request. Check the current record before starting a new operation. The web app sends no automatic DELETE retry.
+
 ## Development
 
 Copy `.env.example` to `.env.local` and set the server-only backend URL:

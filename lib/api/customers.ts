@@ -1,13 +1,15 @@
 import type { Customer, CustomerRecordRequest, UserProfile } from "./contracts";
 import { ApiError } from "./errors";
-import { apiGet, apiJson } from "./http";
+import { apiDeleteNoContent, apiGet, apiJson } from "./http";
 
 const self = "/api/v1/customers/me";
 
 export const customersApi = {
   listStaffCustomers: (): Promise<Customer[]> => apiGet<Customer[]>("/api/v1/customers"),
   getStaffCustomer: (customerId: string): Promise<Customer> =>
-    apiGet<Customer>(`/api/v1/customers/${encodeURIComponent(customerId)}`),
+    apiGet<Customer>(`/api/v1/customers/${encodeURIComponent(customerId)}`, { cache: "no-store" }),
+  deleteStaffCustomer: (customerId: string): Promise<void> =>
+    apiDeleteNoContent(`/api/v1/customers/${encodeURIComponent(customerId)}`),
   searchCustomerUsers: (search: string): Promise<UserProfile[]> => {
     const query = new URLSearchParams({ search });
     return apiGet<UserProfile[]>(`/api/v1/users/all?${query.toString()}`);

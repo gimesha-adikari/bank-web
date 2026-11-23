@@ -99,6 +99,7 @@ const adminReviewDocumentIds = new Set([
 const customerRecords = new Map();
 const customerDirectoryRecords = new Map();
 const customerDeletionAttempts = [];
+const payHereNotifications = [];
 const retryAttempts = new Map();
 const openedAccounts = new Map();
 const accountOpeningClaims = new Map();
@@ -247,7 +248,7 @@ const server = http.createServer(async (request, response) => {
     staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords),
     adminReviewDecisions, adminReviewAttempts, tellerMutations, tellerReads,
     adminAccessMutations, adminAccessReads,
-    customerDeletionAttempts,
+    customerDeletionAttempts, payHereNotifications,
     tellerUsers: users.map(userDirectoryFor),
     ids: { ...managerTellerIds, ...adminAccessIds }
   });
@@ -327,7 +328,25 @@ const server = http.createServer(async (request, response) => {
       : json(response, 401, { message: "Invalid credentials" });
   }
   if (path === "auth/available" && request.method === "GET") return json(response, 200, "Username available");
+  if (path === "wallet/payhere/notify" || path === "wallet/payhere/notify/preapprove") {
+    if (request.method !== "POST") return json(response, 405, { message: "POST required" }, { Allow: "POST" });
+    if (request.headers["content-type"] !== "application/x-www-form-urlencoded") {
+      return json(response, 415, { message: "Form content type required" });
+    }
+    payHereNotifications.push({
+      path: url.pathname, contentType: request.headers["content-type"], body: (await body(request)).toString(),
+      hasAuthorization: Boolean(request.headers.authorization), hasCookie: Boolean(request.headers.cookie),
+      hasCsrf: Boolean(request.headers["x-csrf-token"])
+    });
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    return response.end("mock notification received");
+  }
   const user = authenticatedUser(request);
+  if ((path === "wallet/payments/w1-intent" && request.method === "GET") || (path === "wallet/payments/qr" && request.method === "POST")) {
+    if (!user) return json(response, 401, { code: "AUTH", message: "Missing session" });
+    if (user.role !== "CUSTOMER") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Customer role required" });
+    return json(response, 200, { intentId: "w1-intent", status: "PROCESSING" });
+  }
   const openingCustomer = user?.username.startsWith("opening-");
   if (path === "auth/logout" && request.method === "POST") {
     if (!user) return json(response, 401, { code: "AUTH", message: "Expired" });

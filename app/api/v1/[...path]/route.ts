@@ -20,7 +20,4 @@ export const POST = handle;
 export const PUT = handle;
 export const PATCH = handle;
 export const DELETE = handle;
-
-export async function OPTIONS(): Promise<Response> {
-  return new Response(null, { status: 204, headers: { Allow: "GET,POST,PUT,PATCH,DELETE,OPTIONS" } });
-}
+export const OPTIONS = handle;

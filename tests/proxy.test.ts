@@ -86,6 +86,30 @@ describe("same-origin banking proxy", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ["POST", ["wallet", "payhere", "notify"]],
+    ["POST", ["wallet", "payhere", "notify", "preapprove"]],
+    ["POST", ["wallet", "webhook"]],
+    ["GET", ["wallet", "pay%68ere", "return"]],
+    ["GET", ["wallet;route=test", "payhere;route=test", "cards", "return"]],
+    ["OPTIONS", ["wallet", "payhere", "notify"]]
+  ] as const)("blocks bank-core-only %s %j before reading the body or accessing bank-core", async (method, segments) => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const request = new Request(`http://web.local/api/v1/${segments.join("/")}`, {
+      method, headers: { ...validHeaders(), "Content-Type": "application/x-www-form-urlencoded" },
+      body: method === "POST" ? "order_id=fixture&md5sig=fixture" : undefined
+    });
+
+    const response = await proxyToBankingApi(request, segments);
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("Allow")).toBeNull();
+    expect(request.bodyUsed).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("clears both browser cookies and marks a protected 401 without replay", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: "AUTH", message: "Expired" }), { status: 401, headers: { "content-type": "application/json", "cache-control": "private", "retry-after": "1", "set-cookie": "bank-core=secret" } }));
     vi.stubGlobal("fetch", fetchMock);

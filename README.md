@@ -55,6 +55,8 @@ If the DELETE outcome is uncertain, the page reads the customer record once. An 
 
 ## Development
 
+The [PayHere routing inventory](docs/payhere-routing.md) records which requests use the bank-core origin, which wallet APIs use the BFF, and the backend checks required before enabling wallet features.
+
 Copy `.env.example` to `.env.local` and set the server-only backend URL:
 
 ```text

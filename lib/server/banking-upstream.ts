@@ -77,9 +77,10 @@ function isPublicPath(segments: readonly string[]): boolean {
   return PUBLIC_PATHS.has(path) || path.startsWith("auth/reset-password/");
 }
 
-function isExternalCallbackPath(segments: readonly string[]): boolean {
-  const path = segments.join("/");
-  return path === "wallet/payhere" || path.startsWith("wallet/payhere/") || path === "wallet/webhook" || path.startsWith("wallet/webhook/");
+function isCoreOnlyWalletPath(segments: readonly string[]): boolean {
+  // Compare route names without path parameters, which the backend can treat as metadata.
+  const [scope, route] = segments.slice(0, 2).map((segment) => segment.split(";", 1)[0]);
+  return scope === "wallet" && (route === "payhere" || route === "webhook");
 }
 
 function isBlockedBrowserPath(segments: readonly string[]): boolean {
@@ -87,7 +88,7 @@ function isBlockedBrowserPath(segments: readonly string[]): boolean {
 }
 
 function isAuthenticatedPath(segments: readonly string[]): boolean {
-  return !isPublicPath(segments) && !isExternalCallbackPath(segments) && !isBlockedBrowserPath(segments);
+  return !isPublicPath(segments) && !isBlockedBrowserPath(segments);
 }
 
 export function browserNotFoundResponse(): Response {
@@ -165,9 +166,8 @@ async function readKycBody(request: Request, signal: AbortSignal): Promise<Array
 
 async function fetchCanonicalBankingApi(request: Request, segments: readonly string[], options: UpstreamOptions = {}): Promise<UpstreamResult> {
   const method = request.method.toUpperCase();
-  const external = isExternalCallbackPath(segments);
   const authenticated = options.authenticated ?? isAuthenticatedPath(segments);
-  if (options.validateCsrf !== false && !external && ["POST", "PUT", "PATCH", "DELETE"].includes(method) && !validateCsrfRequest(request)) {
+  if (options.validateCsrf !== false && ["POST", "PUT", "PATCH", "DELETE"].includes(method) && !validateCsrfRequest(request)) {
     return { response: csrfFailureResponse(), authenticated };
   }
 
@@ -255,6 +255,10 @@ export function responseFromUpstream(result: UpstreamResult): Response {
 
 export async function proxyToBankingApi(request: Request, segments: readonly string[]): Promise<Response> {
   const canonical = canonicalizePathSegments(segments);
+  if (canonical && isCoreOnlyWalletPath(canonical)) return browserNotFoundResponse();
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: { Allow: "GET,POST,PUT,PATCH,DELETE,OPTIONS" } });
+  }
   if (!canonical) return invalidPathResponse();
   if (isBlockedBrowserPath(canonical)) return browserNotFoundResponse();
   const path = canonical.join("/");

@@ -117,6 +117,21 @@ At Part 00 this table was deliberately **unscored**. Part 01 now contains source
 | [AUTH-015](#auth-015--springtofastapi-internal-service-authentication) | Spring-to-FastAPI internal service authentication | 01 | Trusted bank-core service caller (not an end-user) | Restrict KYC/ML API routes to authenticated internal core requests | **L4** | None | Source-confirmed | [Part 01 record](#auth-015--springtofastapi-internal-service-authentication) |
 | [AUTH-016](#auth-016--layered-login-attempt-throttling) | Layered login attempt throttling | 01 | Unauthenticated login actors | Bound credential-guessing attempts without creating account-enumeration responses | **L4** | None | Source-confirmed | [Part 01 record](#auth-016--layered-login-attempt-throttling) |
 | [AUTH-017](#auth-017--backend-credential-recheck-endpoint) | Backend credential recheck endpoint | 01 | Authenticated direct API client | Confirm an existing password for an additional sensitive action | **L2** | Backend-only | Source-confirmed | [Part 01 record](#auth-017--backend-credential-recheck-endpoint) |
+| [KYC-001](#kyc-001-authenticated-kyc-entry-and-eligibility-discovery) | Authenticated KYC entry and eligibility discovery | 02 | Signed-in web CUSTOMER, backend authenticated identity | Discover whether identity verification and customer registration are required | **L4** | None | Source-confirmed | [Part 02 record](#kyc-001-authenticated-kyc-entry-and-eligibility-discovery) |
+| [KYC-002](#kyc-002-four-document-upload-and-spring-file-persistence) | Four-document upload and Spring file persistence | 02 | Authenticated KYC applicant | Persist four distinct images before application submission | **L4** | None | Source-confirmed | [Part 02 record](#kyc-002-four-document-upload-and-spring-file-persistence) |
+| [KYC-003](#kyc-003-consent-based-case-submission-and-duplicate-handling) | Consent-based case submission and duplicate handling | 02 | Authenticated user who owns four uploads | Create an authoritative KYC application without accidental repeated submissions | **L4** | None | Source-confirmed | [Part 02 record](#kyc-003-consent-based-case-submission-and-duplicate-handling) |
+| [KYC-004](#kyc-004-automated-fastapi-assessment-and-spring-decision-mapping) | Automated FastAPI assessment and Spring decision mapping | 02 | Spring internal KYC automation and FastAPI | Evaluate submitted images and persist assessment and case decision | **L4** | None | Source-confirmed | [Part 02 record](#kyc-004-automated-fastapi-assessment-and-spring-decision-mapping) |
+| [KYC-005](#kyc-005-customer-kyc-status-and-check-visibility) | Customer KYC status and check visibility | 02 | Authenticated case owner on web | See persisted case state, reasons and automatic checks after navigating away | **L4** | None | Source-confirmed | [Part 02 record](#kyc-005-customer-kyc-status-and-check-visibility) |
+| [KYC-006](#kyc-006-admin-kyc-decision-affecting-customer-status) | Admin KYC decision affecting customer status | 02 | ADMIN reviewer and customer awaiting outcome | Convert a reviewed case into approved, rejected or more-info state | **L4** | None | Source-confirmed | [Part 02 record](#kyc-006-admin-kyc-decision-affecting-customer-status) |
+| [KYC-007](#kyc-007-rejected-case-new-verification-application) | Rejected-case new verification application | 02 | Web CUSTOMER with latest REJECTED case | Reapply using new documents instead of reopening a terminal case | **L4** | None | Source-confirmed | [Part 02 record](#kyc-007-rejected-case-new-verification-application) |
+| [KYC-008](#kyc-008-needs-more-information-correction-and-resubmission) | Needs-more-information correction and resubmission | 02 | Customer with NEEDS_MORE_INFO and Admin reviewer | Replace requested documents and resume review | **L2** | Blocked by dependency | Source-confirmed | [Part 02 record](#kyc-008-needs-more-information-correction-and-resubmission) |
+| [KYC-009](#kyc-009-protected-kyc-document-retrieval-and-admin-preview) | Protected KYC document retrieval and Admin preview | 02 | Document owner or ADMIN | View images already stored for KYC | **L4** | None | Source-confirmed | [Part 02 record](#kyc-009-protected-kyc-document-retrieval-and-admin-preview) |
+| [KYC-010](#kyc-010-scheduled-kyc-image-retention-cleanup) | Scheduled KYC image retention cleanup | 02 | Scheduled Spring background job | Remove files associated with older terminal cases | **L4** | None | Source-confirmed | [Part 02 record](#kyc-010-scheduled-kyc-image-retention-cleanup) |
+| [KYC-011](#kyc-011-post-approval-banking-customer-self-registrationupsert) | Post-approval banking Customer self-registration/upsert | 02 | Authenticated CUSTOMER with latest approved KYC | Create the banking Customer row distinct from User login account | **L4** | None | Source-confirmed | [Part 02 record](#kyc-011-post-approval-banking-customer-self-registrationupsert) |
+| [KYC-012](#kyc-012-approved-kyc-and-customer-gate-for-self-service-account-opening) | Approved KYC and Customer gate for self-service account opening | 02 | Authenticated CUSTOMER opening own account | Prevent self-service banking account creation before customer onboarding | **L4** | None | Source-confirmed | [Part 02 record](#kyc-012-approved-kyc-and-customer-gate-for-self-service-account-opening) |
+| [KYC-013](#kyc-013-android-multi-step-document-capture-and-kyc-submission) | Android multi-step document capture and KYC submission | 02 | Logged-in Android banking app user | Capture images, consent and submit KYC through direct Retrofit | **L3** | None | Source-confirmed | [Part 02 record](#kyc-013-android-multi-step-document-capture-and-kyc-submission) |
+| [KYC-014](#kyc-014-android-kyc-polling-and-approved-customer-registration) | Android KYC polling and approved customer registration | 02 | Android user with active/reviewed case | See result and register Customer on approval | **L3** | None | Source-confirmed | [Part 02 record](#kyc-014-android-kyc-polling-and-approved-customer-registration) |
+| [KYC-015](#kyc-015-standalone-fastapi-identity-check-endpoints) | Standalone FastAPI identity-check endpoints | 02 | Trusted internal FastAPI client, not ordinary banking customer | Call an individual face-match, liveness, OCR or document-classification operation | **L2** | Backend-only | Source-confirmed | [Part 02 record](#kyc-015-standalone-fastapi-identity-check-endpoints) |
 
 Use stable feature IDs e.g. `AUTH-001`, `KYC-001`. Do not equate review area names with discovered features. On future edits, replace the placeholder row with evidenced records.
 
@@ -126,7 +141,7 @@ Use stable feature IDs e.g. `AUTH-001`, `KYC-001`. Do not equate review area nam
 |---|---|---|---|
 | 00 | Review framework and GitHub repository inventory | **COMPLETE** | Framework, repository discovery and expected-commit verification only |
 | 01 | Authentication, identity, and session management | **COMPLETE** | 17 authentication/identity capabilities source-reviewed; real-stack acceptance not verified |
-| 02 | Customer KYC and onboarding | **NOT REVIEWED** | Pending source-based feature review |
+| 02 | Customer KYC and onboarding | **COMPLETE** | 15 KYC/onboarding capabilities source-reviewed; no live-stack acceptance claimed |
 | 03 | Customer dashboard and profile | **NOT REVIEWED** | Pending source-based feature review |
 | 04 | Customer account lifecycle | **NOT REVIEWED** | Pending source-based feature review |
 | 05 | Banking transactions and double-entry ledger | **NOT REVIEWED** | Pending source-based feature review |
@@ -573,9 +588,381 @@ Part 00 established the review rules, the four verified GitHub repositories, obs
 
 ### Part 02 — Customer KYC and onboarding
 
-**Status:** NOT REVIEWED.
+**Status:** COMPLETE (source-based; not certification of live integrated-stack acceptance).
 
-**Review boundary:** Customer KYC and onboarding. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+**Reconfirmed main SHA snapshots on 2026-11-23:** bank-web 012fbc6ff2687d126c67c85ce54cfc8d16f79f27; bank-core 9f58e595a653db9d8aa59b70a35af8e2b0e725d3; bank-service cabdd323b4aa394910cb192ead6d233e9a12d9d3; bank-app 9d98ba24cb754b8295bd58770cd502438d3b7b38. All four recursive trees were non-truncated. Only this documentation branch is written.
+
+**Complete intended web journey:** verified login identity (AUTH-001/002/003) -> authenticated CUSTOMER -> detect missing banking Customer / KYC -> four independent uploads (ID front, ID back, selfie, proof of address) -> consent and JSON case submit -> Spring PENDING case -> FastAPI aggregate checks or Admin review -> latest case APPROVED -> separate customer-details PUT /api/v1/customers/me -> distinct Customer UUID linked to current User UUID -> self-service account opening eligible. Approval alone never creates the banking Customer record.
+
+**State machine:** Declared enum transitions are distinguished from reachability through actual controller and frontend paths.
+
+| Status | Entered by | Allowed outgoing states in code | Customer outcome |
+|---|---|---|---|
+| PENDING | Created by Core after four owned uploads+consent | AUTO_REVIEW, UNDER_REVIEW, NEEDS_MORE_INFO | Queued; no duplicate active case |
+| AUTO_REVIEW | Core orchestration | UNDER_REVIEW, NEEDS_MORE_INFO, APPROVED, REJECTED | FastAPI checks; auto approval/rejection/referral |
+| UNDER_REVIEW | ML referral/error or manual decision | APPROVED, REJECTED, NEEDS_MORE_INFO | Human decision required; user sees reason/checks |
+| NEEDS_MORE_INFO | ADMIN decision | UNDER_REVIEW, REJECTED allowed by enum | User sees reason but has no connected correction/resubmit route |
+| APPROVED | Mapped FastAPI APPROVE or ADMIN decision | None; terminal | Enables separate Customer upsert, does not create one |
+| REJECTED | Mapped FastAPI REJECT or ADMIN decision | None; terminal | Web may start new case with new uploads |
+| SUPERSEDED | Enum declared; no explicit source-confirmed transition into status | None; terminal | Web restart offered but entry state unproven |
+
+**Upload and persistence architecture:** Web 1 MiB image limit; Spring /kyc/upload accepts up to 10 MiB and 20 uploads/user UTC day, while web KYC BFF caps inbound body at 11 MiB. Core filesystem holds bytes and MySQL kyc_uploads metadata (hash, path, userId), kyc_cases, kyc_checks, kyc_idem_keys. FastAPI does not store uploaded images or create Customers. Uploaded images are separate persistent steps before case commit; incomplete browser drafts are not persisted.
+
+**ML scope and quality distinction:** [service/app/api/v1/kyc.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/api/v1/kyc.py) and [service/app/features/factory.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/factory.py) implement default simple/heuristic image assessments and optional model-backed implementations. [service/app/core/policy.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/core/policy.py) uses FACE_MATCH, LIVENESS, OCR_ID, DOC_CLASS to decide APPROVE/REJECT/UNDER_REVIEW; ADDRESS_MATCH and DOC_VALIDITY are computed but not currently used for its decision. Source-based automatic APPROVE is not proof of real-world identity assurance. GitHub models directory contains a dictionary but no deployable advanced ONNX weight files; [service/models/README.md](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/models/README.md) references an external snapshot not inspected. Model inference was not executed.
+
+**Client differences:** Web uses a manual status refresh, recoverable uncertain submission and rejected-case restart; Android has CameraX/ML Kit capture assistance, direct Retrofit uploads, status polling every ~3 seconds and approved-customer registration. Android assigns placeholder local liveness/face-match values 0.9 for picked selfie; those values are not FastAPI check results. Android has no matching idempotent submission recovery, RFI correction or rejected-case reapplication workflow. No local draft restore established.
+
+**Admin and downstream boundaries:** Admin role-specific decision/change-of-status is reviewed only as lifecycle dependency; full queue review remains Part 10. Self-service account-opening eligibility is confirmed in Spring and web, but account lifecycle/ledger remains Part 04, staff creation remains Part 07, Android-wide review Part 14, cross-cutting operational details Part 15.
+
+**Evidence:** Existing web Playwright suite runs [web/e2e/mock-bank-core.mjs](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/mock-bank-core.mjs) rather than live bank-core. Spring [core/src/test/java/com/bankingsystem/core/features/kyc/integration/KycMlContractIT.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/integration/KycMlContractIT.java) can send environment-gated fixtures to FastAPI, but no test run evidence was accessible or executed. No F1-F8 attributable real-stack artifacts found in four GitHub trees. All confidence labels are Source-confirmed and no Level 5 scores are claimed.
+
+
+
+#### KYC-001 — Authenticated KYC entry and eligibility discovery
+- **Review part:** 02.
+- **User roles:** Signed-in web CUSTOMER, backend authenticated identity.
+- **User objective:** Discover whether identity verification and customer registration are required.
+- **Workflow boundary and complete steps:** Login-eligible user enters /customer; dashboard loads GET /api/v1/customers/me and account list, sends missing-customer users to /customer/onboarding. Onboarding retrieves GET /kyc/me and /customers/me; missing case 404 becomes an empty document form, existing case becomes status and checks, approved case enables Customer details, rejected case offers restart. No Customer is generated merely by registration.
+- **Frontend / Android:** [web/components/banking/CustomerDashboard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerDashboard.tsx); [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts); [web/lib/api/customers.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/customers.ts); [web/lib/server/banking-upstream.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/server/banking-upstream.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java); [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java); [core/src/main/java/com/bankingsystem/core/modules/common/security/CurrentUserService.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/security/CurrentUserService.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java); [core/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java)
+- **External dependencies:** No FastAPI request during eligibility reads.
+- **Authorization:** Web role guard CUSTOMER; Spring KYC controllers use authenticated user identity but do not impose CUSTOMER-only annotation; customer self GET requires authentication.
+- **Success, failure and recovery behavior:** No case, active case, approved, rejected and error states; 403 denial is not treated as a missing record; manual refresh available.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts); [web/tests/kyc-client.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/kyc-client.test.ts)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Web entry and missing-state discovery connected to real Spring endpoints in source.
+- **Unsupported / incomplete behavior:** Unfinished document draft and upload UUIDs do not survive page reload; Spring KYC submission authorization is broader than web guard.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Consider resumable drafts and clarifying KYC submission role policy.
+
+
+#### KYC-002 — Four-document upload and Spring file persistence
+- **Review part:** 02.
+- **User roles:** Authenticated KYC applicant.
+- **User objective:** Persist four distinct images before application submission.
+- **Workflow boundary and complete steps:** Web selects ID front, ID back, selfie and address proof separately; local validation accepts JPEG/PNG/WebP, nonempty files at most 1 MiB. Each multipart POST /api/kyc/upload sends file and type through CSRF-protected KYC BFF. Spring requires valid type/content-type, allows up to 10 MiB, limits 20 uploads per user UTC day, stores bytes under date and UUID file name, calculates SHA-256 and creates kyc_uploads metadata; returns UUID used in later case submission.
+- **Frontend / Android:** [web/components/banking/KycDocumentUpload.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/KycDocumentUpload.tsx); [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts); [web/app/api/kyc/[...path]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/kyc/%5B...path%5D/route.ts); [web/lib/server/banking-upstream.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/server/banking-upstream.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycUploadController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycUploadController.java); [core/src/main/java/com/bankingsystem/core/modules/common/support/storage/FileSystemStorageServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/storage/FileSystemStorageServiceImpl.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycUpload.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycUpload.java); [core/src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql); image bytes live on Spring host filesystem, not DB blobs or FastAPI.
+- **External dependencies:** No ML request during upload; FastAPI only later receives images as base64 for checks.
+- **Authorization:** Server identifies uploader from JWT session; later case submission checks all four IDs are owned by the submitting user.
+- **Success, failure and recovery behavior:** Each independently uploaded image receives UUID; invalid type/size and daily limit have explanatory web errors; failed upload does not count as case submission.
+- **Existing automated tests:** [web/e2e/kyc-transport.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/kyc-transport.spec.ts); [web/tests/kyc-bff.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/kyc-bff.test.ts); [web/tests/kyc-client.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/kyc-client.test.ts)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Four-step image upload and core-owned byte persistence implemented.
+- **Unsupported / incomplete behavior:** Web 1 MiB, core 10 MiB and BFF 11 MiB body limit differ; unused uploaded images may remain without a case and no complete orphan cleanup was found.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Align limits and define upload retention and cleanup.
+
+
+#### KYC-003 — Consent-based case submission and duplicate handling
+- **Review part:** 02.
+- **User roles:** Authenticated user who owns four uploads.
+- **User objective:** Create an authoritative KYC application without accidental repeated submissions.
+- **Workflow boundary and complete steps:** Web confirms four distinct upload IDs and consent, POSTs JSON docFrontId/docBackId/selfieId/addressId/consent plus X-Idempotency-Key to /api/kyc/submit. Spring checks consent, same-user ownership, distinct UUIDs and matching document types, creates KycCase PENDING then invokes auto-review. If the latest case is PENDING/AUTO_REVIEW/UNDER_REVIEW/NEEDS_MORE_INFO, controller returns existing status/caseId without creating a duplicate. On ambiguous browser timeout, frontend GETs current case before deliberate retry with same key and payload.
+- **Frontend / Android:** [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts); [web/lib/server/banking-upstream.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/server/banking-upstream.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java); [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java); [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycIdemKey.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycIdemKey.java); [core/src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql)
+- **External dependencies:** After case persistence Spring initiates KYC-004 FastAPI aggregate assessment.
+- **Authorization:** Authenticated principal determines case owner; all 4 upload UUIDs must belong to same principal and match corresponding types.
+- **Success, failure and recovery behavior:** Valid submission returns status/caseId, active duplicate returns case, invalid/foreign ID or missing consent rejected; uncertain web request reconciled before replay.
+- **Existing automated tests:** [core/src/test/java/com/bankingsystem/core/features/kyc/KycDuplicateActiveCaseTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/KycDuplicateActiveCaseTest.java); [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Submission, same-owner checks, active-case reuse and web retry experience connected.
+- **Unsupported / incomplete behavior:** Uploads and submission are separate transactions; optional idempotency key and non-durable web state; Android does not supply idempotency header.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Evaluate durable drafts and cross-platform idempotent retry strategy.
+
+
+#### KYC-004 — Automated FastAPI assessment and Spring decision mapping
+- **Review part:** 02.
+- **User roles:** Spring internal KYC automation and FastAPI.
+- **User objective:** Evaluate submitted images and persist assessment and case decision.
+- **Workflow boundary and complete steps:** Spring on submission or scheduled PENDING batch marks AUTO_REVIEW, reads 4 files, base64 encodes, sends POST /api/v1/kyc/aggregate with bankUserId and caseId through authenticated WebClient. FastAPI computes FACE_MATCH, LIVENESS, OCR_ID, DOC_CLASS, ADDRESS_MATCH and DOC_VALIDITY using configured factory backends and thresholds, returns decision/reasons/checks; Spring stores individual KycCheck rows and maps APPROVE to APPROVED, REJECT to REJECTED, others to UNDER_REVIEW. Absent/failed ML response triggers UNDER_REVIEW with ERROR check.
+- **Frontend / Android:** [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx) (displays stored result, not direct inference)
+- **Next.js BFF / API integration:** Spring-to-FastAPI internal POST, no browser BFF: [core/src/main/java/com/bankingsystem/core/features/kyc/integration/MlKycClient.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/integration/MlKycClient.java); [core/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java); [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java); [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCheck.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCheck.java)
+- **External dependencies:** [service/app/api/v1/kyc.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/api/v1/kyc.py); [service/app/core/policy.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/core/policy.py); [service/app/features/factory.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/factory.py); [service/app/core/internal_auth.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/core/internal_auth.py); defaults use simple/heuristic implementations, optional ONNX advanced backends need runtime assets.
+- **Authorization:** Internal X-Bank-Core-Auth shared service credential; FastAPI only advises, Spring owns persisted state.
+- **Success, failure and recovery behavior:** Policy APPROVE if its four gating checks pass; severe low face or liveness below 0.40 with failures results REJECT; other failures UNDER_REVIEW. ADDRESS_MATCH and DOC_VALIDITY calculated but not used by decide() gating. Exceptions/empty ML yield UNDER_REVIEW.
+- **Existing automated tests:** [core/src/test/java/com/bankingsystem/core/features/kyc/integration/KycMlContractIT.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/integration/KycMlContractIT.java); [core/src/test/java/com/bankingsystem/core/features/kyc/integration/MlKycClientTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/integration/MlKycClientTest.java); [service/tests/test_aggregate.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/tests/test_aggregate.py)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Source-connected default heuristic assessment, decision mapping, check persistence and fallback to manual review.
+- **Unsupported / incomplete behavior:** No real-stack inference execution observed; GitHub models tree lacks advanced ONNX weight files, see [service/models/README.md](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/models/README.md). Identity verification accuracy is not established by source or fixtures.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Verify deployment model availability/provenance and permitted fixture acceptance before assigning assurance to automatic decisions.
+
+
+#### KYC-005 — Customer KYC status and check visibility
+- **Review part:** 02.
+- **User roles:** Authenticated case owner on web.
+- **User objective:** See persisted case state, reasons and automatic checks after navigating away.
+- **Workflow boundary and complete steps:** Customer onboarding GET /api/kyc/me for latest by user UUID and GET /api/kyc/{caseId}/checks. Core returns caseId, status, IDs, time, reviewer reason and checks; web maps seven enumerated statuses to messages, shows decision reason, check pass/fail/scores, special ML-unavailable note, and offers manual Refresh. Case persists across visits unlike unsubmitted file draft.
+- **Frontend / Android:** [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx); [web/lib/api/contracts.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/contracts.ts)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts); [web/app/api/kyc/[...path]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/kyc/%5B...path%5D/route.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java); [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/dto/KycCaseResponse.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/dto/KycCaseResponse.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java); [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCheck.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCheck.java)
+- **External dependencies:** Status GET reads persisted Spring data and does not invoke ML service.
+- **Authorization:** GET latest scoped to current user; checks by case owner or ADMIN only.
+- **Success, failure and recovery behavior:** Pending/review/approved/rejected/needs-more-info/superseded states, missing-case and service-error differentiation; manual refresh.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts); [web/tests/kyc-client.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/kyc-client.test.ts); [core/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Latest-status and per-check UI integrated with Spring persistence.
+- **Unsupported / incomplete behavior:** No customer-accessible full history or prior-case checks; no web automatic polling; RFI visible but not actionable.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Consider optional case history and notification.
+
+
+#### KYC-006 — Admin KYC decision affecting customer status
+- **Review part:** 02.
+- **User roles:** ADMIN reviewer and customer awaiting outcome.
+- **User objective:** Convert a reviewed case into approved, rejected or more-info state.
+- **Workflow boundary and complete steps:** Admin reads GET /admin/kyc status queue, case checks and authenticated documents, confirms POST /admin/kyc/{id}/decision with APPROVED, REJECTED or NEEDS_MORE_INFO and reason. Core enforces ADMIN role and enum state transitions; writes reviewerId, decision reason/time and status. Customer sees changed latest KYC through GET /kyc/me; APPROVED allows customer /customers/me registration. Detailed Admin workspace evaluation remains Part 10.
+- **Frontend / Android:** [web/components/banking/AdminKycReview.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/AdminKycReview.tsx); [web/components/banking/AdminKycDocumentPreview.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/AdminKycDocumentPreview.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts); [web/app/api/admin/kyc/[[...path]]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/admin/kyc/%5B%5B...path%5D%5D/route.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java); [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java); [core/src/main/java/com/bankingsystem/core/modules/common/enums/KycStatus.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/enums/KycStatus.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java); [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCheck.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCheck.java)
+- **External dependencies:** Manual decision is Spring-side, no ML call required.
+- **Authorization:** ADMIN role is required for decisions; document read requires uploaded owner or ADMIN.
+- **Success, failure and recovery behavior:** Allowed case decision persists and is visible to customer after refresh; invalid transition rejected; web reconciliation handles uncertain admin decision response.
+- **Existing automated tests:** [web/e2e/admin-kyc-review.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/admin-kyc-review.spec.ts); [web/tests/admin-kyc-review.test.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/admin-kyc-review.test.tsx); [core/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Authorized human decisions and customer lifecycle effect are connected.
+- **Unsupported / incomplete behavior:** No demonstrated automatic notification to customer; Admin queue usability belongs to Part 10.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Consider notifications and finish independent Admin review in Part 10.
+
+
+#### KYC-007 — Rejected-case new verification application
+- **Review part:** 02.
+- **User roles:** Web CUSTOMER with latest REJECTED case.
+- **User objective:** Reapply using new documents instead of reopening a terminal case.
+- **Workflow boundary and complete steps:** Web displays REJECTED reason and Start a new verification. It clears local draft and permits four new uploads, fresh consent and POST submit. Core REJECTED is terminal, but active-case filter excludes REJECTED so new KycCase row is created; GET /kyc/me then returns newest case. SUPERSEDED also exposes restart in web UI though no source-confirmed setter/transition into that enum state was identified.
+- **Frontend / Android:** [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts); [web/lib/server/banking-upstream.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/server/banking-upstream.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java); [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java) (prior case retained, new case created)
+- **External dependencies:** New case again runs automatic FastAPI assessment.
+- **Authorization:** New uploaded IDs must belong to current user; active cases prevent duplicate.
+- **Success, failure and recovery behavior:** Web user can restart after rejection; old case remains in DB; no in-place terminal state change.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts); [core/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Complete web rejected-case restart source trace.
+- **Unsupported / incomplete behavior:** No customer history UI; Android does not offer equivalent guided restart; SUPERSEDED status lacks a proven reachable transition.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Define cross-platform reapplication guidance and supersession semantics.
+
+
+#### KYC-008 — Needs-more-information correction and resubmission
+- **Review part:** 02.
+- **User roles:** Customer with NEEDS_MORE_INFO and Admin reviewer.
+- **User objective:** Replace requested documents and resume review.
+- **Workflow boundary and complete steps:** ADMIN can mark NEEDS_MORE_INFO and customer sees reason. Enum allows transition to UNDER_REVIEW/REJECTED; KycCaseServiceImpl contains a service branch to replace document IDs in NEEDS_MORE_INFO. But KycCaseController.submit returns existing active case in NEEDS_MORE_INFO before invoking the service method. Web disables a replacement form and instructs contact bank. No connected customer correction or resubmission action exists.
+- **Frontend / Android:** [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx); [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycStatusRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycStatusRoute.kt)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts) (only existing submit; no correction endpoint)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java); [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java); [core/src/main/java/com/bankingsystem/core/modules/common/enums/KycStatus.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/enums/KycStatus.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java) retains status, reason and original document IDs
+- **External dependencies:** No new ML evaluation from customer corrections is reachable.
+- **Authorization:** ADMIN may decide, customer cannot invoke ADMIN review endpoint.
+- **Success, failure and recovery behavior:** Customer sees reason without ability to correct/re-submit existing case; case may later be rejected by reviewer.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts); [core/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/kyc/KycStatusContractTest.java)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 2 — One-sided**, scoped to this feature.
+- **Independent status:** Blocked by dependency.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** RFI status/reason and partial service replacement branch exist.
+- **Unsupported / incomplete behavior:** The intended recovery flow is blocked at controller and absent from web/Android UI.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Add a dedicated secured correction submission path and transition to review.
+
+
+#### KYC-009 — Protected KYC document retrieval and Admin preview
+- **Review part:** 02.
+- **User roles:** Document owner or ADMIN.
+- **User objective:** View images already stored for KYC.
+- **Workflow boundary and complete steps:** Admin selects uploaded document; browser GET /api/kyc/file/{uuid} through protected BFF, Spring verifies current user equals uploadedBy or ROLE_ADMIN then reads file bytes and returns image MIME and inline filename. BFF adds no-store, nosniff and sandbox response headers. Admin renders secure preview; missing/nonowner document receives error. No customer-facing document gallery is wired.
+- **Frontend / Android:** [web/components/banking/AdminKycDocumentPreview.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/AdminKycDocumentPreview.tsx); [web/components/banking/AdminKycReview.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/AdminKycReview.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts); [web/lib/server/banking-upstream.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/server/banking-upstream.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycFileController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycFileController.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/modules/common/support/storage/FileSystemStorageServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/storage/FileSystemStorageServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycUpload.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycUpload.java)
+- **External dependencies:** No FastAPI call; original bytes served from core disk.
+- **Authorization:** Ownership or ADMIN checked server-side, with active JWT/session.
+- **Success, failure and recovery behavior:** Binary file for permitted user, rejection to unauthorized, missing document or file can fail after retention cleanup.
+- **Existing automated tests:** [web/tests/kyc-bff.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/kyc-bff.test.ts); [web/tests/kyc-client.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/kyc-client.test.ts); [web/e2e/kyc-transport.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/kyc-transport.spec.ts)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Authorized retrieval path and Admin preview source-connected.
+- **Unsupported / incomplete behavior:** No independent customer KYC image history viewer; retention may remove older bytes.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Confirm historical document retention and access expectations.
+
+
+#### KYC-010 — Scheduled KYC image retention cleanup
+- **Review part:** 02.
+- **User roles:** Scheduled Spring background job.
+- **User objective:** Remove files associated with older terminal cases.
+- **Workflow boundary and complete steps:** Daily @Scheduled at 03:15 service scans KycCase rows; APPROVED and REJECTED cases updated at least 30 days ago have their four referenced file UUIDs removed via FileStorageService.delete, which deletes filesystem bytes and KycUpload DB metadata; case and check rows remain. Missing file cleanup is tolerated.
+- **Frontend / Android:** Not applicable: background operation without customer UI.
+- **Next.js BFF / API integration:** Not applicable: scheduled service, not an HTTP request.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java); [core/src/main/java/com/bankingsystem/core/modules/common/support/storage/FileSystemStorageServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/storage/FileSystemStorageServiceImpl.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java); [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycUpload.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycUpload.java)
+- **External dependencies:** No FastAPI involvement.
+- **Authorization:** System-internal scheduled task, not a customer action.
+- **Success, failure and recovery behavior:** Terminal old image bytes and metadata deleted, case status and checks remain.
+- **Existing automated tests:** No dedicated retention-service test identified in inspected GitHub KYC test tree; not executed.
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Explicit scheduled terminal-case file deletion exists.
+- **Unsupported / incomplete behavior:** No proven cleanup for unsubmitted orphan uploads or other states, and not an established full data-retention compliance policy.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Review upload lifecycle, cleanup and retention evidence in Part 15.
+
+
+#### KYC-011 — Post-approval banking Customer self-registration/upsert
+- **Review part:** 02.
+- **User roles:** Authenticated CUSTOMER with latest approved KYC.
+- **User objective:** Create the banking Customer row distinct from User login account.
+- **Workflow boundary and complete steps:** APPROVED latest KYC reveals web CustomerRecordForm, prefilled from GET /users/me when available. Customer supplies first/last name, gender, email, phone, DOB, optional address, status. Browser PUT /api/v1/customers/me includes userId; Spring checks latest KYC APPROVED (else 409), overwrites submitted userId from principal, looks up Customer by owning User UUID and creates new Customer row or updates existing. Separate Customer UUID assigned and one-to-one association established; browser reloads GET /customers/me and displays Onboarding complete/Open account.
+- **Frontend / Android:** [web/components/banking/CustomerRecordForm.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerRecordForm.tsx); [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/customers.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/customers.ts); [web/lib/api/users.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/users.ts); [web/lib/server/banking-upstream.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/server/banking-upstream.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java); [core/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/dto/CustomerRequestDTO.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/dto/CustomerRequestDTO.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java); [core/src/main/java/com/bankingsystem/core/features/auth/domain/User.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/domain/User.java); [core/src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql)
+- **External dependencies:** No new ML call; uses persisted KYC approval.
+- **Authorization:** Authenticated principal User UUID cannot be replaced via body; latest approved status mandatory; separate staff /customers POST belongs Part 07.
+- **Success, failure and recovery behavior:** Creates or updates Customer, confirms by GET; errors on 409/not-approved, validation, interrupted save; later visit restores data.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts); [web/tests/customer-client.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/customer-client.test.ts)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Complete web customer-row creation/upsert after approval and persistent user linkage.
+- **Unsupported / incomplete behavior:** Approval does not auto-create Customer. No automatic verified-field extraction-to-Customer promotion; gender/DOB/phone must be provided.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Consider careful verified-field prefill and customer completion messaging.
+
+
+#### KYC-012 — Approved KYC and Customer gate for self-service account opening
+- **Review part:** 02.
+- **User roles:** Authenticated CUSTOMER opening own account.
+- **User objective:** Prevent self-service banking account creation before customer onboarding.
+- **Workflow boundary and complete steps:** Web account-opening eligibility checks GET /customers/me and /kyc/me, shows Continue onboarding when record missing or latest case not APPROVED. Spring POST /api/v1/accounts requires CUSTOMER, looks up Customer linked to current User UUID, checks latest KycCase status APPROVED, otherwise rejects with missing-customer or ERR_KYC_NOT_APPROVED before account opening. Teller-assisted account opening follows different path reserved for Part 08; account/ledger details reserved Part 04.
+- **Frontend / Android:** [web/components/banking/useAccountOpeningEligibility.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/useAccountOpeningEligibility.ts); [web/components/banking/CustomerAccountForm.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerAccountForm.tsx); [web/components/banking/CustomerDashboard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerDashboard.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/accounts.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/accounts.ts); [web/lib/api/customers.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/customers.ts); [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java); [core/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java) and [core/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/domain/KycCase.java) are prerequisites, not duplicate account data
+- **External dependencies:** No FastAPI call at account-opening eligibility check.
+- **Authorization:** Backend CUSTOMER role, owning Customer row and latest approved KYC independently enforced.
+- **Success, failure and recovery behavior:** Missing/invalid KYC prevents self-service account opening, completed Customer+approval unlocks form.
+- **Existing automated tests:** [core/src/test/java/com/bankingsystem/core/features/accounts/AccountOpeningIntegrationTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/accounts/AccountOpeningIntegrationTest.java); [web/e2e/customer-account-opening.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-account-opening.spec.ts)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 4 — Functionally implemented**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Frontend preflight and Spring business eligibility enforcement wired.
+- **Unsupported / incomplete behavior:** Does not demonstrate all account types or other banking paths use the same gate; defer to Parts 04 and 08.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Verify downstream eligibility across relevant workflows in later parts.
+
+
+#### KYC-013 — Android multi-step document capture and KYC submission
+- **Review part:** 02.
+- **User roles:** Logged-in Android banking app user.
+- **User objective:** Capture images, consent and submit KYC through direct Retrofit.
+- **Workflow boundary and complete steps:** Android Verify Identity displays Document -> Selfie -> Address -> Review steps. Camera/gallery capture, ML Kit local face/blink processing and document quality helpers aid selection. Each selected URI asynchronously uploads multipart POST kyc/upload, IDs retained in ViewModel; four required IDs and consent trigger POST kyc/submit. On recognized response status app navigates to status page. Selfie selection/capture assigns local face/liveness scores of 0.9 as UI placeholders; these are not FastAPI results.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycRoute.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycScreens.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycScreens.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycViewModel.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/remote/api/KycApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/remote/api/KycApi.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/repository/KycRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/repository/KycRepositoryImpl.kt); direct Android bearer, no browser BFF
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycUploadController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycUploadController.java); [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java)
+- **Database / ledger:** Same core filesystem and KycCase rows; mobile URI and upload-ID state only in app memory.
+- **External dependencies:** Local ML Kit capture guidance; actual FastAPI approval separately performed by Spring after case submission.
+- **Authorization:** Android Bearer from AUTH-011; backend checks owner and consent.
+- **Success, failure and recovery behavior:** Native step UI/upload/submission; generic failed submission returns home; no documented safe retry reconciliation.
+- **Existing automated tests:** No Android instrumented KYC acceptance test identified; backend/web mock tests do not establish device execution.
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 3 — Partially functional**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Mobile camera/gallery, upload, consent and case submission wired in source.
+- **Unsupported / incomplete behavior:** Hardcoded local 0.9 scores, volatile upload state, no idempotency header, weak failure handling and differing file validation.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Use verified capture quality feedback, durable draft/recovery and Android test acceptance.
+
+
+#### KYC-014 — Android KYC polling and approved customer registration
+- **Review part:** 02.
+- **User roles:** Android user with active/reviewed case.
+- **User objective:** See result and register Customer on approval.
+- **Workflow boundary and complete steps:** Android status screen polls GET kyc/me and GET kyc/{id}/checks about every 3 seconds until APPROVED/REJECTED/NEEDS_MORE_INFO. On APPROVED it shows Proceed to Customer Registration; form gathers name, gender, email, phone, DOB, optional address and status ACTIVE. Repository gets user UUID from profile and PUTs /api/v1/customers/me; Spring requires approved latest KYC and creates/upserts Customer. Successful mobile form navigates Home.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycStatusRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycStatusRoute.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycViewModel.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/customer/interfaces/ui/CustomerRegistrationScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/customer/interfaces/ui/CustomerRegistrationScreen.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/customer/interfaces/ui/CustomerRegistrationViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/customer/interfaces/ui/CustomerRegistrationViewModel.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/remote/api/KycApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/remote/api/KycApi.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/customer/integration/remote/api/CustomerApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/customer/integration/remote/api/CustomerApi.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/customer/integration/repository/CustomerRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/customer/integration/repository/CustomerRepositoryImpl.kt)
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java); [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java); [core/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java)
+- **Database / ledger:** [core/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/domain/Customer.java) with current User UUID; KYC status persisted in core
+- **External dependencies:** No ML re-evaluation on status reads or Customer registration.
+- **Authorization:** Android Bearer; core latest-approved gate applies. Fallback mobile POST /customers on 404/405/501 requires staff role in Spring, so not normal customer alternative.
+- **Success, failure and recovery behavior:** Polling/status/score display, approval CTA and Customer registration result; errors can appear as no status, UI defaults text to UNDER_REVIEW.
+- **Existing automated tests:** No dedicated Android end-to-end KYC/onboarding tests found in inspected paths.
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 3 — Partially functional**, scoped to this feature.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Android status polling and approved Customer form linked to real API paths.
+- **Unsupported / incomplete behavior:** No mobile rejected restart or NEEDS_MORE_INFO correction, network/error ambiguity, limited restoration of incomplete registration; fallback to staff-only POST.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Improve mobile error/status handling, reapplication and recovery after interrupted Customer upsert.
+
+
+#### KYC-015 — Standalone FastAPI identity-check endpoints
+- **Review part:** 02.
+- **User roles:** Trusted internal FastAPI client, not ordinary banking customer.
+- **User objective:** Call an individual face-match, liveness, OCR or document-classification operation.
+- **Workflow boundary and complete steps:** FastAPI exposes POST /api/v1/kyc/face/match, /liveness, /ocr/id and /doc/class, accepting JSON base64 image fields with required per-operation inputs. Each calls selected backend factory and returns KycResult type, score, passed and detailsJson. Spring's customer KYC flow only calls /aggregate; standalone routes neither create KycCase nor change bank approval state.
+- **Frontend / Android:** No web or Android UI for standalone internal endpoints.
+- **Next.js BFF / API integration:** Internal FastAPI JSON POST with X-Bank-Core-Auth; no BFF or end-user JWT.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/kyc/integration/MlKycClient.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/integration/MlKycClient.java) invokes only aggregate in actual KYC workflow
+- **Database / ledger:** No customer KYC DB writes by standalone FastAPI check calls.
+- **External dependencies:** [service/app/api/v1/kyc.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/api/v1/kyc.py); [service/app/api/v1/schemas.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/api/v1/schemas.py); [service/app/features/factory.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/factory.py); [service/app/features/face/simple.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/face/simple.py); [service/app/features/liveness/simple.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/liveness/simple.py); [service/app/features/ocr/simple.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/ocr/simple.py); [service/app/features/doccls/simple.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/doccls/simple.py)
+- **Authorization:** Service shared secret required, not public API; health remains public.
+- **Success, failure and recovery behavior:** Score/flags or bad request for missing inputs; disabled liveness backend may return unavailable; no banking customer-visible effect.
+- **Existing automated tests:** [service/tests/test_face_match.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/tests/test_face_match.py); [service/tests/test_liveness.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/tests/test_liveness.py); [service/tests/test_ocr.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/tests/test_ocr.py); [service/tests/test_internal_auth.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/tests/test_internal_auth.py)
+- **Available live verification:** No attributable real-stack four-service acceptance trace was accessible; tests inspected as code, not run during Part 02.
+- **Completeness level:** **Level 2 — One-sided**, scoped to this feature.
+- **Independent status:** Backend-only.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Four independently callable service endpoints have actual processing code.
+- **Unsupported / incomplete behavior:** No separate bank customer workflow consumes them; advanced ONNX runtime assets unavailable in inspected GitHub tree.
+- **Source references:** Commit-pinned GitHub links appear in implementation and test fields above.
+- **Future implementation opportunities:** Keep as internal reusable verification primitives, not evidence of separate automatic customer approvals.
+
+
 
 ### Part 03 — Customer dashboard and profile
 
@@ -707,6 +1094,16 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 | AUTH-001/010 → Part 02 | Login user identity precedes KYC/customer onboarding | [core/src/main/java/com/bankingsystem/core/features/auth/domain/User.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/domain/User.java); [core/src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql) | User creation is not equivalent to customer or KYC completion (not reviewed here) |
 | AUTH-008 → Parts 09 and 11 | Manager Teller and Admin role changes | [core/src/main/java/com/bankingsystem/core/features/accesscontrol/application/impl/AccessControlServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/application/impl/AccessControlServiceImpl.java) | Business workflows not reviewed; auth impact is session revocation |
 | AUTH-015 → Part 02/15 | Core-to-FastAPI shared credential | [core/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java); [service/app/core/internal_auth.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/core/internal_auth.py) | Only service authentication reviewed; KYC workflow deferred |
+| AUTH-001/002/003/004/011 -> KYC-001/002/003 | Verified login and authenticated web/Android session | [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java) | User login identity precedes KYC; User is not Customer |
+| KYC-002 -> KYC-003 | Four distinct current-user-owned uploaded IDs and consent | [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java) | Upload alone is not a submitted case |
+| AUTH-015 -> KYC-004 | X-Bank-Core-Auth internal credential | [core/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java); [service/app/core/internal_auth.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/core/internal_auth.py) | FastAPI suggestions not independent customer approval |
+| KYC-003/004 -> KYC-005 | Persisted case status and checks | [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java) | Customer sees authoritative Spring persisted result |
+| KYC-006/008 -> Part 10 | Admin review and needs-more-info workflow | [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java) | Admin full workspace remains unreviewed |
+| KYC-004/006 -> KYC-011 | Latest case must be APPROVED | [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | Separate Customer upsert, not auto-created |
+| KYC-011/012 -> Part 04 | Customer record and latest approved KYC | [core/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java) | Bank-account lifecycle still unreviewed |
+| KYC-011 -> Parts 03/07 | Customer profile/record fields and staff creation | [core/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java) | Customer editing and staff workflows deferred |
+| KYC-013/014 -> Part 14 | Android capture/polling and Customer self-registration | [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycRoute.kt) | Native app-wide review remains unreviewed |
+| KYC-002/004/010/015 -> Part 15 | Storage cleanup, model runtime and internal service auth | [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java); [service/app/features/factory.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/factory.py) | Operational/deployment review deferred |
 
 ## 12. Future implementation candidates
 
@@ -723,6 +1120,17 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 | Assess distributed login-throttling operation | AUTH-016 | Limiter is in-process Caffeine buckets rather than shared across nodes | Undecided |
 | Confirm per-channel username-change and recheck requirements | AUTH-014, AUTH-017 | Android change flow submits currentPassword but updateProfile does not evaluate it; web has no editor | Undecided |
 | Core–FastAPI internal-identity lifecycle | AUTH-015 | Static shared secret authenticates KYC service requests without managed rotation workflow | Undecided |
+| Implement customer correction/resubmission for NEEDS_MORE_INFO | KYC-008 | Controller returns active case before replacement; web has no correction form | Actual missing journey; undecided |
+| Replace Android local placeholder liveness/face indicators | KYC-013 | Android assigns 0.9 on selfie without real check feedback | Partial native experience; undecided |
+| Add Android rejected-case restart and error/retry recovery | KYC-013, KYC-014 | Web supports restart and idempotent reconciliation, Android does not | Missing cross-client steps; undecided |
+| Validate actual FastAPI models/runtime and KYC end-to-end acceptance | KYC-004 | Default simple backends, advanced ONNX weights absent in reviewed GitHub, no run evidence | Evidence/assurance opportunity; undecided |
+| Decide whether ADDRESS_MATCH and DOC_VALIDITY should gate approval | KYC-004 | Checks computed but policy decide() ignores them | Optional policy decision; undecided |
+| Align 1 MiB/10 MiB/11 MiB upload limits and orphan retention | KYC-002, KYC-010 | Limits differ; retention only terminal referenced files | Operational design; undecided |
+| Persist unfinished uploads and standardize submission idempotency | KYC-002, KYC-003, KYC-013 | Uploads persist separately, UI drafts volatile, Android no key | Partial workflow; undecided |
+| Consider KYC case history and progress notifications | KYC-005 | Customer can query only latest case; web manual refresh | Optional enhancement; undecided |
+| Clarify Spring KYC eligibility role rules | KYC-001 | Web CUSTOMER guard vs Spring authenticated-any-role KYC routes | Authorization product policy; undecided |
+| Explicitly retain separate approved KYC -> Customer registration step | KYC-011 | Banking Customer not auto-created, additional fields mandatory | Product design; undecided |
+| Define SUPERSEDED lifecycle and re-verification requirements | KYC-007 | Enum exists without known transition setter | Optional design; undecided |
 
 ## 13. Known evidence limitations
 
@@ -738,6 +1146,11 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 - Android device/emulator runtime and email SMTP delivery were not observed. Hence all Part 01 evidence confidence is Source-confirmed and no Level 5 is asserted.
 - Config-dependent email-change link destination and cross-platform difference in password-change sign-out are identified as completeness boundaries, not established live defects.
 - Features not found in inspected source (MFA, social login, device-session management, etc.) are catalogued only as unsupported possibilities, not falsely scored as implemented.
+- Part 02 inspected source only at pinned GitHub SHAs; no application source changed, and no tests, device/emulator runs, ML inference, real document processing, SMTP, or database mutations were performed.
+- No attributable historical F1–F8 actual integrated-stack execution reports or verifiable outputs were accessible in the reviewed four GitHub repository trees; web Playwright uses mock bank-core.
+- KycMlContractIT is environment-gated integration test source, not independently confirmed successful execution. Optional ONNX model weights are not tracked in reviewed bank-service source; local/external model snapshots were not available for verification.
+- Part 02 found explicit source limitations in NEEDS_MORE_INFO customer correction, Android placeholder face/liveness indicators, mobile submission recovery and upload-draft persistence.
+- Part 02 confirms latest approved KYC and separately saved Customer record are both required for self-service account opening; this review does not certify account-opening/ledger, Admin-workspace completeness, staff lifecycle or whole Android platform.
 
 ## 14. Final planning summary
 
@@ -749,7 +1162,8 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 |---|---|---|---|
 | 2026-11-23 | 00 | Established canonical 17-part review framework, repository inventory, source-freshness verification, classifications, tracker, standard record template and empty future-review sections. No feature assessments. | `docs/feature-completeness-review` (this documentation branch) |
 | 2026-11-23 | 01 | Source-reviewed 17 authentication/identity capabilities across four pinned repositories; added individual records, master inventory, dependencies, planning candidates and verification limitations; no live-stack claims. | `docs/feature-completeness-review` (this documentation branch) |
+| 2026-11-23 | 02 | Source-reviewed 15 customer KYC/onboarding capabilities across four pinned source commits; added individual records, status transition map, web/Android distinctions, FastAPI scope, Customer gate, dependencies, candidates and evidence limitations. No application changes. | `docs/feature-completeness-review` (this documentation branch) |
 
 ---
 
-**Next review:** Part 02 — Customer KYC and onboarding, only in a separate ChatGPT conversation when specifically requested. **Do not start Part 02 automatically.**
+**Next review:** Part 03 — Customer dashboard and profile, only in a separate ChatGPT conversation when specifically requested. **Do not start Part 03 automatically.**

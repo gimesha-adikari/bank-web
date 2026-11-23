@@ -52,12 +52,12 @@ function mount() {
 async function openEditorAndReview(targetRole = "MANAGER") {
   fireEvent.click(await screen.findByRole("button", { name: "View ava.customer account" }));
   fireEvent.click(await screen.findByRole("button", { name: "Change role and employee access" }));
-  fireEvent.change(screen.getByLabelText("Target role"), { target: { value: targetRole } });
-  fireEvent.change(screen.getByLabelText("Employee status"), { target: { value: "ACTIVE" } });
-  fireEvent.change(screen.getByLabelText("Gender"), { target: { value: "OTHER" } });
-  fireEvent.change(screen.getByLabelText("Date of birth"), { target: { value: "1991-05-06" } });
-  fireEvent.change(screen.getByLabelText("Phone"), { target: { value: "0712345678" } });
-  fireEvent.change(screen.getByLabelText("Address"), { target: { value: "2 Staff Road" } });
+  fireEvent.change(screen.getByRole("combobox", { name: "Target role" }), { target: { value: targetRole } });
+  fireEvent.change(screen.getByRole("combobox", { name: "Employee status" }), { target: { value: "ACTIVE" } });
+  fireEvent.change(screen.getByRole("combobox", { name: "Gender" }), { target: { value: "OTHER" } });
+  fireEvent.change(screen.getByLabelText(/Date of birth/), { target: { value: "1991-05-06" } });
+  fireEvent.change(screen.getByRole("textbox", { name: "Phone" }), { target: { value: "0712345678" } });
+  fireEvent.change(screen.getByRole("textbox", { name: "Address" }), { target: { value: "2 Staff Road" } });
   fireEvent.change(screen.getByLabelText("Department"), { target: { value: "Operations" } });
   fireEvent.click(screen.getByRole("button", { name: "Review role change" }));
   expect(await screen.findByRole("region", { name: "Confirm role change" })).toBeInTheDocument();
@@ -120,6 +120,16 @@ describe("Admin access management", () => {
     expect(mocks.listUsers).toHaveBeenCalledTimes(2);
   });
 
+  it("requires a new review after the draft changes", async () => {
+    await mount();
+    await openEditorAndReview();
+    fireEvent.change(screen.getByRole("textbox", { name: "Phone" }), { target: { value: "0712345000" } });
+    expect(screen.queryByRole("region", { name: "Confirm role change" })).not.toBeInTheDocument();
+    expect(mocks.updateUserRole).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Review role change" }));
+    expect(screen.getByRole("region", { name: "Confirm role change" })).toBeInTheDocument();
+  });
+
   it("reconciles a persisted timeout by reads without resending the mutation", async () => {
     mocks.updateUserRole.mockImplementationOnce(async (_id: string, request: AdminRoleUpdateRequest) => {
       currentUser = { ...currentUser, role: { roleId: "role-manager", roleName: "MANAGER", description: null } };
@@ -160,7 +170,10 @@ describe("Admin access management", () => {
     fireEvent.click(screen.getByRole("button", { name: "Confirm role change" }));
     const alerts = await screen.findAllByRole("alert");
     expect(alerts.some((alert) => message.test(alert.textContent ?? ""))).toBe(true);
-    if (fields) expect(screen.getByText("phone: Invalid phone")).toBeInTheDocument();
+    if (fields) {
+      expect(screen.getByRole("textbox", { name: "Phone" })).toHaveAttribute("aria-invalid", "true");
+      expect(screen.getByRole("textbox", { name: "Phone" })).toHaveAccessibleDescription("Invalid phone");
+    }
     expect(mocks.updateUserRole).toHaveBeenCalledTimes(1);
     expect(mocks.getUserByUsername).toHaveBeenCalledTimes(1);
   });

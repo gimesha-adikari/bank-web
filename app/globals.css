@@ -33,10 +33,25 @@ button, input, select, textarea { font: inherit; }
 .button.ghost { background: transparent; color: var(--brand-dark); border: 1px solid var(--line); }
 .button.danger { background: #b42318; }
 .field { display: grid; gap: .4rem; }
-.field label { font-size: .9rem; font-weight: 700; }
-.field input, .field select, .field textarea { width: 100%; border: 1px solid #bcccdc; border-radius: .6rem; padding: .7rem .8rem; background: white; color: var(--ink); }
+.field label, .admin-access .admin-readonly-label { font-size: .9rem; font-weight: 700; }
+.field input, .field select, .field textarea, .admin-access .admin-readonly-value { width: 100%; border: 1px solid #bcccdc; border-radius: .6rem; padding: .7rem .8rem; background: white; color: var(--ink); }
 .field small { color: var(--muted); }
 .error-box { border: 1px solid #fda29b; border-radius: .65rem; background: #fff4f2; color: #912018; padding: .75rem; }
 .success-box { border: 1px solid #84e1bc; border-radius: .65rem; background: #ecfdf3; color: #05603a; padding: .75rem; }
 .muted { color: var(--muted); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+.admin-access { overflow-wrap: anywhere; }
+.admin-access :focus-visible { outline-color: var(--brand-dark); }
+.admin-access .muted, .admin-access .field small { color: #486581; }
+.admin-access .field { align-content: start; min-inline-size: 0; }
+.admin-access .field input, .admin-access .field select {
+  min-inline-size: 0;
+  min-block-size: 44px;
+  border-color: var(--muted);
+}
+.admin-access .field .admin-readonly-value { background: var(--paper); border: 1px dashed var(--muted); }
+.admin-access .field :is(input, select):disabled { background: #eef2f6; color: #486581; cursor: not-allowed; opacity: 1; }
+.admin-access .field [aria-invalid="true"] { border-color: var(--danger); }
+.admin-access .admin-field-error { color: var(--danger); }
+.admin-role-editor .button { min-block-size: 44px; }

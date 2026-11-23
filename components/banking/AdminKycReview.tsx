@@ -93,7 +93,7 @@ async function findCurrentCase(caseId: string): Promise<KycCase | null> {
 }
 
 export function AdminKycReview() {
-  const [filter, setFilter] = useState<KycStatus>("PENDING");
+  const [filter, setFilter] = useState<KycStatus>("UNDER_REVIEW");
   const [page, setPage] = useState(0);
   const [reload, setReload] = useState(0);
   const [queue, setQueue] = useState<KycReviewPage>();
@@ -246,7 +246,7 @@ export function AdminKycReview() {
       <section className="card grid content-start gap-4" aria-label="KYC case queue">
         <div>
           <h2 className="text-xl font-black">Submitted cases</h2>
-          <p className="mt-1 muted">Bank-core supports status filtering and pagination. Applicant name and contact details are not returned by this endpoint.</p>
+          <p className="mt-1 muted">Under review lists cases waiting for a human decision. Use the status filter to browse other queues. Applicant name and contact details are not returned by bank-core.</p>
         </div>
         <div className="grid gap-2">
           <label htmlFor="kyc-status-filter" className="font-semibold">Filter by status</label>
@@ -256,7 +256,7 @@ export function AdminKycReview() {
         </div>
         {queueFailure && <div className="error-box grid gap-3" role="alert"><p>{queueFailure}</p><button className="button secondary w-fit" type="button" onClick={() => setReload((value) => value + 1)}>Try again</button></div>}
         {queueLoading && <p className="muted" role="status">Loading KYC cases from bank-core…</p>}
-        {!queueLoading && !queueFailure && queue?.content.length === 0 && <p className="muted" role="status">No cases are currently returned for {statusLabels[filter].toLowerCase()}.</p>}
+        {!queueLoading && !queueFailure && queue?.content.length === 0 && <p className="muted" role="status">No cases in the {statusLabels[filter].toLowerCase()} queue. Choose another status to see its queue.</p>}
         {!queueLoading && !queueFailure && queue && queue.content.length > 0 && <ul className="grid gap-2" aria-label="KYC cases">
           {queue.content.map((item) => <li key={item.caseId}>
             <button type="button" className={`w-full rounded-lg border p-3 text-left hover:border-teal-700 ${selected?.caseId === item.caseId ? "border-teal-700 bg-teal-50" : "border-slate-200"}`} aria-pressed={selected?.caseId === item.caseId} onClick={() => { setSelected(item); setActiveDocument(undefined); setConfirmation(undefined); setDecisionFailure(undefined); setDecisionNotice(undefined); }}>

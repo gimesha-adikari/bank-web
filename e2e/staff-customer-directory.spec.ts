@@ -40,7 +40,7 @@ for (const username of ["teller", "manager", "admin"]) {
     await expect(page.getByText("Ava Martin")).toBeVisible();
     await expect(page.getByText("ava.martin@example.test")).toBeVisible();
 
-    await page.getByRole("link", { name: "View details" }).first().click();
+    await page.getByRole("link", { name: "View details", exact: true }).first().click();
     await expect(page.getByRole("heading", { name: "Ava Martin" })).toBeVisible();
     await expect(page.getByText("Customer ID")).toBeVisible();
     await expect(page.getByText("Linked user ID")).toBeVisible();
@@ -57,6 +57,37 @@ for (const username of ["teller", "manager", "admin"]) {
     } else {
       await expect(tellerAction).toHaveCount(0);
     }
+  });
+}
+
+for (const width of [320, 390]) {
+  test(`staff directory confines table scrolling to its region at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await signIn(page, "teller");
+    await expect(page.getByRole("row", { name: /Ava Martin/ })).toBeVisible();
+    const widths = await page.evaluate(() => ({
+      document: document.documentElement.scrollWidth,
+      viewport: document.documentElement.clientWidth
+    }));
+    expect(widths.document).toBeLessThanOrEqual(widths.viewport);
+
+    const tableRegion = page.getByRole("region", { name: "Customer directory table" });
+    await page.getByLabel("Search customer records").focus();
+    await page.keyboard.press("Tab");
+    await expect(tableRegion).toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(() => tableRegion.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollX)).toBe(0);
+
+    const details = page.getByRole("link", { name: "View details for Ava Martin" });
+    await page.keyboard.press("Tab");
+    await expect(details).toBeFocused();
+    await expect(details).toBeInViewport();
+    await expect(details).toHaveCSS("text-decoration-line", "underline");
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { name: "Ava Martin" })).toBeVisible();
+    await expect(page.getByText("Customer ID")).toBeVisible();
+    await expect(page.getByText("Linked user ID")).toBeVisible();
   });
 }
 

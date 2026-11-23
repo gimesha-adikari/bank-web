@@ -42,8 +42,24 @@ afterEach(() => {
 });
 
 describe("Admin KYC review", () => {
+  it("starts in the human-review queue and scopes an empty result to the selected filter", async () => {
+    mocks.list.mockImplementation(async ({ status, page, size }) => ({
+      page, size, total: status === "UNDER_REVIEW" ? 1 : 0,
+      content: status === "UNDER_REVIEW" ? [underReviewCase] : []
+    }));
+    render(<AdminKycReview />);
+    expect(await screen.findByText(underReviewCase.caseId)).toBeInTheDocument();
+    expect(mocks.list).toHaveBeenCalledWith({ status: "UNDER_REVIEW", page: 0, size: 20 });
+
+    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "PENDING" } });
+    expect(await screen.findByText(/no cases in the pending queue/i)).toBeInTheDocument();
+    expect(screen.queryByText(underReviewCase.caseId)).not.toBeInTheDocument();
+    expect(mocks.list).toHaveBeenCalledWith({ status: "PENDING", page: 0, size: 20 });
+  });
+
   it("loads the backend status-filtered queue and only offers a transition allowed from PENDING", async () => {
     render(<AdminKycReview />);
+    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "PENDING" } });
     expect(await screen.findByText(pendingCase.caseId)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: new RegExp(pendingCase.caseId) }));
     expect(await screen.findByText("FACE_MATCH")).toBeInTheDocument();
@@ -77,6 +93,7 @@ describe("Admin KYC review", () => {
 
   it("retrieves a protected document into a temporary preview and revokes the URL on close", async () => {
     render(<AdminKycReview />);
+    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "PENDING" } });
     await screen.findByText(pendingCase.caseId);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(pendingCase.caseId) }));
     fireEvent.click(await screen.findByRole("button", { name: "View ID front" }));
@@ -89,6 +106,7 @@ describe("Admin KYC review", () => {
   it("shows denied and unsupported document responses without exposing the file", async () => {
     mocks.file.mockRejectedValueOnce(new ApiError({ kind: "backend", status: 403, message: "Access denied" }));
     render(<AdminKycReview />);
+    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "PENDING" } });
     fireEvent.click(await screen.findByRole("button", { name: new RegExp(pendingCase.caseId) }));
     fireEvent.click(await screen.findByRole("button", { name: "View ID front" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/bank-core denied access/i);
@@ -102,6 +120,7 @@ describe("Admin KYC review", () => {
 
   it("requires a deliberate confirmation and posts the supported optional reason", async () => {
     render(<AdminKycReview />);
+    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "PENDING" } });
     await screen.findByText(pendingCase.caseId);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(pendingCase.caseId) }));
     fireEvent.click(await screen.findByRole("button", { name: "Request more information" }));
@@ -119,7 +138,6 @@ describe("Admin KYC review", () => {
     let finish: ((value: KycCase) => void) | undefined;
     mocks.decide.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
     render(<AdminKycReview />);
-    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "UNDER_REVIEW" } });
     fireEvent.click(await screen.findByRole("button", { name: new RegExp(underReviewCase.caseId) }));
     fireEvent.click(await screen.findByRole("button", { name: "Approve case" }));
     const confirm = screen.getByRole("button", { name: "Confirm decision" });
@@ -133,11 +151,14 @@ describe("Admin KYC review", () => {
   it("keeps a stale transition rejection definitive and refreshes current server data", async () => {
     mocks.decide.mockRejectedValueOnce(new ApiError({ kind: "backend", status: 400, code: "ERR_VALIDATION", message: "Invalid request" }));
     render(<AdminKycReview />);
+    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "PENDING" } });
     fireEvent.click(await screen.findByRole("button", { name: new RegExp(pendingCase.caseId) }));
     fireEvent.click(await screen.findByRole("button", { name: "Request more information" }));
     fireEvent.click(screen.getByRole("button", { name: "Confirm decision" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/case has moved to a status that does not allow it/i);
-    await waitFor(() => expect(mocks.list).toHaveBeenCalledTimes(2));
+    await waitFor(() => {
+      expect(mocks.list.mock.calls.filter(([query]) => query.status === "PENDING")).toHaveLength(2);
+    });
     expect(screen.getByRole("button", { name: "Request more information" })).toBeEnabled();
   });
 
@@ -153,7 +174,6 @@ describe("Admin KYC review", () => {
       throw new ApiError({ kind: "timeout", status: 504, code: "BANKING_UPSTREAM_TIMEOUT", message: "Timed out", retryableTransport: true });
     });
     render(<AdminKycReview />);
-    fireEvent.change(screen.getByLabelText("Filter by status"), { target: { value: "UNDER_REVIEW" } });
     fireEvent.click(await screen.findByRole("button", { name: new RegExp(underReviewCase.caseId) }));
     fireEvent.click(await screen.findByRole("button", { name: "Approve case" }));
     fireEvent.click(screen.getByRole("button", { name: "Confirm decision" }));

@@ -19,7 +19,11 @@ export default function HomePage() {
           <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">Manage accounts, review transaction history, and send supported transactions through the authoritative BankingSystem API.</p>
           <div className="mt-8 flex flex-wrap gap-3"><Link href="/login" className="button">Sign in securely</Link><Link href="/register" className="button secondary">Create your profile</Link></div>
         </div>
-        <div className="card bg-gradient-to-br from-teal-700 to-slate-900 text-white"><p className="text-sm uppercase tracking-[.2em] text-teal-100">Your control center</p><h2 className="mt-4 text-3xl font-black">Balances and receipts from the server of record.</h2><p className="mt-4 text-teal-50">The web app never calculates or stores financial state as its own source of truth.</p></div>
+        <section className="card home-feature" aria-labelledby="home-feature-title">
+          <p className="text-sm uppercase tracking-[.2em]">Your control center</p>
+          <h2 id="home-feature-title" className="mt-4 text-3xl font-black">Balances and receipts from the server of record.</h2>
+          <p className="mt-4">The web app never calculates or stores financial state as its own source of truth.</p>
+        </section>
       </section>
       <footer className="container border-t border-slate-200 py-5 text-sm text-slate-500">BankingSystem remains the authority for authentication, balances, and transaction rules.</footer>
     </main>

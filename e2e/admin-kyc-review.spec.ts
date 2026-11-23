@@ -23,6 +23,27 @@ async function reviewEvidence(page: Page) {
   };
 }
 
+test("Admin opens an actionable KYC case from the landing page even with no pending cases", async ({ page }) => {
+  await signIn(page, "kyc-review-actionable", "/admin");
+  const reviewLink = page.getByRole("link", { name: "Review KYC", exact: true });
+  await expect(reviewLink).toHaveAttribute("href", "/admin/kyc");
+  await reviewLink.click();
+  await expect(page).toHaveURL(/\/admin\/kyc$/);
+  const filter = page.getByLabel("Filter by status");
+  await expect(filter).toHaveValue("UNDER_REVIEW");
+  const actionableCase = page.getByRole("button", { name: new RegExp(underReviewCaseId) });
+  await actionableCase.click();
+  await expect(page.getByRole("button", { name: "Approve case" })).toBeVisible();
+
+  await filter.selectOption("PENDING");
+  await expect(page.getByText(/no cases.*pending.*choose another status/i)).toBeVisible();
+  await expect(actionableCase).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Approve case" })).toHaveCount(0);
+
+  await filter.selectOption("UNDER_REVIEW");
+  await expect(actionableCase).toBeVisible();
+});
+
 test("Admin reviews paginated cases, checks and protected documents through the BFF", async ({ page }) => {
   await page.addInitScript(() => {
     const revoked: string[] = [];
@@ -33,7 +54,7 @@ test("Admin reviews paginated cases, checks and protected documents through the 
   await signIn(page, "kyc-review-admin");
   await expect(page).toHaveURL(/\/admin\/kyc$/);
   await expect(page.getByRole("link", { name: "KYC review" })).toHaveAttribute("href", "/admin/kyc");
-  await expect(page.getByLabel("Filter by status")).toHaveValue("PENDING");
+  await page.getByLabel("Filter by status").selectOption("PENDING");
   await expect(page.getByRole("button", { name: new RegExp(pendingCaseId) })).toBeVisible();
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(page.getByRole("button", { name: /70000000-0000-4000-8000-000000000021/ })).toBeVisible();
@@ -55,6 +76,7 @@ test("Admin reviews paginated cases, checks and protected documents through the 
 
 test("Admin decision buttons match current transitions and require confirmation", async ({ page }) => {
   await signIn(page, "kyc-review-decisions");
+  await page.getByLabel("Filter by status").selectOption("PENDING");
   await page.getByRole("button", { name: new RegExp(pendingCaseId) }).click();
   await expect(page.getByRole("button", { name: "Request more information" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Approve case" })).toHaveCount(0);

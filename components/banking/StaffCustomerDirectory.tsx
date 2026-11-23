@@ -72,18 +72,32 @@ export function StaffCustomerDirectory() {
         {!loading && !error && customers?.length === 0 && <div className="card">No customer records were returned by bank-core.</div>}
         {!loading && !error && customers && customers.length > 0 && filtered.length === 0 && <div className="card">No customer records match “{search.trim()}”.</div>}
         {!loading && !error && filtered.length > 0 && (
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+          <div role="region" aria-label="Customer directory table" tabIndex={0} className="min-w-0 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="w-full min-w-[42rem] text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600"><tr><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Email</th><th className="px-4 py-3">Phone</th><th className="px-4 py-3">Status</th><th className="px-4 py-3"><span className="sr-only">Actions</span></th></tr></thead>
-              <tbody>{filtered.map((customer) => (
-                <tr key={customer.customerId} className="border-t border-slate-100">
-                  <td className="px-4 py-3 font-semibold">{nameOf(customer)}</td>
-                  <td className="px-4 py-3">{customer.email || "—"}</td>
-                  <td className="px-4 py-3">{customer.phone || "—"}</td>
-                  <td className="px-4 py-3">{customer.status || "Unknown"}</td>
-                  <td className="px-4 py-3 text-right"><Link className="font-bold text-teal-800 underline" href={`/staff/customers/${encodeURIComponent(customer.customerId)}`}>View details</Link></td>
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  <th scope="col" className="px-4 py-3">Customer</th>
+                  <th scope="col" className="px-4 py-3">Email</th>
+                  <th scope="col" className="px-4 py-3">Phone</th>
+                  <th scope="col" className="px-4 py-3">Status</th>
+                  <th scope="col" aria-label="Actions" className="hidden px-4 py-3 sm:table-cell" />
                 </tr>
-              ))}</tbody>
+              </thead>
+              <tbody>{filtered.map((customer) => {
+                const name = nameOf(customer);
+                const details = `/staff/customers/${encodeURIComponent(customer.customerId)}`;
+                return (
+                  <tr key={customer.customerId} className="border-t border-slate-100">
+                    <td className="px-4 py-3 font-semibold">
+                      <Link href={details} aria-label={`View details for ${name}`} className="staff-customer-name">{name}</Link>
+                    </td>
+                    <td className="px-4 py-3">{customer.email || "—"}</td>
+                    <td className="px-4 py-3">{customer.phone || "—"}</td>
+                    <td className="px-4 py-3">{customer.status || "Unknown"}</td>
+                    <td className="hidden px-4 py-3 text-right sm:table-cell"><Link className="font-bold text-teal-800 underline" href={details}>View details</Link></td>
+                  </tr>
+                );
+              })}</tbody>
             </table>
           </div>
         )}

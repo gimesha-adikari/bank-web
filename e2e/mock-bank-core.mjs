@@ -16,6 +16,7 @@ const users = [
   ["admin", "ADMIN", "e2e-admin-jwt"],
   ["employee", "EMPLOYEE", "e2e-employee-jwt"],
   ["banned", "BANNED", "e2e-banned-jwt"],
+  ["kyc-review-actionable", "ADMIN", "e2e-kyc-review-actionable-jwt"],
   ["kyc-review-admin", "ADMIN", "e2e-kyc-review-admin-jwt"],
   ["kyc-review-decisions", "ADMIN", "e2e-kyc-review-decisions-jwt"],
   ["kyc-review-timeout", "ADMIN", "e2e-kyc-review-timeout-jwt"],
@@ -739,7 +740,7 @@ const server = http.createServer(async (request, response) => {
         selfieId: "75000000-0000-4000-8000-000000000003", addressId: "75000000-0000-4000-8000-000000000004",
         decisionReason: null, createdAt: "2026-03-01T10:00:00Z", updatedAt: "2026-03-01T10:00:00Z", reviewerId: null, decidedAt: null, reviewerNotes: null
       }));
-      if (reviewFixtureUser) pending.push({
+      if (reviewFixtureUser || user.username === "kyc-review-actionable") pending.push({
         caseId: "70000000-0000-4000-8000-000000000099", status: "UNDER_REVIEW", docFrontId: "75000000-0000-4000-8000-000000000001",
         docBackId: "75000000-0000-4000-8000-000000000002", selfieId: "75000000-0000-4000-8000-000000000003", addressId: "75000000-0000-4000-8000-000000000004",
         decisionReason: null, createdAt: "2026-03-02T10:00:00Z", updatedAt: "2026-03-02T10:00:00Z", reviewerId: null, decidedAt: null, reviewerNotes: null

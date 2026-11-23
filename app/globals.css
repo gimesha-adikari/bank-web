@@ -21,6 +21,11 @@ button, input, select, textarea { font: inherit; }
 .container { width: min(1120px, calc(100% - 2rem)); margin-inline: auto; }
 .page-grid { display: grid; gap: 1rem; }
 .card { border: 1px solid var(--line); border-radius: 1rem; background: white; padding: 1.25rem; box-shadow: 0 8px 24px rgb(16 42 67 / 5%); }
+.card.home-feature { background: #115e59 linear-gradient(135deg, #115e59, #0f172a); color: white; }
+.home-feature p { color: #ccfbf1; }
+@media (width < 40rem) {
+  a.staff-customer-name { color: var(--brand-dark); text-decoration: underline; }
+}
 .button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border: 0; border-radius: .65rem; padding: .7rem 1rem; background: var(--brand); color: white; font-weight: 700; cursor: pointer; }
 .button:hover { background: var(--brand-dark); }
 .button:disabled { cursor: not-allowed; opacity: .55; }

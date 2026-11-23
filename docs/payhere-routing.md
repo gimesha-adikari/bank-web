@@ -1,5 +1,7 @@
 # PayHere routing
 
+> Historical W1 inventory. Current bank-core starts with PayHere disabled unless `PAYHERE_ENABLED` is explicitly enabled. The internal Pay feature uses the existing core transfer and never enters these routes. See the [active architecture](architecture.md).
+
 Bank-core `6eabafe` uses one `payhere.server-base-url` property for browser launch links, browser return and cancel links, and provider notification URLs. The example configuration binds this property from `PAYHERE_SERVER_BASE_URL`. All paths in the first table belong to the bank-core origin. Bank-web answers requests in `/api/v1/wallet/payhere` and `/api/v1/wallet/webhook`, including descendants, with a local noncacheable `404` and sends nothing upstream. This keeps bank-core HTML off the web session origin and keeps provider POSTs independent of the browser session.
 
 ## Direct bank-core routes

@@ -55,6 +55,12 @@ The web form requires an existing customer record and approved KYC. Bank-core's 
 
 The account-opening endpoint has no client idempotency key. After an uncertain result the page reloads the account list and offers read-only refreshes. An empty list can precede completion of the original request. Check the bank-core account list before initiating another opening. Confirmed openings show the server's opening balance and refresh the account by ID.
 
+### Staff account closure
+
+Admins, Managers, and Tellers can confirm closure from an active account that displays an exact zero balance. The page refreshes the account before sending DELETE and asks for a new review if it has changed. Bank-core checks both the account and ledger balances under lock. A `422 ERR_ACCOUNT_BALANCE_NONZERO` rejection triggers an account refresh and explains the balance requirement even when the displayed balance is zero.
+
+After a `204` or an uncertain response, the page reads back the account status. A failed or inconclusive read can be checked again with **Refresh account**. The page sends no automatic DELETE retry. Closed accounts retain access to transaction history.
+
 ### Admin customer deletion
 
 Admins can delete a customer record from its staff detail page by typing the exact customer UUID. The page fetches the record from bank-core before submitting DELETE. If the record has changed, review the refreshed record and confirm again. The read and the DELETE are separate requests. Bank-core keeps the linked login and KYC records and enforces dependency constraints during deletion. Any account, including a closed account with zero balance, or other protected dependent record blocks deletion.

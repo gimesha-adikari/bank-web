@@ -12,6 +12,7 @@ import { accountOpeningTerms, openingAccountTypes, type OpeningAccountType } fro
 
 type UpdateReview = { accountType: OpeningAccountType; branch: Branch };
 type PendingAction = "updating" | "closing" | undefined;
+type CloseReadback = "confirmed" | "uncertain";
 
 function readFailureMessage(failure: unknown): string {
   if (failure instanceof ApiError && failure.status === 401) return "Your staff session has expired. Sign in again to view this account.";
@@ -49,7 +50,11 @@ function sameAccountSnapshot(first: Account, second: Account): boolean {
 }
 
 function isZeroBalance(value: string): boolean {
-  return /^0+(?:\.0+)?$/.test(value);
+  return typeof value === "string" && /^-?0+(?:\.0+)?$/.test(value);
+}
+
+function isEligibleForClose(account: Account): boolean {
+  return account.accountStatus === "ACTIVE" && isZeroBalance(account.balance);
 }
 
 function formatTimestamp(value: string | undefined): string {
@@ -70,12 +75,14 @@ export function StaffAccountDetail({ accountId }: Readonly<{ accountId: string }
   const [branchId, setBranchId] = useState("");
   const [updateReview, setUpdateReview] = useState<UpdateReview>();
   const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
-  const [acknowledgeBalance, setAcknowledgeBalance] = useState(false);
+  const [closeReadback, setCloseReadback] = useState<CloseReadback>();
   const [pending, setPending] = useState<PendingAction>();
   const [actionError, setActionError] = useState<string>();
   const [notice, setNotice] = useState<string>();
   const [refreshError, setRefreshError] = useState<string>();
   const mutationLock = useRef(false);
+  const canClose = account?.accountId === accountId && isEligibleForClose(account)
+    && !loadError && !refreshError && closeReadback !== "confirmed";
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -107,6 +114,31 @@ export function StaffAccountDetail({ accountId }: Readonly<{ accountId: string }
       setRefreshError(readFailureMessage(failure));
       return undefined;
     }
+  }
+
+  async function reconcileClose(outcome: CloseReadback) {
+    const refreshed = await refreshAccount();
+    if (refreshed?.accountStatus === "CLOSED") {
+      setCloseReadback(undefined);
+      setActionError(undefined);
+      setNotice(outcome === "confirmed" ? "Account closed by bank-core. Transaction history is preserved."
+        : "A read-back confirms that bank-core closed this account. Transaction history is preserved.");
+      return;
+    }
+
+    setCloseReadback(outcome);
+    if (outcome === "confirmed") {
+      setActionError("Bank-core confirmed closure, but the current account status could not be verified. Refresh the account before taking further action.");
+    } else if (refreshed) {
+      setActionError("The close result is uncertain. The latest account record shows it is still open, and the original request may still complete. No retry was sent.");
+    } else {
+      setActionError("The close result is uncertain and bank-core could not confirm the current status. Refresh the account before submitting another close request.");
+    }
+  }
+
+  function refreshDetails() {
+    if (closeReadback) void reconcileClose(closeReadback);
+    else void refreshAccount();
   }
 
   async function loadBranches() {
@@ -210,50 +242,38 @@ export function StaffAccountDetail({ accountId }: Readonly<{ accountId: string }
   }
 
   async function confirmClose() {
-    if (!account || account.accountStatus === "CLOSED" || mutationLock.current) return;
-    if (!isZeroBalance(account.balance) && !acknowledgeBalance) return;
+    if (!account || !canClose || !showCloseConfirmation || mutationLock.current) return;
     mutationLock.current = true;
     setPending("closing");
     setActionError(undefined);
     setNotice(undefined);
+    let submitted = false;
     try {
       const latest = await accountsApi.byId(accountId);
-      if (!sameAccountSnapshot(account, latest)) {
-        setAccount(latest);
+      if (latest.accountId !== accountId) throw new Error("The account response did not match the requested identifier.");
+      setAccount(latest);
+      if (!sameAccountSnapshot(account, latest) || !isEligibleForClose(latest)) {
         setShowCloseConfirmation(false);
-        setAcknowledgeBalance(false);
-        setActionError("This account changed since this page loaded. Its current server state has been refreshed; review it before closing.");
+        setActionError("This account changed since this page loaded. Review the refreshed account before taking further action.");
         return;
       }
-      if (latest.accountStatus === "CLOSED") {
-        setAccount(latest);
-        setShowCloseConfirmation(false);
-        setNotice("This account was already closed by bank-core. No close request was sent.");
-        return;
-      }
+      setCloseReadback(undefined);
+      submitted = true;
       await accountsApi.close(accountId);
       setShowCloseConfirmation(false);
-      setAcknowledgeBalance(false);
-      const refreshed = await refreshAccount();
-      if (refreshed?.accountStatus === "CLOSED") {
-        setNotice("Account closed by bank-core. No balance transfer or ledger posting was performed.");
-      } else {
-        setNotice("Bank-core accepted the close request, but the current account status could not be confirmed. Refresh before taking further action.");
-      }
+      await reconcileClose("confirmed");
     } catch (failure) {
-      if (hasUncertainOutcome(failure)) {
+      if (!submitted) {
         setShowCloseConfirmation(false);
-        setAcknowledgeBalance(false);
-        setActionError("The close result is uncertain. No automatic retry was sent. Reading the current account status from bank-core.");
-        const refreshed = await refreshAccount();
-        if (refreshed?.accountStatus === "CLOSED") {
-          setActionError(undefined);
-          setNotice("A read-back confirms that bank-core closed this account. Its balance remains unchanged.");
-        } else if (refreshed) {
-          setActionError("The close result is uncertain; the latest read-back still shows this account as open. No retry was sent. Review the current status before deliberately confirming another close request.");
-        } else {
-          setActionError("The close result is uncertain and bank-core could not confirm the current status. Do not submit another close request until an authorized staff member verifies the account.");
-        }
+        setActionError(`Closure was not submitted. ${readFailureMessage(failure)}`);
+      } else if (failure instanceof ApiError && failure.status === 422 && failure.code === "ERR_ACCOUNT_BALANCE_NONZERO") {
+        setShowCloseConfirmation(false);
+        setActionError("Bank-core rejected closure because the account balance or the ledger balance is nonzero. Both must be zero before closure.");
+        await refreshAccount();
+      } else if (hasUncertainOutcome(failure) || (failure instanceof ApiError && failure.kind === "parse")) {
+        setShowCloseConfirmation(false);
+        setActionError("The close result is uncertain. Checking the current account status with bank-core.");
+        await reconcileClose("uncertain");
       } else if (failure instanceof ApiError && failure.status === 409) {
         setActionError(actionFailureMessage(failure, "close"));
         await refreshAfterConflict();
@@ -265,8 +285,6 @@ export function StaffAccountDetail({ accountId }: Readonly<{ accountId: string }
       setPending(undefined);
     }
   }
-
-  const requiresBalanceAcknowledgment = Boolean(account && !isZeroBalance(account.balance));
 
   return <>
     <SectionHeading eyebrow="Staff workspace" title={account?.accountNumber ?? "Account details"}>
@@ -297,14 +315,15 @@ export function StaffAccountDetail({ accountId }: Readonly<{ accountId: string }
         <div className="flex flex-wrap gap-3">
           <Link href={`/staff/accounts/${encodeURIComponent(account.accountId)}/transactions`} className="button">View transaction history</Link>
           <button type="button" className="button secondary" disabled={pending !== undefined || editing} onClick={beginEdit}>Edit account type or branch</button>
-          {account.accountStatus !== "CLOSED" && <button type="button" className="button ghost" disabled={pending !== undefined || editing} onClick={() => {
+          {account.accountStatus !== "CLOSED" && <button type="button" className="button ghost" disabled={!canClose || pending !== undefined || editing} onClick={() => {
             setShowCloseConfirmation(true);
-            setAcknowledgeBalance(false);
             setActionError(undefined);
           }}>Close account</button>}
-          <button type="button" className="button ghost" disabled={pending !== undefined} onClick={() => void refreshAccount()}>Refresh account</button>
+          <button type="button" className="button ghost" disabled={pending !== undefined} onClick={refreshDetails}>Refresh account</button>
         </div>
-        {account.accountStatus === "CLOSED" && <p className="muted" role="status">This account is already closed. It cannot be closed again. Bank-core still exposes account type and branch updates for this record.</p>}
+        {account.accountStatus === "ACTIVE" && !isZeroBalance(account.balance) && <p className="muted">Bring the account balance to zero through authorized banking operations before closing it.</p>}
+        {account.accountStatus !== "ACTIVE" && account.accountStatus !== "CLOSED" && <p className="muted">Only active accounts can be closed.</p>}
+        {account.accountStatus === "CLOSED" && <p className="muted" role="status">This account is already closed. Transaction history and account type or branch updates remain available.</p>}
       </section>
 
       {editing && <form className="card mt-5 grid gap-4" onSubmit={reviewUpdate}>
@@ -347,30 +366,19 @@ export function StaffAccountDetail({ accountId }: Readonly<{ accountId: string }
         </div>
       </section>}
 
-      {showCloseConfirmation && account.accountStatus !== "CLOSED" && <section className="card mt-5 grid gap-4" aria-label="Close account confirmation">
+      {showCloseConfirmation && canClose && <section className="card mt-5 grid gap-4" aria-label="Close account confirmation">
         <h2 className="text-xl font-black">Confirm account closure</h2>
-        <p>Closing changes this account&apos;s status to CLOSED. Bank-core does not check the balance, transfer funds, or create a ledger posting during closure.</p>
-        {!isZeroBalance(account.balance) && <>
-          <p className="error-box">This account has a balance of {formatMoney(account.balance)}. The balance will remain in the account. Bank-core blocks deposits, withdrawals and transfers for closed accounts, so closure can leave these funds unavailable through those workflows.</p>
-          <label className="flex items-start gap-3">
-            <input type="checkbox" checked={acknowledgeBalance} disabled={pending !== undefined} onChange={(event) => setAcknowledgeBalance(event.target.checked)} />
-            <span>I understand the remaining balance will stay in this account.</span>
-          </label>
-        </>}
-        <p>This is a consequential status change. The exposed account API has no reopen operation; confirm only after reviewing the account and any remaining balance.</p>
+        <p>Bank-core checks the current account and ledger balances before closing. Both must be zero. Closing changes the account status to CLOSED and preserves its transaction history.</p>
         {actionError && <p className="error-box" role="alert">{actionError}</p>}
         <div className="flex flex-wrap gap-3">
-          <button type="button" className="button" disabled={pending !== undefined || (requiresBalanceAcknowledgment && !acknowledgeBalance)} onClick={() => void confirmClose()}>{pending === "closing" ? "Closing account…" : "Confirm close account"}</button>
-          <button type="button" className="button ghost" disabled={pending !== undefined} onClick={() => {
-            setShowCloseConfirmation(false);
-            setAcknowledgeBalance(false);
-          }}>Cancel</button>
+          <button type="button" className="button" disabled={pending !== undefined} onClick={() => void confirmClose()}>{pending === "closing" ? "Closing account…" : "Confirm close account"}</button>
+          <button type="button" className="button ghost" disabled={pending !== undefined} onClick={() => setShowCloseConfirmation(false)}>Cancel</button>
         </div>
       </section>}
 
       {actionError && !editing && !showCloseConfirmation && <p className="error-box mt-5" role="alert">{actionError}</p>}
       {notice && <p className="success-box mt-5" role="status">{notice}</p>}
-      {refreshError && <div className="error-box mt-5 grid gap-3" role="alert"><p>{refreshError}</p><button className="button secondary w-fit" disabled={pending !== undefined} onClick={() => void refreshAccount()}>Refresh account details</button></div>}
+      {refreshError && <div className="error-box mt-5 grid gap-3" role="alert"><p>{refreshError}</p><button className="button secondary w-fit" disabled={pending !== undefined} onClick={refreshDetails}>Refresh account details</button></div>}
     </>}
   </>;
 }

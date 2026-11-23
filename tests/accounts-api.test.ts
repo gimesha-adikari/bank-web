@@ -77,8 +77,18 @@ describe("accounts API", () => {
     expect(new Headers(putOptions.headers).get("X-CSRF-Token")).toBe(csrf);
     expect(fetchMock.mock.calls[2]?.[0]).toBe("/api/v1/accounts/account-1");
     expect(deleteOptions.method).toBe("DELETE");
+    expect(deleteOptions.redirect).toBe("error");
     expect(new Headers(deleteOptions.headers).get("X-CSRF-Token")).toBe(csrf);
     expect(deleteOptions.body).toBeUndefined();
+  });
+
+  it("requires the documented 204 for closure and preserves its structured rejection code", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(Response.json({ token: csrf }))
+      .mockResolvedValueOnce(Response.json(account))
+      .mockResolvedValueOnce(Response.json({ code: "ERR_ACCOUNT_BALANCE_NONZERO" }, { status: 422 })));
+
+    await expect(accountsApi.close(account.accountId)).rejects.toMatchObject({ kind: "parse", status: 200 });
+    await expect(accountsApi.close(account.accountId)).rejects.toMatchObject({ status: 422, code: "ERR_ACCOUNT_BALANCE_NONZERO" });
   });
 
   it.each([401, 403, 404, 409, 422, 502, 504])("preserves backend status %i for account management", async (status) => {

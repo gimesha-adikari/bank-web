@@ -51,7 +51,8 @@ const users = [
     .map((username) => [username, "ADMIN", `e2e-${username}-jwt`]),
   ["a3-stale-customer", "CUSTOMER", "e2e-a3-stale-customer-jwt"],
   ["a3-absent-customer", "CUSTOMER", "e2e-a3-absent-customer-jwt"],
-  ...paymentUsers.map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`])
+  ...paymentUsers.map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`]),
+  ["account-close-timeout-open", "TELLER", "e2e-account-close-timeout-open-jwt"]
 ].map(([username, role, token]) => ({ username, role, token }));
 if (new Set(users.map(({ token }) => token)).size !== users.length) {
   throw new Error("Mock bank-core fixture contains duplicate user tokens");
@@ -153,10 +154,21 @@ const staffAccountRecords = new Map([
   ["40000000-0000-4000-8000-000000000002", { accountId: "40000000-0000-4000-8000-000000000002", accountNumber: "1000000002", accountType: "CHECKING", accountStatus: "ACTIVE", balance: "50.5000", createdAt: "2026-01-04T03:04:05", updatedAt: "2026-01-04T03:04:05" }],
   ["40000000-0000-4000-8000-000000000003", { accountId: "40000000-0000-4000-8000-000000000003", accountNumber: "1000000003", accountType: "FIXED_DEPOSIT", accountStatus: "CLOSED", balance: "0.0000", createdAt: "2026-01-05T03:04:05", updatedAt: "2026-01-06T03:04:05" }]
 ]);
+const staffClosureAccounts = ["0.0000", "0.00", "0.0000", "0.0000", "0.0000", "0.0000", "-0.0001"];
+for (const [index, balance] of staffClosureAccounts.entries()) {
+  const suffix = String(index + 4).padStart(12, "0");
+  const accountId = `40000000-0000-4000-8000-${suffix}`;
+  staffAccountRecords.set(accountId, {
+    accountId, accountNumber: String(1000000004 + index), accountType: "CHECKING", accountStatus: "ACTIVE", balance,
+    createdAt: "2026-01-02T03:04:05", updatedAt: "2026-01-03T04:05:06"
+  });
+}
+const staffLedgerBalances = new Map([["40000000-0000-4000-8000-000000000008", "0.0001"]]);
 const staffAccountHistories = new Map([
   ["40000000-0000-4000-8000-000000000001", [{ transactionId: "50000000-0000-4000-8000-000000000001", accountId: "40000000-0000-4000-8000-000000000001", type: "TRANSFER_OUT", amount: "15.2300", balanceAfter: "1250.1234", description: "Sample account transfer", createdAt: "2026-01-07T08:09:10" }]],
   ["40000000-0000-4000-8000-000000000002", []],
-  ["40000000-0000-4000-8000-000000000003", []]
+  ["40000000-0000-4000-8000-000000000003", []],
+  ["40000000-0000-4000-8000-000000000005", [{ transactionId: "50000000-0000-4000-8000-000000000005", accountId: "40000000-0000-4000-8000-000000000005", type: "WITHDRAWAL", amount: "10.0000", balanceAfter: "0.0000", description: "Final withdrawal", createdAt: "2026-01-03T04:05:06" }]]
 ]);
 const staffAccountUpdates = [];
 const staffAccountClosures = [];
@@ -308,6 +320,12 @@ const server = http.createServer(async (request, response) => {
     });
     accountOpeningCreations.set(input.username, 1);
     return json(response, 201, { account: seededAccount, userFound: Boolean(user) });
+  }
+  if (url.pathname === "/test/change-close-preflight-balance" && request.method === "POST") {
+    const accountId = "40000000-0000-4000-8000-000000000009";
+    staffAccountRecords.set(accountId, { ...staffAccountRecords.get(accountId), balance: "0.0001", updatedAt: "2026-02-02T00:00:00" });
+    response.writeHead(204);
+    return response.end();
   }
   requests.push({
     method: request.method,
@@ -918,12 +936,20 @@ const server = http.createServer(async (request, response) => {
     if (user.username === "account-close-conflict") return json(response, 409, { code: "ERR_CONFLICT", message: "Account changed" });
     const current = staffAccountRecords.get(staffAccountId);
     if (!current) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Account not found" });
+    const zero = /^-?0+(?:\.0+)?$/;
+    if (!zero.test(current.balance) || !zero.test(staffLedgerBalances.get(staffAccountId) ?? "0")) {
+      return json(response, 422, { code: "ERR_ACCOUNT_BALANCE_NONZERO", message: "Account and ledger balances must both be zero to close" });
+    }
+    if (current.accountStatus === "CLOSED") {
+      response.writeHead(204);
+      return response.end();
+    }
+    if (current.accountStatus !== "ACTIVE") return json(response, 422, { code: "ERR_ACCOUNT_NOT_ACTIVE", message: "Account must be ACTIVE to close" });
+    // Leave the response pending until the BFF times out, with or without a committed close.
+    if (user.username === "account-close-timeout-open") return;
     staffAccountClosures.push({ accountId: staffAccountId, balanceBefore: current.balance });
     staffAccountRecords.set(staffAccountId, { ...current, accountStatus: "CLOSED", updatedAt: "2026-02-02T00:00:00" });
-    if (user.username === "account-close-timeout") {
-      request.socket.destroy();
-      return;
-    }
+    if (user.username === "account-close-timeout") return;
     response.writeHead(204);
     return response.end();
   }

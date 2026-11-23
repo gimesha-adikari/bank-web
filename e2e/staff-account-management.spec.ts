@@ -3,6 +3,13 @@ import { expect, test, type Page } from "@playwright/test";
 const accountOne = "40000000-0000-4000-8000-000000000001";
 const accountTwo = "40000000-0000-4000-8000-000000000002";
 const accountThree = "40000000-0000-4000-8000-000000000003";
+const eligibleAccount = "40000000-0000-4000-8000-000000000004";
+const zeroToClose = "40000000-0000-4000-8000-000000000005";
+const timeoutClosed = "40000000-0000-4000-8000-000000000006";
+const timeoutOpen = "40000000-0000-4000-8000-000000000007";
+const nonzeroLedger = "40000000-0000-4000-8000-000000000008";
+const changingBalance = "40000000-0000-4000-8000-000000000009";
+const negativeBalance = "40000000-0000-4000-8000-000000000010";
 
 async function signIn(page: Page, username: string, path = "/staff/accounts") {
   await page.context().clearCookies();
@@ -25,6 +32,16 @@ async function evidence(page: Page) {
   };
 }
 
+async function accountMethods(page: Page, accountId: string, from: number) {
+  return (await evidence(page)).requests.slice(from).filter(({ path }) => path === `/api/v1/accounts/${accountId}`)
+    .map(({ method }) => method);
+}
+
+async function reviewClose(page: Page) {
+  await page.getByRole("button", { name: "Close account", exact: true }).click();
+  return page.getByRole("button", { name: "Confirm close account" });
+}
+
 test("ADMIN, MANAGER and TELLER can use shared account pages while Teller opening stays Teller-only", async ({ page }) => {
   for (const [username, canOpenForCustomer] of [["admin", false], ["manager", false], ["teller", true]] as const) {
     await signIn(page, username);
@@ -36,7 +53,7 @@ test("ADMIN, MANAGER and TELLER can use shared account pages while Teller openin
     if (canOpenForCustomer) await expect(tellerOpeningLink).toHaveAttribute("href", "/staff/accounts/new");
     else await expect(tellerOpeningLink).toHaveCount(0);
 
-    await page.goto(`/staff/accounts/${accountOne}`);
+    await page.goto(`/staff/accounts/${eligibleAccount}`);
     await expect(page.getByRole("button", { name: "Edit account type or branch" })).toBeEnabled();
     await expect(page.getByRole("button", { name: "Close account" })).toBeEnabled();
   }
@@ -86,32 +103,78 @@ test("closure authorization and conflicting state are reported without confirmat
     ["account-close-forbidden", /not permitted to close accounts/i],
     ["account-close-conflict", /account changed while you were working/i]
   ] as const) {
-    await signIn(page, username, `/staff/accounts/${accountTwo}`);
-    await page.getByRole("button", { name: "Close account" }).click();
-    await page.getByRole("checkbox", { name: /remaining balance will stay/i }).check();
-    await page.getByRole("button", { name: "Confirm close account" }).click();
+    await signIn(page, username, `/staff/accounts/${eligibleAccount}`);
+    await (await reviewClose(page)).click();
     await expect(page.locator(".error-box[role=alert]")).toContainText(expected);
     await expect(page.locator(".success-box[role=status]")).toHaveCount(0);
   }
 });
 
-test("closure requires deliberate acknowledgment and reports unchanged nonzero balance", async ({ page }) => {
-  await signIn(page, "manager", `/staff/accounts/${accountTwo}`);
-  await page.getByRole("button", { name: "Close account" }).click();
-  const confirm = page.getByRole("button", { name: "Confirm close account" });
-  await expect(confirm).toBeDisabled();
-  await page.getByRole("checkbox", { name: /remaining balance will stay/i }).check();
-  await expect(confirm).toBeEnabled();
+test("positive and negative balances stay exact and block closure in the browser", async ({ page }) => {
+  const before = (await evidence(page)).requests.length;
+  for (const [accountId, balance] of [[accountTwo, "50.5000"], [negativeBalance, "-0.0001"]]) {
+    await signIn(page, "manager", `/staff/accounts/${accountId}`);
+    await expect(page.getByText(`${balance} LKR`, { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Close account", exact: true })).toBeDisabled();
+    await expect(page.getByText(/bring the account balance to zero through authorized banking operations/i)).toBeVisible();
+    await expect(page.getByRole("region", { name: "Close account confirmation" })).toHaveCount(0);
+    expect(await accountMethods(page, accountId, before)).not.toContain("DELETE");
+  }
+});
+
+test("a zero-balance close requires confirmation, returns 204, and preserves history", async ({ page }) => {
+  await signIn(page, "manager", `/staff/accounts/${zeroToClose}`);
+  const confirm = await reviewClose(page);
+  const start = (await evidence(page)).requests.length;
+  await expect(page.getByText(/bank-core checks the current account and ledger balances/i)).toBeVisible();
+  await expect(page.getByRole("checkbox")).toHaveCount(0);
+  const closure = page.waitForResponse((response) => response.request().method() === "DELETE" && response.url().endsWith(`/api/v1/accounts/${zeroToClose}`));
   await confirm.click();
 
+  expect((await closure).status()).toBe(204);
   await expect(page.locator(".success-box[role=status]")).toContainText(/account closed by bank-core/i);
   await expect(page.getByText("CLOSED", { exact: true })).toBeVisible();
-  await expect(page.getByText("50.5000 LKR")).toBeVisible();
+  await expect(page.getByText("0.00 LKR", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close account", exact: true })).toHaveCount(0);
   const result = await evidence(page);
-  expect(result.staffAccountClosures).toContainEqual({ accountId: accountTwo, balanceBefore: "50.5000" });
-  expect(result.staffAccountRecords[accountTwo]).toMatchObject({ accountStatus: "CLOSED", balance: "50.5000" });
-  expect(result.requests.some((entry) => entry.method === "DELETE" && entry.path === `/api/v1/accounts/${accountTwo}`)).toBe(true);
+  expect(result.staffAccountClosures).toContainEqual({ accountId: zeroToClose, balanceBefore: "0.00" });
+  expect(result.staffAccountRecords[zeroToClose]).toMatchObject({ accountStatus: "CLOSED", balance: "0.00" });
+  expect(await accountMethods(page, zeroToClose, start)).toEqual(["GET", "DELETE", "GET"]);
   expect(result.requests.some((entry) => /ledger|journal/i.test(entry.path))).toBe(false);
+  await page.getByRole("link", { name: "View transaction history" }).click();
+  await expect(page.getByText("Final withdrawal")).toBeVisible();
+});
+
+test("a new nonzero balance on the preflight read stops the close", async ({ page }) => {
+  await signIn(page, "teller", `/staff/accounts/${changingBalance}`);
+  const confirm = await reviewClose(page);
+  const change = await page.request.post("http://127.0.0.1:38080/test/change-close-preflight-balance");
+  expect(change.status()).toBe(204);
+  const start = (await evidence(page)).requests.length;
+  await confirm.click();
+
+  await expect(page.locator(".error-box[role=alert]")).toContainText(/changed since this page loaded/i);
+  await expect(page.getByText("0.0001 LKR", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close account", exact: true })).toBeDisabled();
+  expect(await accountMethods(page, changingBalance, start)).toEqual(["GET"]);
+});
+
+test("a 422 ledger balance rejection stays active at displayed zero and triggers a fresh account read", async ({ page }) => {
+  await signIn(page, "admin", `/staff/accounts/${nonzeroLedger}`);
+  const confirm = await reviewClose(page);
+  const start = (await evidence(page)).requests.length;
+  const response = page.waitForResponse((result) => result.request().method() === "DELETE" && result.url().endsWith(`/api/v1/accounts/${nonzeroLedger}`));
+  await confirm.click();
+
+  const rejected = await response;
+  expect(rejected.status()).toBe(422);
+  expect(await rejected.json()).toMatchObject({ code: "ERR_ACCOUNT_BALANCE_NONZERO" });
+  await expect(page.locator(".error-box[role=alert]")).toContainText(/rejected closure because the account balance or the ledger balance is nonzero/i);
+  await expect(page.getByRole("button", { name: "Close account", exact: true })).toBeEnabled();
+  await expect(page.getByText("ACTIVE", { exact: true })).toBeVisible();
+  await expect(page.getByText("0.0000 LKR", { exact: true })).toBeVisible();
+  await expect(page.locator(".success-box[role=status]")).toHaveCount(0);
+  expect(await accountMethods(page, nonzeroLedger, start)).toEqual(["GET", "DELETE", "GET"]);
 });
 
 test("already-closed account does not offer a second close request", async ({ page }) => {
@@ -139,17 +202,31 @@ test("uncertain update is read back and never submitted automatically a second t
   expect(result.requests.some((entry) => entry.method === "GET" && entry.path === `/api/v1/accounts/${accountThree}`)).toBe(true);
 });
 
-test("uncertain close is recovered by a read-only status lookup without resubmission", async ({ page }) => {
-  await signIn(page, "account-close-timeout", `/staff/accounts/${accountOne}`);
-  await page.getByRole("button", { name: "Close account" }).click();
-  await page.getByRole("checkbox", { name: /remaining balance will stay/i }).check();
-  await page.getByRole("button", { name: "Confirm close account" }).click();
+for (const { username, accountId, closed } of [
+  { username: "account-close-timeout", accountId: timeoutClosed, closed: true },
+  { username: "account-close-timeout-open", accountId: timeoutOpen, closed: false }
+]) {
+  test(`close timeout with ${closed ? "closed" : "open"} read-back sends no second DELETE`, async ({ page }) => {
+    await signIn(page, username, `/staff/accounts/${accountId}`);
+    const confirm = await reviewClose(page);
+    const start = (await evidence(page)).requests.length;
+    const response = page.waitForResponse((result) => result.request().method() === "DELETE" && result.url().endsWith(`/api/v1/accounts/${accountId}`));
+    await confirm.click();
 
-  await expect(page.locator(".success-box[role=status]")).toContainText(/read-back confirms that bank-core closed this account/i);
-  const requests = (await evidence(page)).requests;
-  expect(requests.filter((entry) => entry.method === "DELETE" && entry.path === `/api/v1/accounts/${accountOne}`)).toHaveLength(1);
-  expect(requests.some((entry) => entry.method === "GET" && entry.path === `/api/v1/accounts/${accountOne}`)).toBe(true);
-});
+    const timeout = await response;
+    expect(timeout.status()).toBe(504);
+    expect(await timeout.json()).toMatchObject({ code: "BANKING_UPSTREAM_TIMEOUT" });
+    if (closed) {
+      await expect(page.locator(".success-box[role=status]")).toContainText(/read-back confirms that bank-core closed this account/i);
+      await expect(page.getByText("CLOSED", { exact: true })).toBeVisible();
+    } else {
+      await expect(page.locator(".error-box[role=alert]")).toContainText(/close result is uncertain.*original request may still complete/i);
+      await expect(page.getByText("ACTIVE", { exact: true })).toBeVisible();
+      await expect(page.locator(".success-box[role=status]")).toHaveCount(0);
+    }
+    expect(await accountMethods(page, accountId, start)).toEqual(["GET", "DELETE", "GET"]);
+  });
+}
 
 test("permission, missing record and transport failures stay visible without routing loops", async ({ page }) => {
   await signIn(page, "account-directory-forbidden");
@@ -169,10 +246,14 @@ test("permission, missing record and transport failures stay visible without rou
   await expect(page).toHaveURL(/\/login/);
 });
 
-test("a customer is denied direct navigation to staff account records", async ({ page }) => {
-  await signIn(page, "customer", "/staff/accounts");
+test("a customer is denied the staff account page and a direct closure request through the BFF", async ({ page }) => {
+  await signIn(page, "customer", `/staff/accounts/${eligibleAccount}`);
   await expect(page).toHaveURL(/\/unauthorized$/);
   await expect(page.getByRole("heading", { name: /do not have access/i })).toBeVisible();
+  const csrf = await (await page.request.get("/api/auth/csrf")).json();
+  const result = await page.request.delete(`/api/v1/accounts/${eligibleAccount}`, { headers: { "X-CSRF-Token": csrf.token } });
+  expect(result.status()).toBe(403);
+  expect(await result.json()).toMatchObject({ code: "ERR_FORBIDDEN" });
 });
 
 test("bank-core update validation and authorization errors remain definitive", async ({ page }) => {

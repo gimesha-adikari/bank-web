@@ -20,6 +20,13 @@ const account = {
 } as const;
 const branch = { branchId: 22, branchName: "Harbour Branch", address: "12 Harbour Road" };
 const updatedAccount = { ...account, accountType: "FIXED_DEPOSIT", updatedAt: "2026-02-01T00:00:00" };
+const zeroAccount = { ...account, balance: "0.0000" };
+
+async function openCloseConfirmation() {
+  render(<StaffAccountDetail accountId={account.accountId} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Close account" }));
+  return screen.getByRole("button", { name: "Confirm close account" });
+}
 
 beforeEach(() => {
   mocks.byId.mockResolvedValue(account);
@@ -65,23 +72,102 @@ describe("staff account detail and management", () => {
     expect(mocks.byId).toHaveBeenCalledTimes(3);
   });
 
-  it("requires explicit acknowledgment before closing a nonzero-balance account and refreshes status", async () => {
-    const closed = { ...account, accountStatus: "CLOSED" };
-    mocks.byId.mockResolvedValueOnce(account).mockResolvedValueOnce(account).mockResolvedValueOnce(closed);
+  it.each(["1250.1234", "-0.0001"])("blocks closure and preserves the exact balance text for %s", async (balance) => {
+    mocks.byId.mockResolvedValue({ ...account, balance });
     render(<StaffAccountDetail accountId={account.accountId} />);
-    await screen.findByRole("heading", { name: "1000000001" });
-    fireEvent.click(screen.getByRole("button", { name: /close account/i }));
+    const close = await screen.findByRole("button", { name: "Close account" });
+    expect(close).toBeDisabled();
+    expect(screen.getByText(`${balance} LKR`)).toBeInTheDocument();
+    expect(screen.getByText(/bring the account balance to zero through authorized banking operations/i)).toBeInTheDocument();
+    fireEvent.click(close);
+    expect(screen.queryByRole("region", { name: "Close account confirmation" })).not.toBeInTheDocument();
+    expect(mocks.close).not.toHaveBeenCalled();
+  });
 
-    expect(screen.getByText(/does not check the balance, transfer funds, or create a ledger posting/i)).toBeInTheDocument();
-    const confirm = screen.getByRole("button", { name: /confirm close account/i });
-    expect(confirm).toBeDisabled();
-    fireEvent.click(screen.getByRole("checkbox", { name: /i understand the remaining balance will stay in this account/i }));
+  it.each(["0", "0.00", "0.0000", "-0.0000"])("confirms closure for exact decimal zero %s with authoritative read-back", async (balance) => {
+    const active = { ...account, balance };
+    mocks.byId.mockResolvedValueOnce(active).mockResolvedValueOnce(active)
+      .mockResolvedValueOnce({ ...active, accountStatus: "CLOSED" });
+    const confirm = await openCloseConfirmation();
     expect(confirm).toBeEnabled();
+    expect(screen.getByText(/bank-core checks the current account and ledger balances/i)).toBeInTheDocument();
+    expect(mocks.close).not.toHaveBeenCalled();
     fireEvent.click(confirm);
 
-    await waitFor(() => expect(mocks.close).toHaveBeenCalledWith(account.accountId));
     expect(await screen.findByText(/account closed by bank-core/i)).toBeInTheDocument();
     expect(screen.getByText("CLOSED")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Close account" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /transaction history/i })).toBeInTheDocument();
+    expect(mocks.close).toHaveBeenCalledExactlyOnceWith(account.accountId);
+    expect(mocks.byId).toHaveBeenCalledTimes(3);
+  });
+
+  it("keeps a frozen account ineligible even at zero", async () => {
+    mocks.byId.mockResolvedValue({ ...zeroAccount, accountStatus: "FROZEN" });
+    render(<StaffAccountDetail accountId={account.accountId} />);
+    expect(await screen.findByRole("button", { name: "Close account" })).toBeDisabled();
+    expect(screen.getByText(/only active accounts can be closed/i)).toBeInTheDocument();
+  });
+
+  it("stops closure when the fresh read reports that funds arrived", async () => {
+    mocks.byId.mockResolvedValueOnce(zeroAccount).mockResolvedValueOnce({ ...zeroAccount, balance: "0.0001" });
+    fireEvent.click(await openCloseConfirmation());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/account changed since this page loaded/i);
+    expect(screen.getByText("0.0001 LKR")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close account" })).toBeDisabled();
+    expect(mocks.close).not.toHaveBeenCalled();
+  });
+
+  it("shows a nonzero ledger balance rejection despite displayed zero and refreshes the active record", async () => {
+    mocks.byId.mockResolvedValue(zeroAccount);
+    mocks.close.mockRejectedValueOnce(new ApiError({
+      kind: "backend", status: 422, code: "ERR_ACCOUNT_BALANCE_NONZERO", message: "Account and ledger balances must both be zero to close"
+    }));
+    fireEvent.click(await openCloseConfirmation());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/rejected closure because the account balance or the ledger balance is nonzero/i);
+    expect(mocks.byId).toHaveBeenCalledTimes(3);
+    expect(mocks.close).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("ACTIVE")).toBeInTheDocument();
+    expect(screen.getByText("0.0000 LKR")).toBeInTheDocument();
+    expect(screen.queryByText(/account closed by bank-core/i)).not.toBeInTheDocument();
+  });
+
+  it("stops when the preflight read fails, before any DELETE is submitted", async () => {
+    mocks.byId.mockResolvedValueOnce(zeroAccount).mockRejectedValueOnce(new ApiError({ kind: "timeout", message: "Request timed out" }));
+    fireEvent.click(await openCloseConfirmation());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/closure was not submitted.*request timed out/i);
+    expect(mocks.byId).toHaveBeenCalledTimes(2);
+    expect(mocks.close).not.toHaveBeenCalled();
+  });
+
+  it("keeps closure disabled after 204 until a fresh read confirms the current state", async () => {
+    mocks.byId.mockResolvedValueOnce(zeroAccount).mockResolvedValueOnce(zeroAccount)
+      .mockRejectedValueOnce(new ApiError({ kind: "timeout", message: "Request timed out" }))
+      .mockResolvedValueOnce({ ...zeroAccount, accountStatus: "CLOSED" });
+    fireEvent.click(await openCloseConfirmation());
+
+    expect(await screen.findByText(/confirmed closure, but the current account status could not be verified/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close account" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Refresh account details" }));
+    expect(await screen.findByText("CLOSED")).toBeInTheDocument();
+    expect(mocks.close).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps an uncertain close unresolved when read-back fails, then rechecks without a second DELETE", async () => {
+    const timedOut = new ApiError({ kind: "timeout", message: "Request timed out" });
+    mocks.byId.mockResolvedValueOnce(zeroAccount).mockResolvedValueOnce(zeroAccount)
+      .mockRejectedValueOnce(timedOut).mockResolvedValueOnce({ ...zeroAccount, accountStatus: "CLOSED" });
+    mocks.close.mockRejectedValueOnce(timedOut);
+    fireEvent.click(await openCloseConfirmation());
+
+    expect(await screen.findByText(/close result is uncertain and bank-core could not confirm the current status/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close account" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Refresh account details" }));
+    expect(await screen.findByText(/a read-back confirms that bank-core closed this account/i)).toBeInTheDocument();
+    expect(mocks.close).toHaveBeenCalledTimes(1);
   });
 
   it("does not offer closure again for a closed account but preserves the supported update action", async () => {

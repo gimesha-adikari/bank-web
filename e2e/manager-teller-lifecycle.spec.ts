@@ -59,6 +59,7 @@ test("Manager assigns an existing customer login using its user UUID and the bac
   await signIn(page, "manager-teller-create");
   await page.goto("/staff/tellers");
   await page.getByRole("button", { name: "Assign existing customer as Teller" }).click();
+  await expect(page.getByText(/assigns the TELLER role.*revokes its existing sessions.*must sign in again/i)).toBeVisible();
   await page.getByLabel("Existing customer login").selectOption({ label: "Nina Candidate · nina.candidate@example.test" });
   await page.getByLabel("Phone").fill("0712345678");
   await page.getByLabel("Address").fill("1 Synthetic Avenue");
@@ -93,7 +94,7 @@ test("Manager updates by linked user UUID and deliberately removes a Teller assi
   await page.getByRole("button", { name: /view sam teller/i }).click();
   await page.getByRole("button", { name: "Remove Teller assignment" }).click();
   await expect(page.getByText(/changes the linked login role to CUSTOMER/i)).toBeVisible();
-  await expect(page.getByText(/current Teller session may retain Teller authorization/i)).toBeVisible();
+  await expect(page.getByText(/revokes the user’s existing sessions.*must sign in again.*401.*403/i)).toBeVisible();
   await page.getByRole("button", { name: "Confirm removal" }).click();
   await expect(page.getByText("Teller removal was confirmed by bank-core.")).toBeVisible();
 

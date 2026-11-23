@@ -75,7 +75,7 @@ function draftFor(user: AdminUserDirectoryEntry, employee?: AdminEmployeeRecord)
   return {
     firstName: employee?.firstName ?? user.firstName ?? "",
     lastName: employee?.lastName ?? user.lastName ?? "",
-    // The service locates the employee row using the login email before applying this field.
+    // Bank-core uses the login email as a fallback when no employee is linked by user UUID.
     email: user.email,
     phone: employee?.phone ?? user.mobileNumber ?? "",
     address: employee?.address ?? user.address ?? "",
@@ -161,7 +161,17 @@ export function AdminAccessManagement() {
   const [unresolved, setUnresolved] = useState<RoleChangeAttempt>();
   const requestInFlight = useRef(false);
   const linkedEmployee = selectedUser ? employees.find((employee) => employee.userId === selectedUser.userId) : undefined;
-  const employeeEmailMismatch = Boolean(linkedEmployee && linkedEmployee.email.toLowerCase() !== selectedUser?.email.toLowerCase());
+  const employeeEmailMismatch = linkedEmployee && linkedEmployee.email.toLowerCase() !== selectedUser?.email.toLowerCase();
+  const employeeLinkedElsewhere = selectedUser && employees.some((employee) =>
+    employee.email.toLowerCase() === selectedUser.email.toLowerCase()
+    && employee.userId !== null
+    && employee.userId !== selectedUser.userId
+  );
+  const employeeIdentityConflictMessage = employeeEmailMismatch
+    ? "The linked employee email differs from the login email. This form sends the login email, so the change is blocked to avoid overwriting the employee email."
+    : employeeLinkedElsewhere
+      ? "An Employee record with this login email is linked to a different user UUID. This change is blocked to protect that employee association."
+      : undefined;
 
   const readSnapshot = useCallback(async () => Promise.all([
     adminAccessApi.listUsers(),
@@ -222,7 +232,7 @@ export function AdminAccessManagement() {
   }
 
   function openRoleEditor() {
-    if (!selectedUser || unresolved || employeeEmailMismatch) return;
+    if (!selectedUser || unresolved || employeeIdentityConflictMessage) return;
     setDraft(draftFor(selectedUser, linkedEmployee));
     setFormError(undefined);
     setFormFieldErrors({});
@@ -234,6 +244,10 @@ export function AdminAccessManagement() {
 
   function makeAttempt(): RoleChangeAttempt | null {
     if (!selectedUser || !draft) return null;
+    if (employeeIdentityConflictMessage) {
+      setFormError(employeeIdentityConflictMessage);
+      return null;
+    }
     const invalid = validateDraft(draft, roles);
     if (invalid) {
       setFormError(invalid);
@@ -388,13 +402,6 @@ export function AdminAccessManagement() {
 
   const busy = pending || reconciling;
   const detailEmployee = selectedEmployee;
-  const userEmployeeMismatchMessage = "This employee email differs from the login email. The current bank-core role-update service locates employees by login email, so this change is blocked to avoid creating or reassigning the wrong employee record.";
-  const employeeEmailCollision = selectedUser && employees.find((employee) => employee.email.toLowerCase() === selectedUser.email.toLowerCase() && employee.userId !== selectedUser.userId);
-  const employeeIdentityConflictMessage = employeeEmailMismatch
-    ? userEmployeeMismatchMessage
-    : employeeEmailCollision
-      ? "An Employee record with this login email is linked to a different user UUID. Bank-core locates the Employee by email for this update, so the change is blocked to avoid reassigning another user's record."
-      : undefined;
   return <>
     <SectionHeading eyebrow="Administrator workspace" title="User and access management">
       <button type="button" className="button secondary" onClick={() => setReload((value) => value + 1)} disabled={loading || busy}>
@@ -485,10 +492,11 @@ export function AdminAccessManagement() {
 
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
             <p className="font-bold">Account access and employee status are different.</p>
-            <p className="mt-1">Bank-core has no Admin endpoint here to activate or deactivate the user login. The Employee status field only applies to the Employee record. Existing sessions can keep their earlier role claims until they expire; this role-change operation does not revoke sessions.</p>
+            <p className="mt-1">This form changes the role and employee status. The login active flag is read-only here. A linked employee must be ACTIVE to sign in.</p>
+            <p className="mt-1">When a role or employee status change commits, bank-core revokes the affected user’s existing sessions. The user must sign in again. A revoked session receives HTTP 401 on its next protected request. A valid session without permission receives HTTP 403.</p>
           </div>
 
-          {currentUsername === selectedUser.username && <p className="error-box" role="alert">You are changing your own account role. This request does not revoke your current session, which may continue to carry its existing Admin claim until expiry.</p>}
+          {currentUsername === selectedUser.username && <p className="error-box" role="alert">This is your own user account. If your role or employee status changes, your current Admin session will be revoked and you must sign in again.</p>}
           {employeeIdentityConflictMessage && <p className="error-box" role="alert">{employeeIdentityConflictMessage}</p>}
           {userError === undefined && <button type="button" className="button w-fit" onClick={openRoleEditor} disabled={busy || Boolean(unresolved) || Boolean(employeeIdentityConflictMessage)}>Change role and employee access</button>}
           {selectedUser.isActive === false && <p className="muted text-sm">Bank-core has no Admin endpoint to activate or deactivate user logins; changing this user’s role does not change Login active.</p>}
@@ -510,14 +518,14 @@ export function AdminAccessManagement() {
               <label className="grid gap-1 text-sm font-semibold">Department<input className="field" maxLength={100} value={draft.department} onChange={(event) => setDraft((current) => current && ({ ...current, department: event.target.value }))} disabled={busy} /></label>
               <label className="grid gap-1 text-sm font-semibold">Manager employee UUID<select className="field" value={draft.managerId} onChange={(event) => setDraft((current) => current && ({ ...current, managerId: event.target.value }))} disabled={busy}><option value="">No change / not assigned</option>{managers.map((manager) => <option key={manager.employeeId} value={manager.employeeId}>{manager.firstName} {manager.lastName} · {manager.employeeId}</option>)}</select></label>
             </div>
-            <p className="text-sm muted">Employee status does not deactivate the login. Leaving Manager blank preserves an existing manager association; bank-core has no clear-manager operation in this request.</p>
+            <p className="text-sm muted">Leaving Manager blank preserves an existing manager association.</p>
             {formError && <p role="alert" className="error-box">{formError}</p>}
             {Object.entries(formFieldErrors).map(([field, message]) => <p key={field} role="alert" className="error-box">{field}: {message}</p>)}
             <div className="flex flex-wrap gap-2"><button type="button" className="button" onClick={reviewRoleChange} disabled={busy || Boolean(unresolved)}>Review role change</button><button type="button" className="button ghost" onClick={() => { setEditorOpen(false); setReviewOpen(false); }} disabled={busy}>Cancel</button></div>
             {reviewOpen && <div className="grid gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4" role="region" aria-label="Confirm role change">
               <p className="font-bold">Confirm {roleName(selectedUser)} → {draft.roleName}</p>
-              <p className="text-sm">The requested Employee status is {draft.status}. If the target role is CUSTOMER, bank-core will set a linked Employee record to INACTIVE and unlink it. Login active status is not changed. Existing sessions can keep their earlier role claims until expiry.</p>
-              {currentUsername === selectedUser.username && <p className="text-sm font-bold">This is your own user account. Your current Admin session may continue with its current role claim.</p>}
+              <p className="text-sm">The requested Employee status is {draft.status}. If the target role is CUSTOMER, bank-core will set a linked Employee record to INACTIVE and unlink it. If the role or employee status changes, bank-core revokes the user’s existing sessions and the user must sign in again.</p>
+              {currentUsername === selectedUser.username && <p className="text-sm font-bold">This change applies to your own account. Sign in again after any change to your role or employee status.</p>}
               <div className="flex flex-wrap gap-2"><button type="button" className="button danger" onClick={() => void confirmRoleChange()} disabled={busy || Boolean(unresolved)}>{pending ? "Applying role change…" : reconciling ? "Checking current state…" : "Confirm role change"}</button><button type="button" className="button ghost" onClick={() => setReviewOpen(false)} disabled={busy}>Back to form</button></div>
             </div>}
           </div>}

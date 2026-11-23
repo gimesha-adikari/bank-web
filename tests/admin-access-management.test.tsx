@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { ApiError } from "@/lib/api/errors";
 import type {
   AdminAccessRole,
@@ -106,6 +106,9 @@ describe("Admin access management", () => {
     }));
     await mount();
     await openEditorAndReview();
+    expect(screen.getByText(/revoked session receives HTTP 401.*valid session without permission receives HTTP 403/i)).toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: "Confirm role change" }))
+      .getByText(/revokes the user’s existing sessions and the user must sign in again/i)).toBeInTheDocument();
     const confirm = screen.getByRole("button", { name: "Confirm role change" });
     fireEvent.click(confirm);
     fireEvent.click(confirm);
@@ -146,7 +149,8 @@ describe("Admin access management", () => {
   it.each([
     { status: 400, message: /review the form and correct the returned fields/i, fields: { phone: "Invalid phone" } },
     { status: 401, message: /session has expired/i, fields: undefined },
-    { status: 403, message: /does not permit this role change/i, fields: undefined }
+    { status: 403, message: /does not permit this role change/i, fields: undefined },
+    { status: 404, message: /could not find the selected user or target role/i, fields: undefined }
   ])("keeps definitive HTTP $status role-change failures separate from transport uncertainty", async ({ status, message, fields }) => {
     mocks.updateUserRole.mockRejectedValueOnce(new ApiError({
       kind: "backend", status, code: status === 400 ? "ERR_VALIDATION" : "ERR_ACCESS", message: "Rejected", fieldErrors: fields
@@ -182,8 +186,47 @@ describe("Admin access management", () => {
     await mount();
     fireEvent.click(screen.getByRole("button", { name: "View inactive.customer account" }));
     expect(await screen.findByText("Login active", { exact: true })).toBeInTheDocument();
-    expect(screen.getByText(/no Admin endpoint here to activate or deactivate the user login/i)).toBeInTheDocument();
+    expect(screen.getByText(/login active flag is read-only here/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /activate user/i })).not.toBeInTheDocument();
+  });
+
+  it("allows a role change for an employee already linked to the selected user", async () => {
+    currentUser = { ...customer, role: roles[2] };
+    const employee = employeeFromRequest({
+      firstName: "Ava", lastName: "Customer", email: customer.email, phone: "0712345678", address: "2 Staff Road",
+      roleName: "TELLER", department: "Operations", status: "ACTIVE", gender: "OTHER", dateOfBirth: "1991-05-06"
+    });
+    currentEmployees = [employee];
+    mocks.updateUserRole.mockImplementationOnce(async (_id: string, request: AdminRoleUpdateRequest) => {
+      currentUser = { ...currentUser, role: roles[1] };
+      currentEmployees = [employeeFromRequest(request)];
+      return "Updated";
+    });
+
+    await mount();
+    await openEditorAndReview();
+    expect(screen.getByText("Linked employee record")).toBeInTheDocument();
+    expect(mocks.updateUserRole).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm role change" }));
+    expect(await screen.findByRole("status")).toHaveTextContent(/current user role is MANAGER/i);
+    expect(mocks.updateUserRole).toHaveBeenCalledWith(customer.userId, expect.objectContaining({
+      email: customer.email, roleName: "MANAGER", status: "ACTIVE", gender: "OTHER", dateOfBirth: "1991-05-06"
+    }));
+  });
+
+  it("refreshes a 409 and blocks a repeat when the employee is now linked elsewhere", async () => {
+    mocks.updateUserRole.mockImplementationOnce(async (_id: string, request: AdminRoleUpdateRequest) => {
+      currentEmployees = [{ ...employeeFromRequest(request), userId: "different-user-uuid" }];
+      throw new ApiError({ kind: "backend", status: 409, message: "Employee association conflict" });
+    });
+    await mount();
+    await openEditorAndReview();
+    const confirm = screen.getByRole("button", { name: "Confirm role change" });
+    fireEvent.click(confirm);
+    expect(await screen.findByText(/employee profile conflicts with an existing record/i)).toBeInTheDocument();
+    expect(await screen.findByText(/linked to a different user UUID/i)).toBeInTheDocument();
+    fireEvent.click(confirm);
+    expect(mocks.updateUserRole).toHaveBeenCalledTimes(1);
   });
 
   it("blocks role updates that could reassign an employee linked to a different user UUID", async () => {

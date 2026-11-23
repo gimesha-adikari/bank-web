@@ -421,7 +421,7 @@ export function ManagerTellerDirectory() {
         {directoryError && <p className="error-box" role="alert">Manager operations are unavailable until the directory can be loaded.</p>}
         {mode && <section className="card grid gap-4" aria-label={mode === "create" ? "Assign Teller" : "Edit Teller profile"}>
           <div><h2 className="text-xl font-black">{mode === "create" ? "Assign an existing login as Teller" : "Update Teller profile"}</h2>
-            <p className="mt-1 text-sm muted">{mode === "create" ? "This does not create a user account or password. The selected CUSTOMER login is assigned the TELLER role by bank-core." : "This replaces the Teller profile fields through bank-core. Changing this employee email does not change the linked login email."}</p>
+            <p className="mt-1 text-sm muted">{mode === "create" ? "Bank-core assigns the TELLER role to the selected CUSTOMER login and revokes its existing sessions. The user must sign in again." : "This replaces the Teller profile fields through bank-core. Changing this employee email does not change the linked login email."}</p>
           </div>
           {mode === "create" && <>
             <label htmlFor="teller-user-search" className="font-semibold">Search eligible customer logins</label>
@@ -474,7 +474,7 @@ export function ManagerTellerDirectory() {
           </div>}
           {confirmation && <div className="grid gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4" role="region" aria-label="Confirm Teller removal">
             <p className="font-bold">Confirm removal of {employeeName(selected)}?</p>
-            <p className="text-sm">Bank-core marks the employee record INACTIVE, removes its linked user UUID, and changes the linked login role to CUSTOMER. It does not revoke existing login sessions; a current Teller session may retain Teller authorization until its token expires.</p>
+            <p className="text-sm">Bank-core marks the employee record INACTIVE, removes its linked user UUID, and changes the linked login role to CUSTOMER. When removal commits, bank-core revokes the user’s existing sessions. The user must sign in again. A revoked session receives HTTP 401 on its next protected request. A valid session without permission receives HTTP 403.</p>
             <div className="flex flex-wrap gap-2"><button type="button" className="button danger" disabled={busy} onClick={() => void confirmRemoval()}>{writePending ? "Removing…" : "Confirm removal"}</button><button type="button" className="button ghost" disabled={busy} onClick={() => setConfirmation(false)}>Cancel</button></div>
           </div>}
         </section>}

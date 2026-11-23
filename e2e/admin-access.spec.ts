@@ -48,7 +48,7 @@ test("Admin changes a user role only after reviewing the exact request", async (
   await page.getByLabel("Department").fill("Branch Operations");
   await page.getByRole("button", { name: "Review role change" }).click();
   await expect(page.getByText("Confirm CUSTOMER → MANAGER", { exact: true })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Confirm role change" }).getByText(/existing sessions can keep their earlier role claims/i)).toBeVisible();
+  await expect(page.getByRole("region", { name: "Confirm role change" }).getByText(/revokes the user’s existing sessions and the user must sign in again/i)).toBeVisible();
   await page.getByRole("button", { name: "Confirm role change" }).click();
   await expect(page.getByRole("status")).toContainText(/bank-core confirmed the role change/i);
   await expect(page.getByRole("region", { name: "User account details" }).getByText("MANAGER", { exact: true })).toBeVisible();
@@ -67,6 +67,61 @@ test("Admin changes a user role only after reviewing the exact request", async (
       status: "ACTIVE", gender: "OTHER", dateOfBirth: "1991-05-06"
     }
   });
+});
+
+test("Admin reassigns an inactive unlinked former Teller with a reviewed role request", async ({ page, browser, baseURL }) => {
+  const formerTeller = await browser.newPage({ baseURL });
+  await signIn(formerTeller, "former.teller", "/customer");
+  await expect(formerTeller).toHaveURL(/\/customer(?:\/|$)/);
+  const managerAccess = () => formerTeller.evaluate(async () => {
+    const response = await fetch("/api/v1/tellers");
+    return { status: response.status, expired: response.headers.get("X-Bank-Auth-Expired") };
+  });
+  expect(await managerAccess()).toEqual({ status: 403, expired: null });
+
+  await signIn(page, "admin-access-role-change");
+  await page.getByRole("button", { name: "View former.teller account" }).click();
+  const detail = page.getByRole("region", { name: "User account details" });
+  await expect(detail.getByText("CUSTOMER", { exact: true })).toBeVisible();
+  const editor = page.getByRole("button", { name: "Change role and employee access" });
+  await expect(editor).toBeEnabled({ timeout: 5_000 });
+  await editor.click();
+  await page.getByLabel("Target role").selectOption("TELLER");
+  await page.getByLabel("Employee status").selectOption("ACTIVE");
+  await page.getByLabel("Gender").selectOption("OTHER");
+  await page.getByLabel("Date of birth").fill("1990-01-02");
+  await page.getByLabel("Phone").fill("0712345000");
+  await page.getByLabel("Address").fill("4 Teller Street");
+  await page.getByLabel("Department").fill("Branch Operations");
+  const manager = page.getByLabel("Manager employee UUID");
+  const managerOption = manager.getByRole("option", { name: /Lee Manager/ });
+  await expect(managerOption).toHaveCount(1);
+  await manager.selectOption(await managerOption.getAttribute("value") ?? "");
+  await page.getByRole("button", { name: "Review role change" }).click();
+  await expect(page.getByText("Confirm CUSTOMER → TELLER", { exact: true })).toBeVisible();
+  const evidence = async () => (await page.request.get("http://127.0.0.1:38080/test/requests")).json() as Promise<{
+    adminAccessMutations: { path: string; method: string; body: Record<string, unknown> }[];
+    ids: { former: string; managerEmployee: string };
+  }>;
+  const snapshot = await evidence();
+  const path = `/api/v1/access-control/roles/${snapshot.ids.former}`;
+  expect(snapshot.adminAccessMutations.filter((item) => item.path === path)).toHaveLength(0);
+  await page.getByRole("button", { name: "Confirm role change" }).click();
+  await expect(page.getByRole("status")).toContainText(/bank-core confirmed the role change/i);
+  await expect(detail.getByText("TELLER", { exact: true })).toBeVisible();
+  await expect(detail.getByText("Linked employee record")).toBeVisible();
+  expect((await evidence()).adminAccessMutations.filter((item) => item.path === path)).toMatchObject([{
+    path, method: "PUT", body: {
+      firstName: "Robin", lastName: "Former", email: "former.teller@example.test", roleName: "TELLER",
+      status: "ACTIVE", gender: "OTHER", dateOfBirth: "1990-01-02", phone: "0712345000",
+      address: "4 Teller Street", department: "Branch Operations", managerId: snapshot.ids.managerEmployee
+    }
+  }]);
+  expect(await managerAccess()).toEqual({ status: 401, expired: "1" });
+  await signIn(formerTeller, "former.teller", "/staff/accounts");
+  await expect(formerTeller).toHaveURL(/\/staff\/accounts$/);
+  expect(await managerAccess()).toEqual({ status: 403, expired: null });
+  await formerTeller.close();
 });
 
 test("an uncertain persisted role change is reconciled by reads with no automatic resend", async ({ page }) => {
@@ -94,7 +149,7 @@ test("user login activation is shown read-only because no Admin activation endpo
   await signIn(page, "admin-access-directory");
   await page.getByRole("button", { name: "View inactive.customer account" }).click();
   await expect(page.locator("dt", { hasText: "Login active" }).locator("..")).toContainText("No");
-  await expect(page.getByText(/bank-core has no Admin endpoint to activate or deactivate user logins/i)).toBeVisible();
+  await expect(page.getByText(/login active flag is read-only here/i)).toBeVisible();
   await expect(page.getByRole("button", { name: /activate user/i })).toHaveCount(0);
 });
 

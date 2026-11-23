@@ -60,6 +60,7 @@ describe("Manager Teller directory", () => {
     render(<ManagerTellerDirectory />);
     await screen.findByRole("button", { name: "Assign existing customer as Teller" });
     await completeAssignmentForm();
+    expect(screen.getByText(/assigns the TELLER role.*revokes its existing sessions.*must sign in again/i)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Department (optional)"), { target: { value: "Branch Operations" } });
     fireEvent.click(screen.getByRole("button", { name: "Assign Teller" }));
 
@@ -112,7 +113,7 @@ describe("Manager Teller directory", () => {
     fireEvent.click(await screen.findByRole("button", { name: /view sam teller/i }));
     fireEvent.click(screen.getByRole("button", { name: "Remove Teller assignment" }));
     expect(screen.getByText(/changes the linked login role to CUSTOMER/i)).toBeInTheDocument();
-    expect(screen.getByText(/current Teller session may retain Teller authorization/i)).toBeInTheDocument();
+    expect(screen.getByText(/revokes the user’s existing sessions.*must sign in again.*401.*403/i)).toBeInTheDocument();
     expect(mocks.remove).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Confirm removal" }));
     await waitFor(() => expect(mocks.remove).toHaveBeenCalledWith("user-sam"));

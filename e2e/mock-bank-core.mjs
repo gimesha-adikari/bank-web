@@ -22,6 +22,7 @@ const users = [
   ...["admin-access-directory", "admin-access-role-change", "admin-access-timeout", "admin-access-validation"]
     .map((username) => [username, "ADMIN", `e2e-${username}-jwt`]),
   ["alex.customer", "CUSTOMER", "e2e-alex-customer-jwt"],
+  ["former.teller", "CUSTOMER", "e2e-former-teller-jwt"],
   ["teller.jordan", "TELLER", "e2e-teller-jordan-jwt"],
   ["inactive.customer", "CUSTOMER", "e2e-inactive-customer-jwt"],
   ["timeout.customer", "CUSTOMER", "e2e-timeout-dot-customer-jwt"],
@@ -69,6 +70,7 @@ const adminAccessIds = {
   inactive: "0ce3cd10-6395-4acd-9a40-000000000923",
   timeout: "0ce3cd10-6395-4acd-9a40-000000000924",
   manager: "0ce3cd10-6395-4acd-9a40-000000000925",
+  former: "0ce3cd10-6395-4acd-9a40-000000000926",
   managerEmployee: "eeeeeeee-eeee-4eee-8eee-eeeeeeee0091",
   alexEmployee: "eeeeeeee-eeee-4eee-8eee-eeeeeeee0092"
 };
@@ -84,6 +86,7 @@ const adminAccessReads = [];
 const adminAccessRoles = ["ADMIN", "MANAGER", "TELLER", "EMPLOYEE", "CUSTOMER", "BANNED"]
   .map((roleName) => ({ roleId: `role-${roleName.toLowerCase()}`, roleName, description: `${roleName} role`, permissions: null }));
 const adminAccessEmployees = [
+  { ...initialTeller("Robin Former", "former.teller@example.test", null, "INACTIVE"), managerId: adminAccessIds.managerEmployee },
   { firstName: "Jordan", lastName: "Teller", email: "teller.jordan@example.test", roleName: "TELLER", status: "ACTIVE", department: "Branch Operations", phone: "0722222000", address: "5 Synthetic Road", gender: "OTHER", dateOfBirth: "1991-07-08", hireDate: "2025-01-02T09:00:00", managerId: adminAccessIds.managerEmployee, userId: adminAccessIds.teller },
   { firstName: "Lee", lastName: "Manager", email: "manager.lee@example.test", roleName: "MANAGER", status: "ACTIVE", department: "Operations", phone: "0722223000", address: "6 Synthetic Road", gender: "OTHER", dateOfBirth: "1988-04-12", hireDate: "2024-04-02T09:00:00", managerId: null, userId: adminAccessIds.manager }
 ];
@@ -199,6 +202,7 @@ function profileFor(user) {
   if (user.username === "directory-invalid") return { ...profile, firstName: "Invalid", lastName: "Details", email: "invalid.details@example.test" };
   const adminAccessProfiles = {
     "alex.customer": { userId: adminAccessIds.alex, firstName: "Alex", lastName: "Customer", email: "alex.customer@example.test", address: "1 Synthetic Road", mobileNumber: "0712345678" },
+    "former.teller": { userId: adminAccessIds.former, firstName: "Robin", lastName: "Former", email: "former.teller@example.test" },
     "teller.jordan": { userId: adminAccessIds.teller, firstName: "Jordan", lastName: "Teller", email: "teller.jordan@example.test", address: "5 Synthetic Road", mobileNumber: "0722222000" },
     "inactive.customer": { userId: adminAccessIds.inactive, firstName: "Inez", lastName: "Inactive", email: "inactive.customer@example.test", address: "2 Synthetic Road", mobileNumber: "0712345000" },
     "timeout.customer": { userId: adminAccessIds.timeout, firstName: "Toby", lastName: "Timeout", email: "timeout.customer@example.test", address: "3 Synthetic Road", mobileNumber: "0722222222" },
@@ -529,6 +533,7 @@ const server = http.createServer(async (request, response) => {
     }
     if (user.username === "admin-access-validation") return json(response, 400, { code: "ERR_VALIDATION", errors: { phone: "Invalid phone" } });
     const beforeRole = target.role;
+    const beforeStatus = adminAccessEmployees.find((employee) => employee.userId === adminRoleUpdate[1])?.status;
     if (payload.roleName === "CUSTOMER") {
       const employee = adminAccessEmployees.find((candidate) => candidate.userId === adminRoleUpdate[1]);
       if (employee) {
@@ -537,7 +542,8 @@ const server = http.createServer(async (request, response) => {
       }
       target.role = "CUSTOMER";
     } else {
-      const existing = adminAccessEmployees.find((candidate) => candidate.email === profileFor(target).email);
+      const existing = adminAccessEmployees.find((candidate) => candidate.userId === adminRoleUpdate[1])
+        ?? adminAccessEmployees.find((candidate) => candidate.email.toLowerCase() === profileFor(target).email.toLowerCase());
       if (existing && existing.userId && existing.userId !== adminRoleUpdate[1]) {
         return json(response, 409, { code: "ERR_CONFLICT", message: "Employee email is assigned to another login" });
       }
@@ -551,12 +557,14 @@ const server = http.createServer(async (request, response) => {
       if (!existing) adminAccessEmployees.push(employee);
       target.role = payload.roleName;
     }
+    const currentStatus = adminAccessEmployees.find((employee) => employee.userId === adminRoleUpdate[1])?.status;
+    if (beforeRole !== target.role || beforeStatus !== currentStatus) target.token = randomUUID();
     if (user.username === "admin-access-timeout" && adminRoleUpdate[1] === adminAccessIds.timeout) {
       request.socket.destroy();
       return;
     }
     response.writeHead(200, { "Content-Type": "text/plain" });
-    response.end(beforeRole === target.role ? "User role and employee status updated successfully" : "User role and employee status updated successfully");
+    response.end("User role and employee status updated successfully");
     return;
   }
   if (path === "tellers" && request.method === "GET") {

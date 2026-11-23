@@ -132,6 +132,22 @@ At Part 00 this table was deliberately **unscored**. Part 01 now contains source
 | [KYC-013](#kyc-013-android-multi-step-document-capture-and-kyc-submission) | Android multi-step document capture and KYC submission | 02 | Logged-in Android banking app user | Capture images, consent and submit KYC through direct Retrofit | **L3** | None | Source-confirmed | [Part 02 record](#kyc-013-android-multi-step-document-capture-and-kyc-submission) |
 | [KYC-014](#kyc-014-android-kyc-polling-and-approved-customer-registration) | Android KYC polling and approved customer registration | 02 | Android user with active/reviewed case | See result and register Customer on approval | **L3** | None | Source-confirmed | [Part 02 record](#kyc-014-android-kyc-polling-and-approved-customer-registration) |
 | [KYC-015](#kyc-015-standalone-fastapi-identity-check-endpoints) | Standalone FastAPI identity-check endpoints | 02 | Trusted internal FastAPI client, not ordinary banking customer | Call an individual face-match, liveness, OCR or document-classification operation | **L2** | Backend-only | Source-confirmed | [Part 02 record](#kyc-015-standalone-fastapi-identity-check-endpoints) |
+| [DASH-001](#dash-001-web-protected-customer-dashboard-and-entry) | Web protected customer dashboard and entry | 03 | Authenticated CUSTOMER | Reach a role-scoped home after login | **L4** | None | Source-confirmed | [Part 03 record](#dash-001-web-protected-customer-dashboard-and-entry) |
+| [DASH-002](#dash-002-web-owned-account-cards-and-displayed-balance) | Web owned-account cards and displayed balance | 03 | Authenticated CUSTOMER with Customer record | Read own account numbers, types, status and balance | **L4** | None | Source-confirmed | [Part 03 record](#dash-002-web-owned-account-cards-and-displayed-balance) |
+| [DASH-003](#dash-003-web-dashboard-onboarding-and-kyc-next-step-prompts) | Web dashboard onboarding and KYC next-step prompts | 03 | Registered CUSTOMER in incomplete or complete onboarding | Know whether to verify identity or open first bank account | **L3** | None | Source-confirmed | [Part 03 record](#dash-003-web-dashboard-onboarding-and-kyc-next-step-prompts) |
+| [DASH-004](#dash-004-web-customer-menu-and-banking-destination-shortcuts) | Web customer menu and banking destination shortcuts | 03 | Authenticated CUSTOMER | Reach implemented screens from header/dashboard | **L4** | None | Source-confirmed | [Part 03 record](#dash-004-web-customer-menu-and-banking-destination-shortcuts) |
+| [DASH-005](#dash-005-web-user-identity-and-profile-presentation) | Web User identity and profile presentation | 03 | Authenticated CUSTOMER | View login identity, role and email in profile | **L4** | None | Source-confirmed | [Part 03 record](#dash-005-web-user-identity-and-profile-presentation) |
+| [DASH-006](#dash-006-banking-customer-details-maintenance-accessible-from-onboarding) | Banking Customer details maintenance accessible from onboarding | 03 | Authenticated CUSTOMER with latest APPROVED KYC | Update banking Customer personal/contact fields after registration | **L3** | None | Source-confirmed | [Part 03 record](#dash-006-banking-customer-details-maintenance-accessible-from-onboarding) |
+| [DASH-007](#dash-007-backend-user-contact-edit-api-not-exposed-in-web-profile) | Backend User contact-edit API not exposed in web profile | 03 | Authenticated User owner | Edit general User contact data, not banking Customer fields | **L2** | Not applicable (web one-sided) | Source-confirmed | [Part 03 record](#dash-007-backend-user-contact-edit-api-not-exposed-in-web-profile) |
+| [DASH-008](#dash-008-android-home-real-single-account-balance) | Android home real single-account balance | 03 | Authenticated Android user | See selected/first bank account amount at app home | **L3** | None | Source-confirmed | [Part 03 record](#dash-008-android-home-real-single-account-balance) |
+| [DASH-009](#dash-009-android-recent-transaction-home-widget) | Android recent-transaction home widget | 03 | Authenticated Android user | Preview recent real activity | **L1** | Not applicable (frontend-only placeholder) | Source-confirmed | [Part 03 record](#dash-009-android-recent-transaction-home-widget) |
+| [DASH-010](#dash-010-android-home-quick-action-and-notification-controls) | Android home quick-action and notification controls | 03 | Authenticated Android user | Launch common actions and alerts from home | **L1** | Not applicable (frontend-only placeholder) | Source-confirmed | [Part 03 record](#dash-010-android-home-quick-action-and-notification-controls) |
+| [DASH-011](#dash-011-android-sidebar-and-destination-navigation) | Android sidebar and destination navigation | 03 | Authenticated Android user | Move among actual banking screens | **L4** | None | Source-confirmed | [Part 03 record](#dash-011-android-sidebar-and-destination-navigation) |
+| [DASH-012](#dash-012-android-user-profile-reading-and-field-display) | Android User profile reading and field display | 03 | Authenticated Android User | See current login identity and contact details | **L4** | None | Source-confirmed | [Part 03 record](#dash-012-android-user-profile-reading-and-field-display) |
+| [DASH-013](#dash-013-android-inline-user-contact-edits) | Android inline User contact edits | 03 | Authenticated User | Save native User name, location and phone field changes | **L3** | None | Source-confirmed | [Part 03 record](#dash-013-android-inline-user-contact-edits) |
+| [DASH-014](#dash-014-android-my-accounts-owner-scoped-list-and-refresh) | Android My Accounts owner-scoped list and refresh | 03 | Authenticated CUSTOMER with Customer record | Browse real accounts and navigate to account history | **L4** | None | Source-confirmed | [Part 03 record](#dash-014-android-my-accounts-owner-scoped-list-and-refresh) |
+| [DASH-015](#dash-015-android-device-local-default-account-choice) | Android device-local default-account choice | 03 | Authenticated Android user | Pick which account balance Home displays | **L4** | None | Source-confirmed | [Part 03 record](#dash-015-android-device-local-default-account-choice) |
+| [DASH-016](#dash-016-android-my-accounts-onboarding-guidance) | Android My Accounts onboarding guidance | 03 | Logged-in Android user without Customer row | Navigate to identity verification or Customer registration | **L3** | None | Source-confirmed | [Part 03 record](#dash-016-android-my-accounts-onboarding-guidance) |
 
 Use stable feature IDs e.g. `AUTH-001`, `KYC-001`. Do not equate review area names with discovered features. On future edits, replace the placeholder row with evidenced records.
 
@@ -142,7 +158,7 @@ Use stable feature IDs e.g. `AUTH-001`, `KYC-001`. Do not equate review area nam
 | 00 | Review framework and GitHub repository inventory | **COMPLETE** | Framework, repository discovery and expected-commit verification only |
 | 01 | Authentication, identity, and session management | **COMPLETE** | 17 authentication/identity capabilities source-reviewed; real-stack acceptance not verified |
 | 02 | Customer KYC and onboarding | **COMPLETE** | 15 KYC/onboarding capabilities source-reviewed; no live-stack acceptance claimed |
-| 03 | Customer dashboard and profile | **NOT REVIEWED** | Pending source-based feature review |
+| 03 | Customer dashboard and profile | **COMPLETE** | 16 source-reviewed dashboard/profile capabilities and placeholders; no live stack verified |
 | 04 | Customer account lifecycle | **NOT REVIEWED** | Pending source-based feature review |
 | 05 | Banking transactions and double-entry ledger | **NOT REVIEWED** | Pending source-based feature review |
 | 06 | Internal Pay and receipt recovery | **NOT REVIEWED** | Pending source-based feature review |
@@ -966,9 +982,672 @@ Part 00 established the review rules, the four verified GitHub repositories, obs
 
 ### Part 03 — Customer dashboard and profile
 
+**Status:** COMPLETE (source-confirmed; no real-stack acceptance).
+
+**Source snapshot 2026-11-23:** bank-web `012fbc6ff2687d126c67c85ce54cfc8d16f79f27`; bank-core `9f58e595a653db9d8aa59b70a35af8e2b0e725d3`; bank-service `cabdd323b4aa394910cb192ead6d233e9a12d9d3`; bank-app `9d98ba24cb754b8295bd58770cd502438d3b7b38`. All four main HEADs rechecked, matching Part 02. No FastAPI dashboard/profile dependency exists, so bank-service was not redundantly analyzed for this part.
+
+**Scope:** This review covers dashboard/profile presentation, data loading, navigation, Customer/User field ownership, edit discoverability, local settings, Android parity and placeholder boundaries. AUTH-003/004/007/009/010/011/014 and KYC-001/005/011/012/014 are reused as dependencies; they are not counted again. Account opening Part 04; transaction/ledger Part 05; Internal Pay Part 06; staff Customer CRUD Part 07; entire Android app Part 14.
+
+**Web architecture and information:** CUSTOMER roleHome -> /customer -> ProtectedLayout/AuthGuard. CustomerDashboard concurrently GETs /api/v1/customers/me (existence) and /api/v1/accounts/my (owner-scoped AccountResponseDTO list). Only if Customer exists and account list is empty does it GET /kyc/me to decide opening vs onboarding CTA. It displays username from AuthProvider, each Account's number/type/status and account.balance as a lossless decimal string with LKR suffix; no bank-wide total, chart, account count metric or recent feed. Shared header has Accounts/Deposit/Withdraw/Pay/Profile links, logo returns CUSTOMER home, dashboard Start transaction points to Deposit. Clicking links does not itself execute banking workflows.
+
+**User versus Customer ownership and edit/display map:**
+
+| Field group | Authoritative source | Read API | Presentation | Edit boundary |
+|---|---|---|---|---|
+| User username/name/role/email | User (users table) | GET /api/v1/users/me | Web Profile username/name/role and email; Android Profile also shows all | Web name/username read-only; email AUTH-009; Android edit User (username AUTH-014) |
+| User contact/location | User address/city/state/country/postalCode and home/work/office/mobile numbers | GET /api/v1/users/me | Android Profile; omitted from Web Profile | Android PUT /users/me; web no general editor |
+| Customer name/email/phone/address | Customer (customers table); duplicates can diverge from User | GET /api/v1/customers/me | Web onboarding form; Android Customer Registration, not either User Profile | PUT /customers/me after latest KYC approved, KYC-011 |
+| Customer DOB/gender/status/UUID/timestamps | Customer, separate customerId and linked userId | GET /api/v1/customers/me | Available in DTO, form uses DOB/gender, dashboard checks record existence | Self-upsert DTO carries status; no dedicated /customer/profile editor |
+| Account number/type/status/balance | Account (accounts table), not User/Customer fields | GET /api/v1/accounts/my | Web AccountSummary; Android My Accounts list, Home selected/first balance | Read-only display; account lifecycle Part 04 |
+| KYC state | Latest KycCase.status | GET /kyc/me | Web conditional empty-account next step; Android My Accounts after Customer missing | KYC review/updates already Part 02 |
+
+**Onboarding, loading, empty and unavailable states:**
+
+| Customer situation | Web | Android |
+|---|---|---|
+| Missing Customer; no case or KYC pending | Web redirects to /customer/onboarding and that page exposes exact case status | Android Home no KYC; My Accounts on missing Customer shows Start Verification |
+| Latest UNDER_REVIEW / NEEDS_MORE_INFO / REJECTED | Web onboarding shows actual case status; REJECTED may restart; RFI cannot correct (KYC-008) | Android My Accounts generic verification CTA, KYC Status separate |
+| APPROVED KYC, no Customer | Web still redirects onboarding and shows CustomerRecordForm | Android My Accounts offers Register as Customer |
+| Customer exists, zero accounts, APPROVED KYC | Web shows Open account CTA | Android My Accounts empty shows Open Account |
+| Customer exists, zero accounts, not approved / status unknown | Web shows Continue/View onboarding | Android list path does not query KYC unless Customer missing |
+| Customer with accounts | Web per-account cards and View onboarding; no KYC call at this point | Android Home preferred/first balance and real My Accounts list |
+| CLOSED / FROZEN account among returned records | Web card shows accountStatus, not removed by dashboard | Android account row status shown; account lifecycle Part 04 |
+| Accounts query error | Web error message; no inline retry or status lookup | Android My Accounts retry; Android Home silently shows zero |
+
+**Web profile boundary:** /customer/profile uses GET /users/me and renders User.username/firstName/lastName/roleName/email only. Email/password controls were fully scoped in Part 01. The User DTO also contains home/work/office/mobile numbers and geographic fields but the web page does not show or edit them. For banking Customer fields the user instead revisits /customer/onboarding, where approved latest KYC enables CustomerRecordForm GET/PUT /customers/me; update persists Customer only and GET rechecks the saved Customer. The two rows can diverge.
+
+**Android boundary:** HomeViewModel gets own accounts, picks the local preferred account or first; BalanceCard displays it with a dollar symbol even though backend Account currency is LKR; error state is not displayed by Home route. Three Recent Transactions are hardcoded examples; local swipe/Undo does not delete a bank transaction. Home Quick Actions callbacks and Notifications onClick are empty, while sidebar navigation reaches actual separate screens. My Accounts is real-data-backed with skeleton, refresh, error, empty, default-account DataStore and Customer-missing -> KYC/registration CTA. Android Profile GET/PUT /users/me reads/edits User fields only; generic email PUT initiates verification but UI optimistically shows new email before confirmation.
+
+**Other profile/settings/summary boundaries:** Core has generic PUT /users/me consumed on Android but not web. Staff-only Customer list/update/delete belongs to Part 07, not the self-service profile. Core GET /transactions/my currently returns a literal string, not a dashboard activity list; staff AnalyticsController spending/fraud GETs return fixed text and are not a customer financial dashboard feed. No implemented customer preferences, notification-center backend, profile-photo, communication preferences, theme/language preferences or account-deletion request flow was found in inspected scope, so absent possibilities are noted without artificial Level 0 records. Android Settings includes existing App Lock (AUTH-012), logout (AUTH-005), and version info; device-local default account is DASH-015.
+
+**Verification:** [web/playwright.config.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/playwright.config.ts) launches [web/e2e/mock-bank-core.mjs](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/mock-bank-core.mjs); relevant [web/e2e/smoke.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/smoke.spec.ts), [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts), and [web/tests/customer-client.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/customer-client.test.ts) exercise mock-core/contract/UI paths, not actual integrated Spring/MySQL. Android [app/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt) tests serialization, not device dashboard/profile. Spring integration tests were inspected but not run. No GitHub-accessible F1–F8 evidence specifically proves this Part 03 real-stack workflow. All ratings Source-confirmed, no Level 5.
+
+#### DASH-001 — Web protected customer dashboard and entry
+
+- **Review part:** 03.
+- **User roles:** Authenticated CUSTOMER.
+- **User objective:** Reach a role-scoped home after login.
+- **Workflow boundary:** Web; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** Login/authenticated session -> roleHome(CUSTOMER) /customer -> customer layout ProtectedLayout -> AuthGuard verifies authenticated role; booting and boot-error states displayed, anonymous redirects /login?returnTo, other roles /unauthorized, reload revalidates. /customer/home is a redirect alias.
+- **Frontend / Android:** [web/app/(customer)/customer/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/page.tsx); [web/app/(customer)/customer/layout.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/layout.tsx); [web/components/auth/AuthGuard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/auth/AuthGuard.tsx)
+- **Next.js BFF / API integration:** [web/components/auth/AuthProvider.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/auth/AuthProvider.tsx); [web/lib/auth/navigation.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/auth/navigation.ts) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java)
+- **Database / ledger:** User.username and role, JWT/server session (AUTH-003/004/008); dashboard-specific state is client memory.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Web CUSTOMER layout or authenticated current User; Spring method/ownership checks apply independently.
+- **Success, failure and recovery behavior:** Successful CUSTOMER sees protected shell; errors show retry; no direct banking mutations.
+- **Existing automated tests:** [web/e2e/smoke.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/smoke.spec.ts) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Login/authenticated session -> roleHome(CUSTOMER) /customer -> customer layout ProtectedLayout -> AuthGuard verifies authenticated role; booting and boot-error states displayed, anonymous redirects /login?returnTo, other roles /unauthorized, reload revalidates.
+- **Unsupported / incomplete behavior:** The guard is a navigation UX gate, not proof that linked banking workflows are complete.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Optional customer dashboard skeleton and clearer return-to-work affordances.
+
+
+#### DASH-002 — Web owned-account cards and displayed balance
+
+- **Review part:** 03.
+- **User roles:** Authenticated CUSTOMER with Customer record.
+- **User objective:** Read own account numbers, types, status and balance.
+- **Workflow boundary:** Web; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** CustomerDashboard mounts and calls accountsApi.mine GET /api/v1/accounts/my via Next.js BFF -> Spring AccountController -> AccountService.getAccountsForCurrentUser resolves user UUID -> Customer UUID -> AccountRepository.findByCustomerCustomerId -> AccountResponseDTO -> AccountSummary cards. balance is Account.balance decimal rendered as raw decimal text with LKR suffix; no sum or ledger-reconciliation calculation.
+- **Frontend / Android:** [web/components/banking/CustomerDashboard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerDashboard.tsx); [web/components/banking/AccountSummary.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/AccountSummary.tsx); [web/lib/finance/money.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/finance/money.ts)
+- **Next.js BFF / API integration:** [web/lib/api/accounts.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/accounts.ts); [web/app/api/v1/[...path]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/v1/%5B...path%5D/route.ts); [web/lib/api/http.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/http.ts) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java); [core/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/accounts/domain/repository/AccountRepository.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/domain/repository/AccountRepository.java)
+- **Database / ledger:** Persisted Account.accountNumber/accountType/accountStatus/balance under Customer; account count inferred from returned cards, no dedicated account-count KPI.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Web CUSTOMER layout or authenticated current User; Spring method/ownership checks apply independently.
+- **Success, failure and recovery behavior:** Account rows appear or loading/no-account/error text; revisit refetches, no dashboard refresh button.
+- **Existing automated tests:** [web/e2e/smoke.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/smoke.spec.ts); [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** CustomerDashboard mounts and calls accountsApi.
+- **Unsupported / incomplete behavior:** No total balance, activity preview or account aggregation; CLOSED/FROZEN status displayed without filtering; balances are not independently proven ledger-reconciled.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Consider explicit refresh, consolidated total/count and account-status filtering if desired.
+
+
+#### DASH-003 — Web dashboard onboarding and KYC next-step prompts
+
+- **Review part:** 03.
+- **User roles:** Registered CUSTOMER in incomplete or complete onboarding.
+- **User objective:** Know whether to verify identity or open first bank account.
+- **Workflow boundary:** Web; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** Dashboard GET /customers/me plus GET /accounts/my; specific Customer 404 redirects /customer/onboarding. Only when Customer exists AND account list is empty, GET /kyc/me: APPROVED -> Open account; other result -> Continue/View onboarding; onboarding route displays exact case state (KYC-005), approved user without Customer remains redirected until Customer upsert (KYC-011). Existing accounts -> View onboarding link; account lookup failure skips conditional KYC read.
+- **Frontend / Android:** [web/components/banking/CustomerDashboard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerDashboard.tsx); [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx); [web/components/banking/useAccountOpeningEligibility.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/useAccountOpeningEligibility.ts)
+- **Next.js BFF / API integration:** [web/lib/api/customers.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/customers.ts); [web/lib/api/accounts.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/accounts.ts); [web/lib/api/kyc.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/kyc.ts) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java); [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java)
+- **Database / ledger:** Existing Customer row, Account count, latest KycCase.status; User and Customer are separate entities.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Web CUSTOMER layout or authenticated current User; Spring method/ownership checks apply independently.
+- **Success, failure and recovery behavior:** Missing record -> onboarding, Customer/no accounts APPROVED -> opening CTA, otherwise onboarding CTA; backend lookup failures shown independently.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 3 — Partially functional**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Dashboard GET /customers/me plus GET /accounts/my; specific Customer 404 redirects /customer/onboarding.
+- **Unsupported / incomplete behavior:** No detailed inline KYC status on dashboard, status not looked up when existing accounts or account read failure; no dashboard retry button or automatic refresh.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Add explicit, independent status/eligibility summary and retry if product requires it.
+
+
+#### DASH-004 — Web customer menu and banking destination shortcuts
+
+- **Review part:** 03.
+- **User roles:** Authenticated CUSTOMER.
+- **User objective:** Reach implemented screens from header/dashboard.
+- **Workflow boundary:** Web navigation-only; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** Header renders role-filtered Accounts, Deposit, Withdraw, Pay and Profile links, My Bank logo -> roleHome; dashboard Start a transaction -> /customer/transactions/deposit; each AccountSummary View transaction history -> /customer/accounts/{id}/transactions; zero-account Open an account -> /customer/accounts/new, View onboarding -> onboarding. Target route files exist; links themselves issue no banking mutation.
+- **Frontend / Android:** [web/components/layout/AppHeader.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/layout/AppHeader.tsx); [web/components/banking/CustomerDashboard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerDashboard.tsx); [web/components/banking/AccountSummary.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/AccountSummary.tsx); [web/lib/auth/navigation.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/auth/navigation.ts)
+- **Next.js BFF / API integration:** [web/app/(customer)/customer/pay/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/pay/page.tsx); [web/app/(customer)/customer/accounts/[accountId]/transactions/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/accounts/%5BaccountId%5D/transactions/page.tsx) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** N/A — no connected call for this navigation/presentation action.
+- **Database / ledger:** No navigation-specific persistence or new API; destination banking flows belong Parts 04–06.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Web CUSTOMER layout or authenticated current User; Spring method/ownership checks apply independently.
+- **Success, failure and recovery behavior:** Route transitions and role-scoped menu work; responsive web header wraps links, logout handled AUTH-005.
+- **Existing automated tests:** [web/e2e/smoke.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/smoke.spec.ts); [web/e2e/customer-account-opening.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-account-opening.spec.ts) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Header renders role-filtered Accounts, Deposit, Withdraw, Pay and Profile links, My Bank logo -> roleHome; dashboard Start a transaction -> /customer/transactions/deposit; each AccountSummary View transaction history -> /customer/accounts/{id}/transactions; zero-account Open an account -> /customer/accounts/new, View onboarding -> onboarding.
+- **Unsupported / incomplete behavior:** Deposit, Pay, account opening and transaction history are not certified by navigation alone; no direct header Transfer item or notification center.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Consider contextual next actions after later financial-workflow reviews.
+
+
+#### DASH-005 — Web User identity and profile presentation
+
+- **Review part:** 03.
+- **User roles:** Authenticated CUSTOMER.
+- **User objective:** View login identity, role and email in profile.
+- **Workflow boundary:** Web; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** Open /customer/profile -> ProfileView -> usersApi.me GET /api/v1/users/me BFF -> Spring UserController.getProfile -> UserServiceImpl.getCurrentUserProfile -> UserProfileResponse from User row -> username, first+last name, role, current User.email displayed. Email-change and password controls are AUTH-009/AUTH-007 and not rescored.
+- **Frontend / Android:** [web/app/(customer)/customer/profile/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/profile/page.tsx); [web/components/banking/ProfileView.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/ProfileView.tsx); [web/components/banking/PasswordChangeForm.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/PasswordChangeForm.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/users.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/users.ts); [web/app/api/v1/[...path]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/v1/%5B...path%5D/route.ts) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java); [core/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/dto/UserProfileResponse.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/dto/UserProfileResponse.java)
+- **Database / ledger:** User row stores username, firstName, lastName, role, email plus address/contact fields; Customer row is not fetched by /profile.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Web CUSTOMER layout or authenticated current User; Spring method/ownership checks apply independently.
+- **Success, failure and recovery behavior:** Identity/email shown on success, API error displayed, no dedicated profile Retry button.
+- **Existing automated tests:** [web/e2e/smoke.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/smoke.spec.ts); [core/src/test/java/com/bankingsystem/core/features/auth/UserEmailChangeMvcTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/auth/UserEmailChangeMvcTest.java) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Open /customer/profile -> ProfileView -> usersApi.
+- **Unsupported / incomplete behavior:** Web profile does not display User mobile/address/city/postal fields nor Customer gender, date of birth, status or customerId; general User editing not exposed.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Separate User and banking Customer detail sections and optionally expose unshown User contacts.
+
+
+#### DASH-006 — Banking Customer details maintenance accessible from onboarding
+
+- **Review part:** 03.
+- **User roles:** Authenticated CUSTOMER with latest APPROVED KYC.
+- **User objective:** Update banking Customer personal/contact fields after registration.
+- **Workflow boundary:** Web partial profile integration (not a repeat of KYC-011); defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** The /customer/profile route does not read Customer. On /customer/onboarding, GET /customers/me and GET /kyc/me gate CustomerRecordForm; prefill Customer first/last names, gender, contact email, phone, address and DOB (with User fallback for some fields). PUT /customers/me overwrites client userId with current user UUID, CustomerServiceImpl.upsertByUser persists Customer row; form checks saved customerId and reGETs authoritative Customer. Existing customer status carried forward. This upsert was scored in KYC-011; here only the profile discoverability/integration is assessed.
+- **Frontend / Android:** [web/components/banking/CustomerRecordForm.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerRecordForm.tsx); [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx); [web/components/banking/ProfileView.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/ProfileView.tsx)
+- **Next.js BFF / API integration:** [web/lib/api/customers.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/customers.ts); [web/lib/api/users.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/users.ts) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java); [core/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java)
+- **Database / ledger:** Customer.customerId/firstName/lastName/gender/email/phone/address/dateOfBirth/status/createdAt/updatedAt/linked user_id; changes do not update User names/email/mobile/address.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Web CUSTOMER layout or authenticated current User; Spring method/ownership checks apply independently.
+- **Success, failure and recovery behavior:** After approved KYC, can edit and save existing Customer data with server reread; validation, conflict, 403 and uncertain errors shown.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts); [web/tests/customer-client.test.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/tests/customer-client.test.ts) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 3 — Partially functional**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** The /customer/profile route does not read Customer.
+- **Unsupported / incomplete behavior:** No unified customer-profile read/edit view at /customer/profile; Customer and User duplicates may diverge; editing requires latest approved KYC.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Make Customer data reachable from Profile and document overlapping-field ownership.
+
+
+#### DASH-007 — Backend User contact-edit API not exposed in web profile
+
+- **Review part:** 03.
+- **User roles:** Authenticated User owner.
+- **User objective:** Edit general User contact data, not banking Customer fields.
+- **Workflow boundary:** Backend+Android; one-sided for Web; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** Spring PUT /api/v1/users/me accepts UpdateProfileRequest fields for first/last name, address, city/state/country/postalCode, home/work/office/mobile numbers and username/email; UserServiceImpl updates nonblank fields of current User then saves. Android uses Retrofit PUT (DASH-013); web usersApi has only me and changeEmail and no general edit control. User email and username auth workflows remain AUTH-009/014.
+- **Frontend / Android:** [web/components/banking/ProfileView.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/ProfileView.tsx); [web/lib/api/users.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/users.ts); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileViewModel.kt)
+- **Next.js BFF / API integration:** [web/app/api/v1/[...path]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/v1/%5B...path%5D/route.ts); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java); [core/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/dto/UpdateProfileRequest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/dto/UpdateProfileRequest.java)
+- **Database / ledger:** User table only, not Customer; email request starts pending verification instead of changing immediately.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Spring update persisted for nonblank supported fields and Android consumer exists; web profile has no corresponding call.
+- **Existing automated tests:** [core/src/test/java/com/bankingsystem/core/features/auth/UserEmailChangeServiceTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/auth/UserEmailChangeServiceTest.java); [app/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 2 — One-sided**, for the stated channel/feature scope.
+- **Independent status:** Not applicable (Spring/Android supported, web one-sided).
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Spring PUT /api/v1/users/me accepts UpdateProfileRequest fields for first/last name, address, city/state/country/postalCode, home/work/office/mobile numbers and username/email; UserServiceImpl updates nonblank fields of current User then saves.
+- **Unsupported / incomplete behavior:** Web-only one-sided implementation, no server-side currentPassword validation on generic field updates, name/address/contact can diverge from Customer.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Decide whether general User editing should exist on web and how overlapping Customer fields are reconciled.
+
+
+#### DASH-008 — Android home real single-account balance
+
+- **Review part:** 03.
+- **User roles:** Authenticated Android user.
+- **User objective:** See selected/first bank account amount at app home.
+- **Workflow boundary:** Android; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** AppNavHost HOME -> BankHomeRoute -> HomeViewModel subscribes DefaultAccountStore defaultAccountId and calls AccountRepository.getMyAccounts -> Retrofit GET /api/v1/accounts/my -> Spring authenticated User -> Customer -> Account rows; selected account or first list item chosen, BalanceCard shows Double formatted with dollar symbol. Errors stored in ViewModel, but Route passes only balance (not loading/error) and screen initially shows zero.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeRoute.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/HomeViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/HomeViewModel.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BalanceCard.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BalanceCard.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java); [core/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java)
+- **Database / ledger:** Account.balance persisted in MySQL; Android local default-account ID preference; no dashboard financial aggregate.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Home displays selected/first balance or zero for empty; errors do not visually distinguish unavailable from zero; no Home refresh action.
+- **Existing automated tests:** [app/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 3 — Partially functional**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** AppNavHost HOME -> BankHomeRoute -> HomeViewModel subscribes DefaultAccountStore defaultAccountId and calls AccountRepository.
+- **Unsupported / incomplete behavior:** Display '
+
+### Part 04 — Customer account lifecycle
+
 **Status:** NOT REVIEWED.
 
-**Review boundary:** Customer dashboard and profile. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+**Review boundary:** Customer account lifecycle. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 05 — Banking transactions and double-entry ledger
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Banking transactions and double-entry ledger. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 06 — Internal Pay and receipt recovery
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Internal Pay and receipt recovery. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 07 — Staff customer management
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Staff customer management. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 08 — Teller-assisted opening and staff account operations
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Teller-assisted opening and staff account operations. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 09 — Manager Teller lifecycle
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Manager Teller lifecycle. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 10 — Admin KYC management
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Admin KYC management. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 11 — Admin users, employees, roles, and customer management
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Admin users, employees, roles, and customer management. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 12 — Financial administration and backend-only financial capabilities
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Financial administration and backend-only financial capabilities. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 13 — External payments, wallet capabilities, and deferred features
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** External payments, wallet capabilities, and deferred features. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 14 — Android bank-app
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Android bank-app. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 15 — Cross-cutting platform capabilities and remaining API inventory
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Cross-cutting platform capabilities and remaining API inventory. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+### Part 16 — Final completeness map and future development planning
+
+**Status:** NOT REVIEWED.
+
+**Review boundary:** Final completeness map and future development planning. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+
+
+## 10. Standard feature record template
+
+Copy this structure into the appropriate part when a feature is actually reviewed; replace placeholders only with observed evidence:
+
+```md
+#### [FEATURE-ID] — [Feature name]
+
+- **Review part:** [00–16]
+- **User roles:** [roles and permissions]
+- **User objective:** [reason this feature is used]
+- **Workflow boundary:** [entry condition through observable outcome]
+- **Complete workflow steps:** [ordered stages and branch conditions]
+- **Frontend / Android:** [routes/screens/components/action links, or N/A]
+- **Next.js BFF / API integration:** [client, endpoint, method, payload, response, error handling, or N/A]
+- **Spring Boot implementation:** [controllers/services/validation, or N/A]
+- **Database / ledger:** [entities, tables, migrations, journal effects, or N/A]
+- **External dependencies:** [FastAPI, provider, mail, etc., or N/A]
+- **Authorization:** [authn/authz, role/ownership checks]
+- **Success, failure and recovery behavior:** [actual user-visible states]
+- **Existing automated tests:** [file paths, scope, mock boundaries]
+- **Available live verification:** [dated evidence, environment and scope, or none]
+- **Completeness level:** [0–5, or unscored when insufficient evidence]
+- **Independent status:** [status, if applicable]
+- **Evidence confidence:** [one of the five evidence labels]
+- **Supported behavior:** [precisely what works from inspected evidence]
+- **Unsupported / incomplete behavior:** [precise missing portions]
+- **Source references:** [commit-pinned repo links and file paths]
+- **Future implementation opportunities:** [possible follow-ups, not defects]
+```
+
+## 11. Cross-feature dependencies
+
+**Part 01-authentication prerequisites identified from source.** Later business workflows remain NOT REVIEWED; these are only confirmed authentication touchpoints.
+
+| Dependent feature ID | Prerequisite / service | Current evidence | Consequence for completeness |
+|---|---|---|---|
+| AUTH-001 → AUTH-002 | Verification-token mail + inactive CUSTOMER identity | [core/src/main/java/com/bankingsystem/core/features/auth/application/impl/AuthServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/application/impl/AuthServiceImpl.java) | New registration cannot authenticate until verified |
+| AUTH-002 → AUTH-003 | Active verified user status | [core/src/main/java/com/bankingsystem/core/features/auth/domain/User.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/domain/User.java) | Login eligibility gates unverified registrations via isActive=false |
+| AUTH-003 → AUTH-004/011 | JWT + session fingerprint + role state | [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java); [core/src/main/java/com/bankingsystem/core/modules/common/security/JwtAuthFilter.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/security/JwtAuthFilter.java) | Web and Android depend on valid persisted session and live user state |
+| AUTH-004 → AUTH-008 | Web role guard and backend role enforcement | [web/components/auth/AuthGuard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/auth/AuthGuard.tsx); [core/src/main/java/com/bankingsystem/core/modules/common/security/SecurityConfig.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/security/SecurityConfig.java) | Client navigation cannot substitute for Spring authorization |
+| AUTH-007/008 → AUTH-005/011 | Password/role/employee state change -> revoke all sessions | [core/src/main/java/com/bankingsystem/core/features/auth/application/impl/AuthServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/application/impl/AuthServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/employee/application/impl/EmployeeServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/employee/application/impl/EmployeeServiceImpl.java) | Clients must reauthenticate after revocation; Android needs explicit UX |
+| AUTH-009 → AUTH-010 | Current user profile + pending email reservation + mail link | [core/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/system/application/impl/EmailServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/application/impl/EmailServiceImpl.java) | Confirmation depends on configured link origin and valid token |
+| AUTH-001/010 → Part 02 | Login user identity precedes KYC/customer onboarding | [core/src/main/java/com/bankingsystem/core/features/auth/domain/User.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/domain/User.java); [core/src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql) | User creation is not equivalent to customer or KYC completion (not reviewed here) |
+| AUTH-008 → Parts 09 and 11 | Manager Teller and Admin role changes | [core/src/main/java/com/bankingsystem/core/features/accesscontrol/application/impl/AccessControlServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/application/impl/AccessControlServiceImpl.java) | Business workflows not reviewed; auth impact is session revocation |
+| AUTH-015 → Part 02/15 | Core-to-FastAPI shared credential | [core/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java); [service/app/core/internal_auth.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/core/internal_auth.py) | Only service authentication reviewed; KYC workflow deferred |
+| AUTH-001/002/003/004/011 -> KYC-001/002/003 | Verified login and authenticated web/Android session | [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java) | User login identity precedes KYC; User is not Customer |
+| KYC-002 -> KYC-003 | Four distinct current-user-owned uploaded IDs and consent | [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycCaseServiceImpl.java) | Upload alone is not a submitted case |
+| AUTH-015 -> KYC-004 | X-Bank-Core-Auth internal credential | [core/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/integration/MlWebClientConfig.java); [service/app/core/internal_auth.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/core/internal_auth.py) | FastAPI suggestions not independent customer approval |
+| KYC-003/004 -> KYC-005 | Persisted case status and checks | [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java) | Customer sees authoritative Spring persisted result |
+| KYC-006/008 -> Part 10 | Admin review and needs-more-info workflow | [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java) | Admin full workspace remains unreviewed |
+| KYC-004/006 -> KYC-011 | Latest case must be APPROVED | [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | Separate Customer upsert, not auto-created |
+| KYC-011/012 -> Part 04 | Customer record and latest approved KYC | [core/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java) | Bank-account lifecycle still unreviewed |
+| KYC-011 -> Parts 03/07 | Customer profile/record fields and staff creation | [core/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/application/impl/CustomerServiceImpl.java) | Customer editing and staff workflows deferred |
+| KYC-013/014 -> Part 14 | Android capture/polling and Customer self-registration | [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/interfaces/ui/KycRoute.kt) | Native app-wide review remains unreviewed |
+| KYC-002/004/010/015 -> Part 15 | Storage cleanup, model runtime and internal service auth | [core/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java); [service/app/features/factory.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/features/factory.py) | Operational/deployment review deferred |
+
+| AUTH-003/004/008/010 -> DASH-001/005 | Session, role and current User identity | [web/components/auth/AuthGuard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/auth/AuthGuard.tsx); [web/components/auth/AuthProvider.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/auth/AuthProvider.tsx) | Login identity and web guard, not a new auth feature |
+| KYC-001/005/011/012 -> DASH-003/006 | Latest KYC and separately saved banking Customer | [web/components/banking/CustomerDashboard.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerDashboard.tsx); [web/components/banking/CustomerOnboarding.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/banking/CustomerOnboarding.tsx) | Incomplete onboarding redirects; Customer editing still requires approval |
+| DASH-002/014/015 -> Part 04 | Account-response list and local default account | [core/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java); [app/app/src/main/java/com/bankingsystem/mobile/core/modules/common/storage/DefaultAccountStore.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/core/modules/common/storage/DefaultAccountStore.kt) | Only presentation, not bank-account lifecycle |
+| DASH-002/009/014 -> Part 05 | Account balance and account-history data sources | [core/src/main/java/com/bankingsystem/core/features/accounts/domain/Account.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/domain/Account.java); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/Transactions.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/Transactions.kt) | No ledger verification or real home recent feed claimed |
+| DASH-004/010/011 -> Part 06 | Pay/transfer destinations vs inert Android home buttons | [web/components/layout/AppHeader.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/components/layout/AppHeader.tsx); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt) | Internal Pay/receipt implementation remains not reviewed |
+| DASH-006/007 -> Part 07 | Customer maintenance vs staff CRUD | [core/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | Staff-only record-management workflow deferred |
+| DASH-008/011/012/013/015/016 -> Part 14 | Android Home/Profile/My Accounts/nav | [app/app/src/main/java/com/bankingsystem/mobile/app/navigation/AppNavHost.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/app/navigation/AppNavHost.kt) | Mobile-wide review deferred; Part 03 considers only dashboard/profile |
+| AUTH-009/014 -> DASH-007/013 | Generic User contact/email/username update semantics | [core/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java) | Email confirmation and username reauthentication already covered Part 01 |
+
+## 12. Future implementation candidates
+
+**Part 01 candidates based on traced auth implementation.** Ideas only; no work authorized. Do not implement these during review or treat an opportunity as a proven defect.
+
+| Candidate | Related feature ID | Evidence for opportunity | Priority / decision |
+|---|---|---|---|
+| Native Android email-verification, resend and reset completion | AUTH-001, AUTH-002, AUTH-006 | Android AuthApi / screens lack verification/resend and reset-completion flows despite web support | Undecided |
+| Align Android password-change reauthentication | AUTH-007, AUTH-011 | Core revokes all sessions on change while Android profile retains success state until a later 401 | Undecided |
+| Standardize verified email-change link target | AUTH-009 | Email-change mail uses app.baseUrl; web result BFF expects its own origin | Undecided |
+| Define intentional refresh/session-expiry experience | AUTH-004, AUTH-013 | Web blocks backend rotation; backend session expires at two hours and Android does not rotate | Undecided |
+| Active-device/session listing and selective revocation | AUTH-005, AUTH-011 | Persisted sessions exist without user session-management UI/API | Undecided |
+| Decide on secure multi-factor authentication separately from app lock | AUTH-012 | Android local PIN/biometric gate does not protect Spring API with MFA | Undecided |
+| Assess distributed login-throttling operation | AUTH-016 | Limiter is in-process Caffeine buckets rather than shared across nodes | Undecided |
+| Confirm per-channel username-change and recheck requirements | AUTH-014, AUTH-017 | Android change flow submits currentPassword but updateProfile does not evaluate it; web has no editor | Undecided |
+| Core–FastAPI internal-identity lifecycle | AUTH-015 | Static shared secret authenticates KYC service requests without managed rotation workflow | Undecided |
+| Implement customer correction/resubmission for NEEDS_MORE_INFO | KYC-008 | Controller returns active case before replacement; web has no correction form | Actual missing journey; undecided |
+| Replace Android local placeholder liveness/face indicators | KYC-013 | Android assigns 0.9 on selfie without real check feedback | Partial native experience; undecided |
+| Add Android rejected-case restart and error/retry recovery | KYC-013, KYC-014 | Web supports restart and idempotent reconciliation, Android does not | Missing cross-client steps; undecided |
+| Validate actual FastAPI models/runtime and KYC end-to-end acceptance | KYC-004 | Default simple backends, advanced ONNX weights absent in reviewed GitHub, no run evidence | Evidence/assurance opportunity; undecided |
+| Decide whether ADDRESS_MATCH and DOC_VALIDITY should gate approval | KYC-004 | Checks computed but policy decide() ignores them | Optional policy decision; undecided |
+| Align 1 MiB/10 MiB/11 MiB upload limits and orphan retention | KYC-002, KYC-010 | Limits differ; retention only terminal referenced files | Operational design; undecided |
+| Persist unfinished uploads and standardize submission idempotency | KYC-002, KYC-003, KYC-013 | Uploads persist separately, UI drafts volatile, Android no key | Partial workflow; undecided |
+| Consider KYC case history and progress notifications | KYC-005 | Customer can query only latest case; web manual refresh | Optional enhancement; undecided |
+| Clarify Spring KYC eligibility role rules | KYC-001 | Web CUSTOMER guard vs Spring authenticated-any-role KYC routes | Authorization product policy; undecided |
+| Explicitly retain separate approved KYC -> Customer registration step | KYC-011 | Banking Customer not auto-created, additional fields mandatory | Product design; undecided |
+| Define SUPERSEDED lifecycle and re-verification requirements | KYC-007 | Enum exists without known transition setter | Optional design; undecided |
+
+| Unified web User vs banking Customer profile presentation/editing | DASH-005, DASH-006, DASH-007 | Banking Customer form only on onboarding and general User contact editor absent on web | Undecided |
+| Status/eligibility summary and refresh/retry | DASH-003, DASH-016 | Web KYC request conditional on no accounts; Android Home omits KYC and My Accounts collapses lookup failure | Undecided |
+| Real recent activity vs Android hardcoded fixtures | DASH-009 | Three static UiTransaction records with local-only swipe/Undo | Undecided |
+| Wire Android Home quick actions and Notifications to real destinations | DASH-010 | BankHomeRoute does not provide callback handlers; notification onClick empty | Undecided |
+| Correct Android home currency and loading/error states | DASH-008 | Account.balance via API displayed $ while core uses LKR; ViewModel error not rendered | Undecided |
+| Android verified email change UX and post-edit authoritative re-read | DASH-013 | Generic User PUT email starts pending confirmation, local state optimistically changes | Undecided |
+| Actual dashboard account total/count if requested | DASH-002 | Web renders account cards only, no total/KPI/recent feed | Undecided |
+| Per-user default-account preference policy | DASH-015 | Device-wide DataStore default_account_id, not linked to User | Undecided |
+| Decide notification/communication preferences and photo support | DASH-005, DASH-010 | No connected customer settings/notifications/photo implementation found; do not invent Level 0 | Undecided |
+
+## 13. Known evidence limitations
+
+- Part 00 inspected GitHub repository metadata, the default-branch refs, three known commits and root-level directories **only**.
+- No frontend-to-backend workflow tracing, test inspection, API verification or live-stack acceptance was performed during Part 00.
+- Matching the named local commits to GitHub main does not establish the absence of subsequent unpublished changes.
+- No expected local commit was provided for bank-app, so local-vs-GitHub parity for the Android app is unknown.
+- Future parts should provide source links pinned to inspected commits, distinguish documentation from independent verification, and disclose relevant access or version gaps.
+
+- Part 01 inspected GitHub source only at the four pinned SHAs above, including web BFF, Spring security/services/entities, Android auth/storage/lock, and FastAPI internal authorization. No code was executed, no credentials tested, and no commits modified application sources.
+- The committed Playwright tests run a mock core via `e2e/mock-bank-core.mjs`; they do not establish a real Spring/MySQL/Mailpit workflow. The Spring integration and unit tests were read as code, not executed in this review.
+- No historical F1–F8 real-stack reports were found as readable evidence within the four GitHub trees. Their contents may exist outside these repositories; none were used to claim live verification.
+- Android device/emulator runtime and email SMTP delivery were not observed. Hence all Part 01 evidence confidence is Source-confirmed and no Level 5 is asserted.
+- Config-dependent email-change link destination and cross-platform difference in password-change sign-out are identified as completeness boundaries, not established live defects.
+- Features not found in inspected source (MFA, social login, device-session management, etc.) are catalogued only as unsupported possibilities, not falsely scored as implemented.
+- Part 02 inspected source only at pinned GitHub SHAs; no application source changed, and no tests, device/emulator runs, ML inference, real document processing, SMTP, or database mutations were performed.
+- No attributable historical F1–F8 actual integrated-stack execution reports or verifiable outputs were accessible in the reviewed four GitHub repository trees; web Playwright uses mock bank-core.
+- KycMlContractIT is environment-gated integration test source, not independently confirmed successful execution. Optional ONNX model weights are not tracked in reviewed bank-service source; local/external model snapshots were not available for verification.
+- Part 02 found explicit source limitations in NEEDS_MORE_INFO customer correction, Android placeholder face/liveness indicators, mobile submission recovery and upload-draft persistence.
+- Part 02 confirms latest approved KYC and separately saved Customer record are both required for self-service account opening; this review does not certify account-opening/ledger, Admin-workspace completeness, staff lifecycle or whole Android platform.
+
+- Part 03 rechecked the four pinned GitHub main HEAD commits and inspected web dashboard/navigation/profile source, Spring User/Customer/Account APIs/entities and Android home/profile/accounts/navigation/settings; bank-service is not called by dashboard/profile.
+- Dashboard Account.balance is an owner-scoped stored account amount; no independently computed ledger total is claimed. Web account and Customer reads and conditional KYC state are distinct, and errors are not treated as missing records.
+- Web /customer/profile reads only User, whereas banking Customer editing persists through /customer/onboarding after approved KYC; no automatic User/Customer field synchronization. General Spring User update is used by Android but not web.
+- Android Home is partially backed by account API, but dollar symbol, hidden loading/error, fixture recent activity, inert quick actions/notifications; My Accounts uses real account list and device-local default choice.
+- Relevant Playwright uses mock bank-core; Android ApiContractTest is serialization-only; no tests were executed, no real-stack Part 03 evidence was independently verified and no Level 5 ratings assigned.
+- Parts 04–16 remain unreviewed. Navigation into account opening/transaction/Pay/staff/Android modules was not scored as destination feature completeness.
+
+## 14. Final planning summary
+
+**Reserved for Part 16.** Synthesize evidenced feature coverage, actual supported workflows, incomplete and deferred functions, dependencies, future development options and explicit limitations. Do not prefill it from conversation summaries.
+
+## 15. Review-document change log
+
+| Date | Part | Change | GitHub ref |
+|---|---|---|---|
+| 2026-11-23 | 00 | Established canonical 17-part review framework, repository inventory, source-freshness verification, classifications, tracker, standard record template and empty future-review sections. No feature assessments. | `docs/feature-completeness-review` (this documentation branch) |
+| 2026-11-23 | 01 | Source-reviewed 17 authentication/identity capabilities across four pinned repositories; added individual records, master inventory, dependencies, planning candidates and verification limitations; no live-stack claims. | `docs/feature-completeness-review` (this documentation branch) |
+| 2026-11-23 | 02 | Source-reviewed 15 customer KYC/onboarding capabilities across four pinned source commits; added individual records, status transition map, web/Android distinctions, FastAPI scope, Customer gate, dependencies, candidates and evidence limitations. No application changes. | `docs/feature-completeness-review` (this documentation branch) |
+| 2026-11-23 | 03 | Source-reviewed 16 customer dashboard/profile/web-Android integration capabilities and placeholders; documented field ownership, data/API map, onboarding states, test limitations, dependencies and planning candidates. Documentation branch only. | `docs/feature-completeness-review` (this documentation branch) |
+
+---
+
+**Next review:** Part 04 — Customer account lifecycle, only in a separate ChatGPT conversation when specifically requested. **Do not start Part 04 automatically.**
+ despite underlying LKR account currency; Double conversion; account identity not shown; loading/error state hidden.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Display LKR and selected account label; expose error/refresh and appropriate decimal formatting.
+
+
+#### DASH-009 — Android recent-transaction home widget
+
+- **Review part:** 03.
+- **User roles:** Authenticated Android user.
+- **User objective:** Preview recent real activity.
+- **Workflow boundary:** Android frontend-only placeholder; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** BankHomeScreen defaults transactions to three hardcoded UiTransaction items (Starbucks, Salary, Electricity Bill). BankHomeRoute never passes real transaction records, so home renders fixtures. TransactionListSwipe supports local swipe/remove and Undo using mutable UI list, not Retrofit, Spring or database delete. A separate per-account history route exists, but not consumed by Home.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/Transactions.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/Transactions.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeRoute.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java); [core/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java)
+- **Database / ledger:** Hardcoded sample transactions in Kotlin only, no persisted banking data; GET /transactions/my returns a static string, not a recent feed.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** UI shown inside authenticated Android shell; no request is made by placeholder.
+- **Success, failure and recovery behavior:** Example entries visible and locally dismissible with Undo; UI action never deletes a banking transaction.
+- **Existing automated tests:** N/A — no connected call for this navigation/presentation action. Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 1 — Stub / placeholder**, for the stated channel/feature scope.
+- **Independent status:** Not applicable (frontend-only placeholder).
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** BankHomeScreen defaults transactions to three hardcoded UiTransaction items (Starbucks, Salary, Electricity Bill).
+- **Unsupported / incomplete behavior:** No backend current-user recent transaction read, fictional amounts/dates, misleading 'deleted' affordance.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Replace fixtures with authenticated scoped activity data and label read-only actions.
+
+
+#### DASH-010 — Android home quick-action and notification controls
+
+- **Review part:** 03.
+- **User roles:** Authenticated Android user.
+- **User objective:** Launch common actions and alerts from home.
+- **Workflow boundary:** Android frontend-only placeholder; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** BankHomeScreen renders Withdraw, Pay Bill, Transfer, Deposit QuickAction elements, default handlers are empty lambdas, and BankHomeRoute passes none of their specific callbacks. Withdraw currently refers to onDepositClick placeholder. Notifications IconButton onClick is empty. Separate sidebar routes exist and are evaluated in DASH-011, but these home controls emit no request or navigation.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeScreen.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/BankHomeRoute.kt)
+- **Next.js BFF / API integration:** N/A — no connected call for this navigation/presentation action. Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** N/A — no connected call for this navigation/presentation action.
+- **Database / ledger:** Frontend-only UI, no persisted notification/read action.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** UI shown inside authenticated Android shell; no request is made by placeholder.
+- **Success, failure and recovery behavior:** Buttons and bell icon visually present, inert when tapped in the wired home route.
+- **Existing automated tests:** N/A — no connected call for this navigation/presentation action. Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 1 — Stub / placeholder**, for the stated channel/feature scope.
+- **Independent status:** Not applicable (frontend-only placeholder).
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** BankHomeScreen renders Withdraw, Pay Bill, Transfer, Deposit QuickAction elements, default handlers are empty lambdas, and BankHomeRoute passes none of their specific callbacks.
+- **Unsupported / incomplete behavior:** Navigation/action functionality absent; do not infer Payments, Withdrawals or Notifications are implemented from controls.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Connect actions to approved routes or clearly disable/hide; define notifications before presenting active icon.
+
+
+#### DASH-011 — Android sidebar and destination navigation
+
+- **Review part:** 03.
+- **User roles:** Authenticated Android user.
+- **User objective:** Move among actual banking screens.
+- **Workflow boundary:** Android navigation-only; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** MainActivity after successful login (and optional local lock) shows AppNavHost. Sidebar lists Home, Wallet, My Accounts, Open Account, Payments, Verify Identity, KYC Status, Profile, Settings and Logout; navigateByLabel maps known entries to composable registered routes; account history uses route with accountId. Navigation alone does not establish transaction/wallet implementation. Menu items are not dynamically hidden for incomplete Customer/KYC state.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/MainActivity.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/MainActivity.kt); [app/app/src/main/java/com/bankingsystem/mobile/app/navigation/AppNavHost.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/app/navigation/AppNavHost.kt); [app/app/src/main/java/com/bankingsystem/mobile/app/navigation/Routes.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/app/navigation/Routes.kt); [app/app/src/main/java/com/bankingsystem/mobile/core/modules/common/designsystem/Sidebar.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/core/modules/common/designsystem/Sidebar.kt)
+- **Next.js BFF / API integration:** N/A — no connected call for this navigation/presentation action. Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** N/A — no connected call for this navigation/presentation action.
+- **Database / ledger:** Local NavHost state only; linked screens call own APIs.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Sidebar screens reachable and logout routed to existing auth lifecycle (AUTH-005).
+- **Existing automated tests:** [app/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** MainActivity after successful login (and optional local lock) shows AppNavHost.
+- **Unsupported / incomplete behavior:** No eligibility-aware menu, Android roles not separated into complete staff workspaces; downstream actions belong to later parts.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Consider contextual menu eligibility cues, keeping business authorization in Spring.
+
+
+#### DASH-012 — Android User profile reading and field display
+
+- **Review part:** 03.
+- **User roles:** Authenticated Android User.
+- **User objective:** See current login identity and contact details.
+- **Workflow boundary:** Android; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** Sidebar Profile -> ProfileRoute -> ProfileViewModel.loadProfile -> ProfileRepositoryImpl.getMe -> Retrofit GET /api/v1/users/me -> UserController.getProfile -> UserServiceImpl -> UserProfileDto -> ProfileScreen shows username, first/last, email, address, city, state, country, postal code, home/work/office/mobile numbers and role chip. Spinner and failure message shown; Customer DOB/gender/status/customerId not loaded.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileRoute.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileViewModel.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileScreen.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/dto/UserProfileDto.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/dto/UserProfileDto.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java); [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/dto/UserProfileResponse.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/dto/UserProfileResponse.java)
+- **Database / ledger:** Only User entity; all User contact strings shown unmasked and in full when present; empty value blank.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Loading indicator then current User fields or Failed to load profile; reentry may reload, no explicit retry button.
+- **Existing automated tests:** [app/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Sidebar Profile -> ProfileRoute -> ProfileViewModel.
+- **Unsupported / incomplete behavior:** No banking Customer fields or KYC indicators in native Profile.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Optional separate banking Customer section with accurate source labels.
+
+
+#### DASH-013 — Android inline User contact edits
+
+- **Review part:** 03.
+- **User roles:** Authenticated User.
+- **User objective:** Save native User name, location and phone field changes.
+- **Workflow boundary:** Android; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** ProfileScreen inline edit -> ProfileViewModel maps field key -> ProfileRepositoryImpl.updateMe map JSON -> Retrofit PUT /api/v1/users/me -> UserServiceImpl saves nonblank fields to User. Client optimistically updates local profile on 200 without GET reread. Generic email edit starts pending verified email change, yet Android immediately shows typed email as updated. Blank edits may be ignored by backend while local UI changes. Username and password are AUTH-014/007.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileScreen.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/ProfileViewModel.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/EditableField.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/interfaces/ui/EditableField.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/repository/ProfileRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/repository/ProfileRepositoryImpl.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java); [core/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/application/impl/UserServiceImpl.java)
+- **Database / ledger:** User fields saved; Customer record not updated. Email unchanged until separate verification.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Success snackbar and local field copy; failure snackbar; reentry fetch may reveal old email or ignored blank.
+- **Existing automated tests:** [core/src/test/java/com/bankingsystem/core/features/auth/UserEmailChangeServiceTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/auth/UserEmailChangeServiceTest.java); [app/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/test/java/com/bankingsystem/mobile/ApiContractTest.kt) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 3 — Partially functional**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** ProfileScreen inline edit -> ProfileViewModel maps field key -> ProfileRepositoryImpl.
+- **Unsupported / incomplete behavior:** No authoritative post-save refetch, misleading pending-email presentation and blank update mismatch; separate User and Customer may diverge.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Refresh authoritative User after edits and handle pending email verification explicitly.
+
+
+#### DASH-014 — Android My Accounts owner-scoped list and refresh
+
+- **Review part:** 03.
+- **User roles:** Authenticated CUSTOMER with Customer record.
+- **User objective:** Browse real accounts and navigate to account history.
+- **Workflow boundary:** Android account-overview integration; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** Sidebar My Accounts -> MyAccountsViewModel.refresh -> AccountRepositoryImpl -> Retrofit GET /api/v1/accounts/my -> Spring owner-scoped AccountService -> AccountUi list. MyAccountsScreen shows account number, type, status, default indicator and optional branchName, with View link to account transaction route, Refresh control, loading skeleton, empty and retryable errors. Account balance exists in API model but is not rendered in MyAccounts list rows.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsRoute.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsViewModel.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsScreen.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java); [core/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java)
+- **Database / ledger:** Persisted Account rows of current User's linked Customer; branchName optional from Android DTO while Spring AccountResponseDTO does not expose it.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Real account row list, refresh, error retry, skeleton, no-accounts prompt and account history navigation.
+- **Existing automated tests:** [core/src/test/java/com/bankingsystem/core/features/accounts/AccountOpeningIntegrationTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/accounts/AccountOpeningIntegrationTest.java) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** Sidebar My Accounts -> MyAccountsViewModel.
+- **Unsupported / incomplete behavior:** No balance in row; optional branchName may be absent; actual history/creation not assessed here.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Consider showing accurate balance and avoid assuming branch metadata is always available.
+
+
+#### DASH-015 — Android device-local default-account choice
+
+- **Review part:** 03.
+- **User roles:** Authenticated Android user.
+- **User objective:** Pick which account balance Home displays.
+- **Workflow boundary:** Android local preference; defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** MyAccountsScreen Make Default -> MyAccountsViewModel.setDefault(id) -> DefaultAccountStoreImpl DataStore string default_account_id -> badge changes; HomeViewModel watches same flow, refetches /api/v1/accounts/my and chooses matching ID or first account. Setting persists locally across app recreation, not to core Customer or Account row.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsScreen.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsViewModel.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/HomeViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/home/interfaces/ui/HomeViewModel.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/core/modules/common/storage/DefaultAccountStore.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/core/modules/common/storage/DefaultAccountStore.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java)
+- **Database / ledger:** Android DataStore named default_account; not backend or web preference, not keyed to User.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Star/Default badge and Home-selected balance react to stored choice; stale ID falls back to first account.
+- **Existing automated tests:** N/A — no connected call for this navigation/presentation action. Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 4 — Functionally implemented**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** MyAccountsScreen Make Default -> MyAccountsViewModel.
+- **Unsupported / incomplete behavior:** Preference is device-wide and not per user/remote synced, account label not visible on Home.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Consider per-user preference scope and clearer selected account labeling.
+
+
+#### DASH-016 — Android My Accounts onboarding guidance
+
+- **Review part:** 03.
+- **User roles:** Logged-in Android user without Customer row.
+- **User objective:** Navigate to identity verification or Customer registration.
+- **Workflow boundary:** Android My Accounts (not Home); defined goal only. No independent rating of AUTH/KYC or future financial modules.
+- **Complete workflow steps:** MyAccountsViewModel GET /accounts/my; AccountRepositoryImpl recognizes 404 message 'Customer not found', throws CustomerMissingException; ViewModel then checks KycRepository.myCase GET /kyc/me. If APPROVED, screen CTA Register as Customer; otherwise Start Verification; successful empty account list instead shows Open Account. KYC lookup failure treated as unknown and also shows Start Verification. Home itself does not load KYC/Customer state.
+- **Frontend / Android:** [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsViewModel.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsViewModel.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsScreen.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsScreen.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsRoute.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/interfaces/ui/MyAccountsRoute.kt)
+- **Next.js BFF / API integration:** [app/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt); [app/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/repository/KycRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/repository/KycRepositoryImpl.kt) Web protected API routes use HttpOnly-cookie BFF and CSRF on unsafe methods; Android direct requests use its bearer session. If no endpoint is listed, this is navigation/presentation only.
+- **Spring Boot implementation:** [core/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/application/impl/AccountServiceImpl.java); [core/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java)
+- **Database / ledger:** Customer missing, KycCase latest status persists in Spring; Android UI state local.
+- **External dependencies:** No bank-service/FastAPI dependency in this dashboard/profile feature; KYC processing was covered in Part 02.
+- **Authorization:** Android session bearer; core business data uses authenticated-user/ownership or current User.
+- **Success, failure and recovery behavior:** Register if KYC approved, otherwise verify; retryable account error on other failures.
+- **Existing automated tests:** [web/e2e/customer-onboarding.spec.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/e2e/customer-onboarding.spec.ts) Tests are source evidence and have not been executed during this Part 03 review; Playwright uses mock bank-core, and Android serialization tests do not establish runtime UI behavior.
+- **Available live verification:** None independently attributable to this feature in the GitHub source trees.
+- **Completeness level:** **Level 3 — Partially functional**, for the stated channel/feature scope.
+- **Independent status:** None.
+- **Evidence confidence:** **Source-confirmed**.
+- **Supported behavior:** MyAccountsViewModel GET /accounts/my; AccountRepositoryImpl recognizes 404 message 'Customer not found', throws CustomerMissingException; ViewModel then checks KycRepository.
+- **Unsupported / incomplete behavior:** No onboarding indicator on Home, no specific pending/rejected/RFI state in prompt, KYC error may be shown as needs verification.
+- **Source references:** Commit-pinned source/test links are included in the feature record fields above.
+- **Future implementation opportunities:** Surface KYC status accurately with unavailable/rejected distinctions on Android home or My Accounts.
+
+
 
 ### Part 04 — Customer account lifecycle
 

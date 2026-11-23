@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ApiError } from "@/lib/api/errors";
-import { allowsRole, PAGE_ROLES, roleHome, TELLER_ACCOUNT_OPENING } from "@/lib/auth/navigation";
+import { allowsRole, CUSTOMER_PAY, PAGE_ROLES, roleHome, TELLER_ACCOUNT_OPENING } from "@/lib/auth/navigation";
 
 export function AppHeader() {
   const { role, username, signOut } = useAuth();
@@ -23,7 +23,7 @@ export function AppHeader() {
           <Link href="/customer/accounts">Accounts</Link>
           <Link href="/customer/transactions/deposit">Deposit</Link>
           <Link href="/customer/transactions/withdraw">Withdraw</Link>
-          <Link href="/customer/transactions/transfer">Transfer</Link>
+          <Link href={CUSTOMER_PAY}>Pay</Link>
           <Link href="/customer/profile">Profile</Link>
         </>}
         {allowsRole(role, PAGE_ROLES.admin) && <>

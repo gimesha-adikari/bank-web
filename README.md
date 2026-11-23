@@ -25,6 +25,14 @@ Financial amounts remain decimal strings and deposit, withdrawal, and transfer r
 
 The money forms accept positive decimal text with up to two fractional digits. If the result of a submission is uncertain, the open form keeps the original request and key for a manual retry. Check account history before starting a different transaction or leaving the form. After a confirmed receipt, bank-web fetches balances and account-scoped history from core.
 
+### Internal payments
+
+The CUSTOMER Pay page and the existing Transfer URL use the same form. Choose an active account from your own accounts and enter the recipient's account UUID. The recipient can find it on their account history page. Review the UUID and amount before confirming. Bank-core checks account ownership, eligibility, currency, and available funds as part of `POST /api/v1/transactions/transfer`.
+
+The payment uses one `Idempotency-Key` and an unchanged decimal-string request. If the POST result is uncertain, the page checks `GET /api/v1/transactions/transfer/receipt` with the original key. A `404` means no committed receipt was visible at that moment. The original request may still complete. Use **Check receipt** to check again, or choose **Retry same payment** to send the exact request with the original key. A conflict stops resubmission. Reloading or leaving the page loses the in-memory recovery details. Check account history or contact support before initiating another payment if the outcome is unresolved.
+
+The confirmed receipt shows the journal reference, journal UUID, amount, currency, and payer balance at posting. The page separately refreshes the source account and its history from bank-core and keeps the receipt visible if either read fails.
+
 ### KYC transport
 
 The browser uses `/api/kyc` for upload, protected files, submission, and case reads, and `/api/admin/kyc` for review. The BFF maps these specific operations to bank-core's unversioned `/kyc` and `/admin/kyc` paths, preserving any deployment prefix before `/api/v1` in `BANKING_API_BASE_URL`. Core enforces case ownership and Admin access. Protected file responses are non-cacheable.

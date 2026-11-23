@@ -1,12 +1,15 @@
 import { apiGet, apiJson } from "./http";
 import type { ApiError } from "./errors";
-import type { DepositRequest, FinancialReceipt, ReversalRequest, ReversalResponse, Transaction, TransferRequest, WithdrawalRequest } from "./contracts";
+import type { DepositRequest, FinancialReceipt, ReversalRequest, ReversalResponse, Transaction, TransferReceipt, TransferRequest, WithdrawalRequest } from "./contracts";
 
 export const transactionsApi = {
   history: (accountId: string) => apiGet<Transaction[]>(`/api/v1/accounts/${encodeURIComponent(accountId)}/transactions`),
   deposit: (body: DepositRequest, idempotencyKey: string) => apiJson<FinancialReceipt>("/api/v1/transactions/deposit", "POST", body, { headers: { "Idempotency-Key": idempotencyKey } }),
   withdraw: (body: WithdrawalRequest, idempotencyKey: string) => apiJson<FinancialReceipt>("/api/v1/transactions/withdraw", "POST", body, { headers: { "Idempotency-Key": idempotencyKey } }),
-  transfer: (body: TransferRequest, idempotencyKey: string) => apiJson<FinancialReceipt>("/api/v1/transactions/transfer", "POST", body, { headers: { "Idempotency-Key": idempotencyKey } }),
+  transfer: (body: TransferRequest, idempotencyKey: string) => apiJson<TransferReceipt>("/api/v1/transactions/transfer", "POST", body, { headers: { "Idempotency-Key": idempotencyKey }, redirect: "error" }),
+  transferReceipt: (idempotencyKey: string) => apiGet<TransferReceipt>("/api/v1/transactions/transfer/receipt", {
+    headers: { "Idempotency-Key": idempotencyKey }, cache: "no-store", redirect: "error"
+  }),
   reverse: (journalEntryId: string, body: ReversalRequest) => apiJson<ReversalResponse>(`/api/v1/transactions/${encodeURIComponent(journalEntryId)}/reversal`, "POST", body)
 };
 

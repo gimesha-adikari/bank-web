@@ -16,18 +16,16 @@ import {
   uncertainFailure,
   type IdempotencyState
 } from "@/lib/finance/idempotency";
-import type { Account, DepositRequest, FinancialReceipt, Transaction, TransferRequest } from "@/lib/api/contracts";
+import type { Account, DepositRequest, FinancialReceipt, Transaction } from "@/lib/api/contracts";
 
-type Kind = "deposit" | "withdraw" | "transfer";
-type FinancialPayload = DepositRequest | TransferRequest;
+type Kind = "deposit" | "withdraw";
 
 export function FinancialForm({ kind }: { kind: Kind }) {
   const { status } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [accountId, setAccountId] = useState("");
-  const [destinationAccountId, setDestinationAccountId] = useState("");
   const [amount, setAmount] = useState("");
-  const [operation, setOperation] = useState<IdempotencyState<FinancialPayload> | null>(null);
+  const [operation, setOperation] = useState<IdempotencyState<DepositRequest> | null>(null);
   const submissionInFlight = useRef(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -47,8 +45,7 @@ export function FinancialForm({ kind }: { kind: Kind }) {
   const succeeded = operation?.status === "succeeded";
   const fieldsLocked = pending || uncertain || succeeded;
 
-  async function refreshAuthoritative(payload: FinancialPayload): Promise<void> {
-    const sourceId = "sourceAccountId" in payload ? payload.sourceAccountId : payload.accountId;
+  async function refreshAuthoritative({ accountId: sourceId }: DepositRequest): Promise<void> {
     const [source, history] = await Promise.allSettled([accountsApi.byId(sourceId), transactionsApi.history(sourceId)]);
     if (source.status === "fulfilled") {
       setAccounts((current) => current.map((account) => account.accountId === sourceId ? source.value : account));
@@ -57,14 +54,6 @@ export function FinancialForm({ kind }: { kind: Kind }) {
     if (history.status === "fulfilled") setRecentHistory(history.value);
     if (source.status === "rejected" || history.status === "rejected") {
       setRefreshWarning("The transaction succeeded. Some account data could not be refreshed. Reload the account view for the latest balance and history.");
-    }
-    if ("destinationAccountId" in payload) {
-      try {
-        const destination = await accountsApi.byId(payload.destinationAccountId);
-        setRefreshedBalances((current) => [...current.filter((account) => account.accountId !== destination.accountId), destination]);
-      } catch {
-        // Bank-core may accept a transfer to a destination the sender cannot read.
-      }
     }
   }
 
@@ -77,14 +66,11 @@ export function FinancialForm({ kind }: { kind: Kind }) {
       setError(new ApiError({ kind: "backend", status: 401, message: "Sign in again to submit this transaction." }));
       return;
     }
-    const draft: FinancialPayload = kind === "transfer"
-      ? { sourceAccountId: accountId, destinationAccountId: destinationAccountId.trim(), amount: amount.trim() }
-      : { accountId, amount: amount.trim() };
+    const draft = { accountId, amount: amount.trim() };
     const payload = uncertain ? operation.payload : draft;
     const amountError = validateAmount(payload.amount);
     if (amountError) { setError(new ApiError({ kind: "backend", status: 422, message: amountError })); return; }
-    const hasAccounts = "sourceAccountId" in payload ? payload.sourceAccountId && payload.destinationAccountId : payload.accountId;
-    if (!hasAccounts) {
+    if (!payload.accountId) {
       setError(new ApiError({ kind: "backend", status: 422, message: "Enter the required account identifier(s)." }));
       return;
     }
@@ -96,11 +82,9 @@ export function FinancialForm({ kind }: { kind: Kind }) {
 
     try {
       const { key, payload: submitted } = current;
-      const result = "sourceAccountId" in submitted
-        ? await transactionsApi.transfer(submitted, key)
-        : kind === "deposit"
-          ? await transactionsApi.deposit(submitted, key)
-          : await transactionsApi.withdraw(submitted, key);
+      const result = kind === "deposit"
+        ? await transactionsApi.deposit(submitted, key)
+        : await transactionsApi.withdraw(submitted, key);
       setOperation(completeSuccess(current));
       setReceipt(result);
       await refreshAuthoritative(submitted);
@@ -118,7 +102,6 @@ export function FinancialForm({ kind }: { kind: Kind }) {
     if (submissionInFlight.current) return;
     setOperation(null);
     setAmount("");
-    setDestinationAccountId("");
     setError(null);
     setRefreshWarning(null);
     setReceipt(null);
@@ -126,12 +109,11 @@ export function FinancialForm({ kind }: { kind: Kind }) {
     setRefreshedBalances([]);
   }
 
-  const title = kind === "deposit" ? "Deposit funds" : kind === "withdraw" ? "Withdraw funds" : "Transfer funds";
+  const title = kind === "deposit" ? "Deposit funds" : "Withdraw funds";
   return <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(260px,.7fr)]">
     <form className="card grid gap-5" onSubmit={(event) => void submit(event)} data-testid={`${kind}-form`}>
       <div><h2 className="text-2xl font-black">{title}</h2><p className="mt-2 muted">The server validates and commits the financial operation. This screen never updates balances optimistically.</p></div>
-      <div className="field"><label htmlFor={`${kind}-account`}>{kind === "transfer" ? "Source account" : "Account"}</label><select id={`${kind}-account`} value={accountId} onChange={(event) => setAccountId(event.target.value)} disabled={fieldsLocked} required><option value="">Choose an account</option>{accounts.map((account) => <option key={account.accountId} value={account.accountId}>{account.accountNumber} · {account.accountType} · {account.balance} LKR</option>)}</select></div>
-      {kind === "transfer" && <div className="field"><label htmlFor="transfer-destination">Destination account ID</label><input id="transfer-destination" value={destinationAccountId} onChange={(event) => setDestinationAccountId(event.target.value)} autoComplete="off" disabled={fieldsLocked} required/><small>Enter the destination account UUID provided by the recipient. BankingSystem checks that the destination is valid.</small></div>}
+      <div className="field"><label htmlFor={`${kind}-account`}>Account</label><select id={`${kind}-account`} value={accountId} onChange={(event) => setAccountId(event.target.value)} disabled={fieldsLocked} required><option value="">Choose an account</option>{accounts.map((account) => <option key={account.accountId} value={account.accountId}>{account.accountNumber} · {account.accountType} · {account.balance} LKR</option>)}</select></div>
       <div className="field"><label htmlFor={`${kind}-amount`}>Amount (decimal text)</label><input id={`${kind}-amount`} inputMode="decimal" autoComplete="off" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="50.00" disabled={fieldsLocked} required/><small>Enter a positive amount with up to two decimal places.</small></div>
       {(error || uncertain) && <div className="error-box" role="alert">
         {error && !isUncertainTransactionOutcome(error) && <>{error.message}{error.code && <span className="ml-2 text-xs">({error.code})</span>}{error.fieldErrors && <ul className="mt-2 list-disc pl-5">{Object.entries(error.fieldErrors).map(([field, message]) => <li key={field}>{field}: {message}</li>)}</ul>}</>}

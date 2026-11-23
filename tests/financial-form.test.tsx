@@ -14,7 +14,7 @@ function reject(status: number, code: string, message = "Server response", heade
   return Response.json({ code, message }, { status, headers });
 }
 
-async function openForm(replies: Reply[], refreshFailure?: "balance" | "history", kind: "deposit" | "withdraw" | "transfer" = "deposit") {
+async function openForm(replies: Reply[], refreshFailure?: "balance" | "history", kind: "deposit" | "withdraw" = "deposit") {
   const writePath = `/api/v1/transactions/${kind}`;
   const fetchMock = vi.fn<(path: string, options: RequestInit) => Promise<Response>>(async (path) => {
     if (path === "/api/auth/csrf") return Response.json({ token: "a".repeat(43) });
@@ -23,7 +23,6 @@ async function openForm(replies: Reply[], refreshFailure?: "balance" | "history"
       ? reject(503, "ERR_UNAVAILABLE") : Response.json({ ...account, balance: "110.0000" });
     if (path === "/api/v1/accounts/account-1/transactions") return refreshFailure === "history"
       ? reject(503, "ERR_UNAVAILABLE") : Response.json(history);
-    if (path === "/api/v1/accounts/recipient") return reject(403, "ERR_FORBIDDEN");
     if (path === writePath) {
       const reply = replies.shift();
       if (reply) return reply();
@@ -32,7 +31,7 @@ async function openForm(replies: Reply[], refreshFailure?: "balance" | "history"
   });
   vi.stubGlobal("fetch", fetchMock);
   render(<FinancialForm kind={kind} />);
-  await waitFor(() => expect(screen.getByLabelText(kind === "transfer" ? "Source account" : "Account")).toHaveValue(account.accountId));
+  await waitFor(() => expect(screen.getByLabelText("Account")).toHaveValue(account.accountId));
   const input = screen.getByLabelText("Amount (decimal text)");
   const form = screen.getByTestId(`${kind}-form`);
   const writes = () => fetchMock.mock.calls
@@ -192,17 +191,14 @@ describe("money submission outcomes", () => {
     expect(writes()).toHaveLength(1);
   });
 
-  it.each(["withdraw", "transfer"] as const)("submits %s through its own endpoint and refreshes the source", async (kind) => {
-    const { input, form, writes, fetchMock } = await openForm([() => Response.json(receipt)], undefined, kind);
+  it("submits a withdrawal through its own endpoint and refreshes the source", async () => {
+    const { input, form, writes, fetchMock } = await openForm([() => Response.json(receipt)], undefined, "withdraw");
     fireEvent.change(input, { target: { value: "10.00" } });
-    if (kind === "transfer") fireEvent.change(screen.getByLabelText("Destination account ID"), { target: { value: " recipient " } });
     fireEvent.submit(form);
     expect(await screen.findByTestId("transaction-receipt")).toHaveTextContent("JR-1");
     expect(await screen.findByLabelText("Refreshed server balances")).toHaveTextContent("110.0000");
     expect(writes()).toHaveLength(1);
-    expect(writes()[0].body).toEqual(kind === "transfer"
-      ? { sourceAccountId: "account-1", destinationAccountId: "recipient", amount: "10.00" }
-      : { accountId: "account-1", amount: "10.00" });
+    expect(writes()[0].body).toEqual({ accountId: "account-1", amount: "10.00" });
     expect(fetchMock).toHaveBeenCalledWith("/api/v1/accounts/account-1/transactions", expect.anything());
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });

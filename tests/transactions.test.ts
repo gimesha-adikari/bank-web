@@ -32,6 +32,23 @@ describe("financial request contracts", () => {
     expect(String((options as RequestInit).body)).toBe('{"reason":"Duplicate teller posting"}');
   });
 
+  it("looks up the original transfer receipt without a write and preserves numeric JSON decimals", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(new Response(
+      '{"operationType":"TRANSFER","amount":10.0000,"sourceResultingBalance":90071992547409.1234,"currency":"LKR"}'
+    ));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(transactionsApi.transferReceipt("original-key")).resolves.toMatchObject({
+      operationType: "TRANSFER", amount: "10.0000", sourceResultingBalance: "90071992547409.1234", currency: "LKR"
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [path, options] = fetchMock.mock.calls[0];
+    expect(path).toBe("/api/v1/transactions/transfer/receipt");
+    expect(options).toMatchObject({ method: "GET", cache: "no-store", redirect: "error" });
+    expect(options.body).toBeUndefined();
+    expect(options.headers.get("Idempotency-Key")).toBe("original-key");
+    expect(options.headers.get("X-CSRF-Token")).toBeNull();
+  });
+
   it.each([
     ["deposit", "transactions/deposit", { accountId: "a", amount: "10.00" }],
     ["withdraw", "transactions/withdraw", { accountId: "a", amount: "10.00" }],

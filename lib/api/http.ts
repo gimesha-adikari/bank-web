@@ -6,7 +6,7 @@ export type RequestOptions = Omit<RequestInit, "body" | "credentials"> & {
   timeoutMs?: number;
 };
 
-const DECIMAL_FIELDS = new Set(["amount", "balance", "balanceAfter", "totalAmount", "initialDeposit"]);
+const DECIMAL_FIELDS = new Set(["amount", "balance", "balanceAfter", "totalAmount", "initialDeposit", "sourceResultingBalance"]);
 const DEFAULT_TIMEOUT_MS = 15_000;
 const CSRF_ACQUISITION_TIMEOUT_MS = DEFAULT_TIMEOUT_MS;
 let csrfToken: string | null = null;

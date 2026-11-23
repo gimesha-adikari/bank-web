@@ -11,12 +11,14 @@ export const PAGE_ROLES = {
 export const TELLER_ACCOUNT_OPENING = "/staff/accounts/new";
 export const CUSTOMER_ONBOARDING = "/customer/onboarding";
 export const CUSTOMER_ACCOUNT_OPENING = "/customer/accounts/new";
+export const CUSTOMER_PAY = "/customer/pay";
 
 const pageRoles = new Map<string, readonly Role[]>([
   ["/customer", PAGE_ROLES.customer],
   [CUSTOMER_ONBOARDING, PAGE_ROLES.customer],
   ["/customer/accounts", PAGE_ROLES.customer],
   [CUSTOMER_ACCOUNT_OPENING, PAGE_ROLES.customer],
+  [CUSTOMER_PAY, PAGE_ROLES.customer],
   ["/customer/profile", PAGE_ROLES.customer],
   ["/customer/transactions/deposit", PAGE_ROLES.customer],
   ["/customer/transactions/withdraw", PAGE_ROLES.customer],

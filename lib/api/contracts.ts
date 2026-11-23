@@ -204,6 +204,18 @@ export type Transaction = {
 export type DepositRequest = { accountId: string; amount: string };
 export type WithdrawalRequest = { accountId: string; amount: string };
 export type TransferRequest = { sourceAccountId: string; destinationAccountId: string; amount: string };
+export type TransferReceipt = {
+  operationType: "TRANSFER";
+  journalEntryId: string;
+  journalReference: string;
+  sourceAccountId: string;
+  destinationAccountId: string;
+  amount: string;
+  currency: "LKR";
+  sourceResultingBalance: string;
+  postedAt: string;
+  replayed: boolean;
+};
 export type ReversalRequest = { reason: string };
 export type AffectedBalance = { accountId: string; balance: string };
 export type ReversalResponse = {

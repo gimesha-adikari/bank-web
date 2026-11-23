@@ -8,6 +8,7 @@ const timeoutCustomerUsers = Array.from({ length: 3 }, (_, repeatIndex) =>
     return [username, "CUSTOMER", `e2e-${username}-jwt`];
   })
 ).flat();
+const paymentUsers = ["pay-success", "pay-timeout", "pay-retry", "pay-lookup-error", "pay-refresh-error", "pay-errors"];
 const users = [
   ["customer", "CUSTOMER", "e2e-sentinel-jwt"],
   ["teller", "TELLER", "e2e-teller-jwt"],
@@ -49,7 +50,8 @@ const users = [
   ...["admin-customer-delete", "admin-customer-delete-conflict", "admin-customer-delete-timeout-persisted", "admin-customer-delete-timeout-present"]
     .map((username) => [username, "ADMIN", `e2e-${username}-jwt`]),
   ["a3-stale-customer", "CUSTOMER", "e2e-a3-stale-customer-jwt"],
-  ["a3-absent-customer", "CUSTOMER", "e2e-a3-absent-customer-jwt"]
+  ["a3-absent-customer", "CUSTOMER", "e2e-a3-absent-customer-jwt"],
+  ...paymentUsers.map((username) => [username, "CUSTOMER", `e2e-${username}-jwt`])
 ].map(([username, role, token]) => ({ username, role, token }));
 if (new Set(users.map(({ token }) => token)).size !== users.length) {
   throw new Error("Mock bank-core fixture contains duplicate user tokens");
@@ -100,6 +102,45 @@ const customerRecords = new Map();
 const customerDirectoryRecords = new Map();
 const customerDeletionAttempts = [];
 const payHereNotifications = [];
+const paymentAccounts = new Map(paymentUsers.map((username) => [username, [
+  { accountId: "60000000-0000-4000-8000-000000000001", accountNumber: "2000000001", accountType: "SAVINGS", accountStatus: "ACTIVE", balance: "100.0000" },
+  { accountId: "60000000-0000-4000-8000-000000000002", accountNumber: "2000000002", accountType: "CHECKING", accountStatus: "ACTIVE", balance: "250.5678" },
+  { accountId: "60000000-0000-4000-8000-000000000003", accountNumber: "2000000003", accountType: "SAVINGS", accountStatus: "CLOSED", balance: "0.0000" }
+]]));
+const paymentRecipient = "60000000-0000-4000-8000-000000000004";
+const paymentClaims = new Map();
+const paymentRequests = [];
+const paymentReadFailures = new Set();
+const paymentRejections = {
+  "11.01": [422, "ERR_INSUFFICIENT_FUNDS"], "11.02": [422, "ERR_ACCOUNT_ACCESS_DENIED"],
+  "11.03": [422, "ERR_ACCOUNT_NOT_ACTIVE"], "11.04": [422, "ERR_CURRENCY_MISMATCH"],
+  "11.05": [403, "ERR_FORBIDDEN"], "11.06": [409, "ERR_IDEMPOTENCY_CONFLICT"]
+};
+
+function decimalUnits(amount) {
+  const [whole, fraction = ""] = amount.split(".");
+  return BigInt(whole) * 10_000n + BigInt(fraction.padEnd(4, "0"));
+}
+
+function formatDecimalUnits(units) {
+  const digits = units.toString().padStart(5, "0");
+  return `${digits.slice(0, -4)}.${digits.slice(-4)}`;
+}
+
+function commitMockPayment(claim) {
+  const amount = decimalUnits(claim.payload.amount);
+  claim.account.balance = formatDecimalUnits(decimalUnits(claim.account.balance) - amount);
+  claim.receipt = {
+    operationType: "TRANSFER", sourceAccountId: claim.payload.sourceAccountId, destinationAccountId: claim.payload.destinationAccountId,
+    amount: formatDecimalUnits(amount), currency: "LKR", journalEntryId: randomUUID(), journalReference: "JR-TEST-PAY",
+    sourceResultingBalance: claim.account.balance, postedAt: "2026-02-03T12:00:00", replayed: false
+  };
+  claim.history = {
+    transactionId: randomUUID(), accountId: claim.account.accountId, type: "TRANSFER_OUT", amount: claim.receipt.amount,
+    balanceAfter: claim.account.balance, description: "Internal transfer", createdAt: claim.receipt.postedAt
+  };
+  return claim.receipt;
+}
 const retryAttempts = new Map();
 const openedAccounts = new Map();
 const accountOpeningClaims = new Map();
@@ -248,7 +289,7 @@ const server = http.createServer(async (request, response) => {
     staffAccountUpdates, staffAccountClosures, staffAccountRecords: Object.fromEntries(staffAccountRecords),
     adminReviewDecisions, adminReviewAttempts, tellerMutations, tellerReads,
     adminAccessMutations, adminAccessReads,
-    customerDeletionAttempts, payHereNotifications,
+    customerDeletionAttempts, payHereNotifications, paymentRequests,
     tellerUsers: users.map(userDirectoryFor),
     ids: { ...managerTellerIds, ...adminAccessIds }
   });
@@ -364,6 +405,65 @@ const server = http.createServer(async (request, response) => {
     return user ? json(response, 200, { username: user.username, role: user.role }) : json(response, 401, { code: "AUTH", message: "Expired" });
   }
   if (!user || (path === "expired" && request.method === "GET")) return json(response, 401, { code: "AUTH", message: "Expired" });
+  if ((path === "transactions/transfer" && request.method === "POST") || (path === "transactions/transfer/receipt" && request.method === "GET")) {
+    if (user.role !== "CUSTOMER") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Customer role required" });
+    const key = request.headers["idempotency-key"];
+    if (!key) return json(response, 400, { code: "ERR_IDEMPOTENCY_KEY_INVALID", message: "Missing key" });
+    const claimId = `${user.username}:${key}`;
+    const claim = paymentClaims.get(claimId);
+    if (request.method === "GET") {
+      paymentRequests.push({ username: user.username, method: "GET", key });
+      if (user.username === "pay-lookup-error" && !paymentReadFailures.has(claimId)) {
+        paymentReadFailures.add(claimId);
+        setTimeout(() => { if (!response.destroyed) json(response, 200, { ...claim.receipt, replayed: true }); }, 4_000).unref();
+        return;
+      }
+      if (claim?.receipt) return json(response, 200, { ...claim.receipt, replayed: true });
+      json(response, 404, { code: "ERR_NOT_FOUND", message: "No committed receipt" });
+      // This fixture models an original POST committing just after a read observes no receipt.
+      if (claim) commitMockPayment(claim);
+      return;
+    }
+    const payload = await new Response(await body(request)).json().catch(() => null);
+    paymentRequests.push({ username: user.username, method: "POST", key, payload });
+    if (!payload || typeof payload.amount !== "string" || !/^\d+(?:\.\d{1,2})?$/.test(payload.amount)) {
+      return json(response, 400, { code: "ERR_VALIDATION", message: "Expected an exact decimal string" });
+    }
+    if (claim) {
+      const samePayment = ["sourceAccountId", "destinationAccountId", "amount"].every((field) => claim.payload[field] === payload[field]);
+      if (!samePayment) return json(response, 409, { code: "ERR_IDEMPOTENCY_CONFLICT", message: "Key already used" });
+      return claim.receipt ? json(response, 200, { ...claim.receipt, replayed: true })
+        : json(response, 409, { code: "ERR_IDEMPOTENCY_IN_PROGRESS", message: "Transfer in progress" });
+    }
+    const rejection = user.username === "pay-errors" && paymentRejections[payload.amount];
+    if (rejection) return json(response, rejection[0], { code: rejection[1], message: "Payment rejected" });
+    const payerAccount = paymentAccounts.get(user.username)?.find(({ accountId }) => accountId === payload.sourceAccountId);
+    if (!payerAccount || payload.destinationAccountId !== paymentRecipient) return json(response, 422, { code: "ERR_ACCOUNT_ACCESS_DENIED", message: "Account unavailable" });
+    if (payerAccount.accountStatus !== "ACTIVE") return json(response, 422, { code: "ERR_ACCOUNT_NOT_ACTIVE", message: "Account inactive" });
+    if (decimalUnits(payload.amount) > decimalUnits(payerAccount.balance)) return json(response, 422, { code: "ERR_INSUFFICIENT_FUNDS", message: "Insufficient funds" });
+    const pending = { account: payerAccount, payload };
+    paymentClaims.set(claimId, pending);
+    if (user.username === "pay-retry") return request.socket.destroy();
+    const receipt = commitMockPayment(pending);
+    if (user.username === "pay-lookup-error") return request.socket.destroy();
+    if (user.username === "pay-timeout") {
+      setTimeout(() => { if (!response.destroyed) json(response, 200, receipt); }, 4_000).unref();
+      return;
+    }
+    return json(response, 200, receipt);
+  }
+  if (paymentAccounts.has(user.username) && request.method === "GET") {
+    const ownAccounts = paymentAccounts.get(user.username);
+    if (path === "accounts/my") return json(response, 200, ownAccounts);
+    const match = /^accounts\/([^/]+)(\/transactions)?$/.exec(path);
+    if (match) {
+      const ownAccount = ownAccounts.find(({ accountId }) => accountId === match[1]);
+      if (!ownAccount) return json(response, 404, { code: "ERR_NOT_FOUND", message: "Account not found" });
+      if (user.username === "pay-refresh-error") return json(response, 503, { message: "Account service unavailable" });
+      const history = [...paymentClaims.values()].filter((entry) => entry.account === ownAccount && entry.history).map((entry) => entry.history).reverse();
+      return json(response, 200, match[2] ? history : ownAccount);
+    }
+  }
   if (path === "access-control/roles" && request.method === "GET") {
     adminAccessReads.push({ method: request.method, path: url.pathname, username: user.username });
     if (user.role !== "ADMIN") return json(response, 403, { code: "ERR_FORBIDDEN", message: "Access denied" });

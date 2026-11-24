@@ -61,6 +61,8 @@ Part 14 source verification: all four main HEADs reverified unchanged; bank-app 
 
 **Part 15 source freshness (2026-11-24):** four pinned main heads unchanged; complete recursive trees. Documentation parent 4d4f8ca35e904b7ecffdf96deb7d4981ba6acd55, original blob 79f3ed5914efbe5c6094f3555aaf0b1a66c038ce. No application source changes.
 
+**Part 16 source freshness (2026-11-24):** all four main heads unchanged at pinned SHAs; canonical parent f758cc2d9119c704e1b711006bca362cb5f4965b, prior blob f2d871445735de76799d586013e827636e6fd9b1, 1,999,888 characters / 2,002,022 bytes. Source synthesis only.
+
 ## 5. Mandatory review methodology
 
 Review each actual feature from user intent to visible result. Apply, where relevant:
@@ -314,7 +316,7 @@ Use stable feature IDs e.g. `AUTH-001`, `KYC-001`. Do not equate review area nam
 | 13 | External payments, wallet capabilities, and deferred features | **COMPLETE** | Six distinct EXT-PAY records; PayHere default disabled, wallet metadata and fake/real Android boundaries, no provider ledger/settlement, deferred loan placeholders; no tests executed |
 | 14 | Android bank-app | **COMPLETE** | 227-file inventory, 27 API methods, 11 destinations; 2 new policy records; existing Android and Wallet ownership preserved |
 | 15 | Cross-cutting platform capabilities and remaining API inventory | **COMPLETE** | 16 source-reviewed capabilities; 24 Core controllers/105 method-path pairs, 32 web pages/7 BFF handlers, 27 native methods, 8 main/7 debug service mappings; no runtime acceptance |
-| 16 | Final completeness map and future development planning | **NOT REVIEWED** | Pending source-based feature review |
+| 16 | Final completeness map and future development planning | **COMPLETE** | Final synthesis; 181 historical records/scores preserved, 24 planning packages and acceptance roadmap; no implementation/runtime verification |
 
 ## 9. Individual part sections
 
@@ -6515,9 +6517,1003 @@ Part 15: 16 records, L4 6/L3 2/L1 8; all Source-confirmed. Cumulative 181 record
 
 ### Part 16 — Final completeness map and future development planning
 
-**Status:** NOT REVIEWED.
+**Status: COMPLETE — final source-based synthesis and planning.** All 181 existing records and scores preserved; no new feature IDs, implementation, builds/tests or runtime operations.
 
-**Review boundary:** Final completeness map and future development planning. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+#### 16.A Final verification and authoritative feature map
+
+Parent f758cc2d9119c704e1b711006bca362cb5f4965b; prior canonical blob f2d871445735de76799d586013e827636e6fd9b1; 1,999,888 characters / 2,002,022 UTF-8 bytes matching Git metadata. All four main heads reconfirmed unchanged: [bank-core 9f58e595a653db9d8aa59b70a35af8e2b0e725d3](https://github.com/gimesha-adikari/bank-core/commit/9f58e595a653db9d8aa59b70a35af8e2b0e725d3); [bank-web 012fbc6ff2687d126c67c85ce54cfc8d16f79f27](https://github.com/gimesha-adikari/bank-web/commit/012fbc6ff2687d126c67c85ce54cfc8d16f79f27); [bank-service cabdd323b4aa394910cb192ead6d233e9a12d9d3](https://github.com/gimesha-adikari/bank-service/commit/cabdd323b4aa394910cb192ead6d233e9a12d9d3); [bank-app 9d98ba24cb754b8295bd58770cd502438d3b7b38](https://github.com/gimesha-adikari/bank-app/commit/9d98ba24cb754b8295bd58770cd502438d3b7b38). Complete Git blob parsed, not file preview. Part 15 source inventory preserved: 877 files, 406 directories, 1,283 entries, no truncated trees; 24 Core controllers/105 declarations (8 conditional PayHere), 32 pages/7 BFF handlers, 27 Retrofit methods/6 interfaces/11 authenticated native destinations, 8 main and 7 debug service routes, six Flyway migrations/36 domain tables plus history. Declarations not implemented workflow counts.
+
+| Part | Prefix | L0 | L1 | L2 | L3 | L4 | L5 | Total | Source-confirmed |
+|---|---|---|---|---|---|---|---|---|---|
+| 00 | Framework | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 01 | AUTH | 0 | 0 | 2 | 3 | 12 | 0 | 17 | 17 |
+| 02 | KYC | 0 | 0 | 2 | 2 | 11 | 0 | 15 | 15 |
+| 03 | DASH | 0 | 2 | 1 | 5 | 8 | 0 | 16 | 16 |
+| 04 | ACC | 0 | 0 | 1 | 2 | 12 | 0 | 15 | 15 |
+| 05 | TXN | 0 | 2 | 2 | 2 | 13 | 0 | 19 | 19 |
+| 06 | PAY | 0 | 1 | 0 | 4 | 10 | 0 | 15 | 15 |
+| 07 | STAFF-CUST | 0 | 0 | 1 | 3 | 6 | 0 | 10 | 10 |
+| 08 | STAFF-ACC | 0 | 0 | 1 | 3 | 8 | 0 | 12 | 12 |
+| 09 | MGR-TELLER | 0 | 0 | 0 | 4 | 7 | 0 | 11 | 11 |
+| 10 | ADMIN-KYC | 0 | 0 | 0 | 4 | 8 | 0 | 12 | 12 |
+| 11 | ADMIN-ID | 0 | 0 | 0 | 4 | 9 | 0 | 13 | 13 |
+| 12 | ADMIN-FIN | 0 | 0 | 1 | 1 | 0 | 0 | 2 | 2 |
+| 13 | EXT-PAY | 0 | 1 | 3 | 2 | 0 | 0 | 6 | 6 |
+| 14 | ANDROID | 0 | 0 | 0 | 0 | 2 | 0 | 2 | 2 |
+| 15 | PLATFORM | 0 | 8 | 0 | 2 | 6 | 0 | 16 | 16 |
+| 16 | Synthesis | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Total | All | 0 | 14 | 14 | 41 | 112 | 0 | 181 | 181 |
+
+Confidence: 181 Source-confirmed; zero Live real-stack verified, Automated-test verified, Documentation-only or Unverified/unknown inventory records. Status values retained exactly:
+
+| Independent status | Count |
+|---|---|
+| None | 157 |
+| Blocked by dependency (link base-URL configuration for intended web result) | 1 |
+| Intentionally disabled (browser route); backend-only | 1 |
+| Backend-only | 6 |
+| Blocked by dependency | 2 |
+| Not applicable (web one-sided) | 1 |
+| Not applicable (frontend-only placeholder) | 2 |
+| Backend service only | 1 |
+| Placeholder | 3 |
+| Blocked by dependency (authoritative journal discovery/detail) | 1 |
+| Intentionally disabled | 3 |
+| Partial; new external payment initiation intentionally disabled | 1 |
+| Partial; new enrollment intentionally disabled | 1 |
+| Deferred | 1 |
+
+**Authoritative final map:** §7 master inventory contains all 181 IDs exactly once with part, role, scope, level, status, confidence, and link to detail. Channel and principal limitation are in linked detailed record; no inconsistent second inventory. Group index and planning cross-reference below reconciles all 181.
+
+| Domain | Existing detail range | Implemented | Principal gap | Related packages |
+|---|---|---|---|---|
+| Authentication | 17 records: [AUTH-001](#auth-001--public-loginidentity-registration-and-username-availability) through [AUTH-017](#auth-017--backend-credential-recheck-endpoint) | Web registration/verification/login/reset/logout, role-aware sessions, native bearer/local lock and internal auth | Native link/re-login, rotation, devices/MFA policy | PLAN-001, PLAN-002, PLAN-003, PLAN-005, PLAN-006, PLAN-012, PLAN-016, PLAN-024 |
+| KYC/onboarding | 15 records: [KYC-001](#kyc-001-authenticated-kyc-entry-and-eligibility-discovery) through [KYC-015](#kyc-015-standalone-fastapi-identity-check-endpoints) | Owned four uploads/consent, Core case/assessment/decision, separate Customer upsert | RFI correction, draft/recovery, model assurance/policy | PLAN-001, PLAN-002, PLAN-004, PLAN-005, PLAN-006, PLAN-007, PLAN-017, PLAN-021, PLAN-023 |
+| Dashboard/profile | 16 records: [DASH-001](#dash-001-web-protected-customer-dashboard-and-entry) through [DASH-016](#dash-016-android-my-accounts-onboarding-guidance) | Owned Account cards/status/profile, native list/profile/local default | User vs Customer fields, demo activity and native currency/error | PLAN-003, PLAN-004, PLAN-006, PLAN-007, PLAN-016, PLAN-017, PLAN-019, PLAN-023, PLAN-024 |
+| Accounts | 15 records: [ACC-001](#acc-001-account-types-and-minimum-deposit-product-rules) through [ACC-015](#acc-015-android-native-account-opening-and-mobile-completeness-gap) | Product rules, branch reads, self/Teller open, ledger funding, metadata, zero closure | Teller/native key, status policy, branch/owner metadata, product terms | PLAN-001, PLAN-006, PLAN-007, PLAN-008, PLAN-009, PLAN-010, PLAN-011, PLAN-015, PLAN-017, PLAN-018, PLAN-022 |
+| Accounting | 19 records: [TXN-001](#txn-001-customer-web-deposit-and-posted-deposit-receipt) through [TXN-019](#txn-019-ledger-migration-balance-cutover-and-legacy-history-compatibility) | Balanced journals, locks, exact LKR, retry/idempotency, deposit/withdraw, history | Deposit/withdraw read-only receipt, reconciliation, journal inquiry/native posting | PLAN-001, PLAN-002, PLAN-008, PLAN-009, PLAN-010, PLAN-014, PLAN-015, PLAN-016, PLAN-017, PLAN-018, PLAN-020, PLAN-021, PLAN-022, PLAN-023 |
+| Internal Pay | 15 records: [PAY-001](#pay-001-customer-pay-entry-and-eligible-source-account-selection) through [PAY-015](#pay-015-android-transferpayments-preview-without-core-posting) | Review, transfer, authoritative payer receipt, GET and same-key recovery | Recipient discovery, reload persistence, history links, native preview | PLAN-001, PLAN-002, PLAN-009, PLAN-010, PLAN-014, PLAN-016, PLAN-017, PLAN-020 |
+| Staff Customer | 10 records: [STAFF-CUST-001](#staff-cust-001-shared-staff-customer-workspace-navigation-and-role-guards) through [STAFF-CUST-010](#staff-cust-010-teller-handoff-from-customer-record-to-account-opening-context) | Directory/search, existing User link, create/edit/detail | Eligibility, status control, paging, related accounts | PLAN-001, PLAN-008, PLAN-011, PLAN-012, PLAN-013, PLAN-018, PLAN-024 |
+| Staff Account | 12 records: [STAFF-ACC-001](#staff-acc-001-staff-account-workspace-navigation-and-role-gated-operations) through [STAFF-ACC-012](#staff-acc-012-authorized-staff-account-scoped-transaction-history-and-csv-export) | Directory, Teller open, metadata, closure/history/CSV | Opening recovery, status control, no cash desk | PLAN-001, PLAN-007, PLAN-008, PLAN-009, PLAN-010, PLAN-011, PLAN-013, PLAN-014, PLAN-018, PLAN-024 |
+| Manager Teller | 11 records: [MGR-TELLER-001](#mgr-teller-001-manager-only-teller-management-workspace-and-role-authorization) through [MGR-TELLER-011](#mgr-teller-011-read-only-reconciliation-after-ambiguous-manager-teller-mutations) | Assign existing user, Employee edit/remove, session revoke | Restoration, target policy, actor receipt | PLAN-001, PLAN-011, PLAN-012, PLAN-013, PLAN-018, PLAN-023, PLAN-024 |
+| Admin KYC | 12 records: [ADMIN-KYC-001](#admin-kyc-001-protected-admin-workspace-and-navigation) through [ADMIN-KYC-012](#admin-kyc-012-historical-case-review-and-decision-metadata) | Queues, checks/docs, manual approve/reject/RFI, readback | Correction, applicant detail and decision timeline | PLAN-001, PLAN-004, PLAN-005, PLAN-013, PLAN-023, PLAN-024 |
+| Admin identity | 13 records: [ADMIN-ID-001](#admin-id-001--protected-admin-identity-workspace) through [ADMIN-ID-013](#admin-id-013--customer-deletion-uncertain-response-recovery) | User/Employee directory, role/status mutation, revoke, constrained Customer delete | Provision/activation, privilege safeguards, restore/audit | PLAN-001, PLAN-011, PLAN-012, PLAN-013, PLAN-024 |
+| Financial administration | 2 records: [ADMIN-FIN-001](#admin-fin-001--administrative-financial-investigation-and-correction-history-context) through [ADMIN-FIN-002](#admin-fin-002--administrative-reversal-preparation-and-web-request-integration) | Staff history context, existing reversal helper and underlying TXN-015 | Journal lookup, read-only result, operational UI | PLAN-001, PLAN-014, PLAN-024 |
+| Wallet and deferred loans | 6 records: [EXT-PAY-001](#ext-pay-001--payhere-wallet-payment-initiation-and-hosted-checkout) through [EXT-PAY-006](#ext-pay-006--deferred-loan-application-and-decision-api-placeholders) | Local metadata and conditional provider implementation | Disabled, no settlement, nondebug fake; loan placeholder | PLAN-019, PLAN-020, PLAN-021, PLAN-022 |
+| Native policy | 2 records: [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy) through [ANDROID-002](#android-002--native-app-private-data-backup-and-device-transfer-exclusion) | Endpoint/transport and backup exclusions | Actual release/device acceptance | PLAN-001, PLAN-002, PLAN-003, PLAN-016, PLAN-017, PLAN-019, PLAN-021, PLAN-024 |
+| Cross-cutting | 16 records: [PLATFORM-001](#platform-001--branch-mutation-placeholders) through [PLATFORM-016](#platform-016--optional-verification-calibration-telemetry-and-offline-tooling) | Schema/seed/SMTP/logging/debug/calibration, partial errors/health | Eight placeholder families; readiness/audit/backup absent | PLAN-001, PLAN-002, PLAN-003, PLAN-005, PLAN-013, PLAN-015, PLAN-018, PLAN-021, PLAN-022, PLAN-023 |
+
+No overall implementation percentage. Review completion is distinct from implementation. Historical tracker statements inside old records describe their dates; preserve unchanged.
+
+#### 16.B Architecture and repository assessment
+
+```mermaid
+
+flowchart LR
+
+  B["Browser: Customer / staff / Admin"] --> W["bank-web: UI + Next BFF"]
+
+  W -->|"Cookie -> bearer; CSRF"| C["bank-core: Spring Security and banking domain"]
+
+  A["bank-app: Compose / Retrofit"] -->|"Direct bearer, real repos"| C
+
+  A --- L["Local encrypted token, PIN/biometric, preferences"]
+
+  A --- F["Nondebug Wallet fake; financial preview / Home demo"]
+
+  C --> D["MySQL: authoritative persisted domain"]
+
+  C --> J["Posting engine / journals / postings / idempotency"]
+
+  J --> D
+
+  C --> S["KYC files and metadata"]
+
+  C -->|"Internal service key: aggregate"| M["bank-service: FastAPI main"]
+
+  M -->|"Assessment only; Core decides"| C
+
+  C -->|"SMTP adapter"| E["Configured mail"]
+
+  Q["Separate debug / offline calibration"] --- M
+
+  C -.->|"Conditional disabled default"| P["PayHere checkout / callbacks"]
+
+  P -.->|"Conditional metadata only"| C
+
+  P -.- X["External settlement to ledger absent"]
+
+```
+
+Solid arrows are connected source interactions, not verified runtime; dotted provider lines conditional/disabled. Core owns authorization and all banking facts; BFF cookie/CSRF and direct native bearer are transport. Native app lock is not server MFA. Client drafts/preferences/demo data are not authoritative. FastAPI recommends, Core persists decision. SMTP synchronous adapter not delivery guarantee. Separate debug/calibration is developer tooling.
+
+| Repository | Actual contribution | Incomplete and development leverage |
+|---|---|---|
+| bank-web | Connected retail and role-specific staff/Admin journeys; BFF, internal money, receipts/history | RFI, durable recovery, journal inquiry/reversal, selected status/identity lifecycles; reuse BFF |
+| bank-core | Authoritative identity, KYC, Accounts and ledger; posting/retry/idempotency, reversal, staff lifecycle | Extend read/recovery and transition contracts; placeholders and external settlement absent; no engine replacement |
+| bank-service | Heuristic default assessment, optional model selectors, separate debug and calibration | Controlled assurance, artifact provenance/policy; no proven biometric accuracy |
+| bank-app | Real auth/local lock, KYC, Customer upsert, profile, own accounts/open/history, variant policies | Exact opening and receipt recovery, no financial posting, demo Home, fake nondebug Wallet; Customer parity/staff decision, device evidence |
+
+Sources: [bank-web/lib/server/banking-upstream.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/server/banking-upstream.ts); [bank-core/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java); [bank-service/app/api/v1/kyc.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/api/v1/kyc.py); [bank-app/app/src/main/java/com/bankingsystem/mobile/app/di/NetworkModule.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/app/di/NetworkModule.kt). Detail records in §9 contain full pinned traces.
+
+#### 16.C Domain and identity map
+
+Core/MySQL owns persisted banking facts. Logical KYC/Wallet ownership does not imply an actual foreign key. Local files/preferences/calibration not ledger facts.
+
+| Tables/domain | Identity and relationship | Creation/mutation | Retention and active boundary |
+|---|---|---|---|
+| roles, users | role_id; user_id UUID; User role FK, optional employee_id/customer_id; Customer also references User | Seed/register, role and profile mutations | User retained on Customer delete; no general User provisioning/delete |
+| sessions, verification_token, password_reset_tokens | session_id / id; User FK | Issue/login/rotate/logout/revoke, verification/reset tokens | Expiry/consume/revoke; no periodic general purge found |
+| employees | employee_id UUID; role FK, manager self-FK; User optional link | Assign/create/reuse/edit/detach by authorized Manager/Admin | Former Employee retained; restore incomplete |
+| customers | customer_id UUID; user_id FK; separate User pointer | Approved self-upsert or linked staff create/edit, Admin delete | Dependent Accounts incl CLOSED block delete; User retained |
+| branches | branch_id integer; manager_employee_id optional FK | Seed, actual GET; literal writes | No operational write/lifecycle |
+| accounts | account_id UUID and number; Customer/branch FKs | Open/self/Teller, metadata, zero closure, internal status setter | Closed row and history retained |
+| transactions | transaction_id; Account FK, V4 journal link | Synchronous legacy history projection | Not journal-read API; retained |
+| ledger_accounts | ledger_account_id, customer_account_id restricted FK, system code | Customer liability mapping and SYSTEM_VAULT_CASH:LKR asset | Separate status; no GL directory |
+| journal_entries, journal_postings | entry_id, posting_id; actor User; unique reversal_of_entry_id FK; posting→entry/ledger_account | Balanced posting, compensating reversal | Immutable original; no direct edit |
+| core_transaction_idempotency, customer_account_opening_idempotency | id, scoped User+operation key; entry/account FK | Durable claim/fingerprint/result/replay; opening key optional | No periodic cleanup established |
+| kyc_cases, kyc_checks, kyc_idem_keys, kyc_uploads | id; logical User/case/document/uploader identifiers | Owned upload FS+metadata, submit, checks/decision | Case/check retained; terminal image cleanup; RFI/history gaps |
+| wallet_cards, wallet_card_sessions, wallet_payment_intents, wallet_idempotency | id / idem_key; logical owner and session/intent associations | Metadata read/default/delete; conditional enrollment/intent/callback | No ledger FK/settlement established; disabled creation/fake variant |
+| cards, loans, loan_repayments, credit_scores | card_id, loan_id, repayment_id, credit_score_id; Card→Account/optional Customer, Loan→Customer, repayment→Loan/Transaction, score→Customer | Schema scaffold; Loan literal routes | No issuing/lending/repayment/scoring lifecycle |
+| scheduled_transactions, feedbacks | scheduled_transaction_id, feedback_id; Account/Customer FK | Literal APIs | No persisted operational workflow/worker |
+| notifications, devices, support_tickets, file_storage | notification_id, device_id, ticket_id, file_id; Customer FK; ticket assigned Employee | Schema scaffold; file_storage distinct from KYC uploads | No active workflow established |
+| audit_logs, ai_models, system_configs | audit_log_id, ai_model_id, config_id; Audit User/Device FK | Scaffold except actual V3 system config cutover marker | No general audit/model registry/config workflow |
+
+Migration source: [bank-core/src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql); [bank-core/src/main/resources/db/migration/V2__core_ledger.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V2__core_ledger.sql); [bank-core/src/main/resources/db/migration/V5__customer_account_opening_idempotency.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V5__customer_account_opening_idempotency.sql). V1 31 + V2 four + V5 one = 36 domain tables; V3 data cutover, V4/V6 alterations. User role is authorization; Employee employment status affects staff login, Customer status is separate and not universal existing-money gate, KYC latest case approval gates self onboarding/opening, Account ACTIVE/FROZEN/CLOSED controls posting; LedgerAccount status separate. KYC approval does not create Customer or Account. User/Employee/Customer/Account/Journal UUIDs and Account number not interchangeable. Customer status ACTIVE/INACTIVE/PENDING/RESIGNED; KYC PENDING/AUTO_REVIEW/UNDER_REVIEW/NEEDS_MORE_INFO/APPROVED/REJECTED, SUPERSEDED declared without proven writer.
+
+#### 16.D Role and prerequisite capability matrix
+
+| Actor/stage | Workspace/reads | Mutations | Core authority/prerequisite | Missing / records |
+|---|---|---|---|---|
+| Visitor | Public web/register/reset; native auth; username availability | Register User/verify/login/reset | Public auth/token checks; no banking identity yet | No Account/money; AUTH-001–006 |
+| CUSTOMER no approved KYC | Onboarding, own case/checks/profile; own existing reads as authorized | Upload/submit consent, rejected restart web | Owner case; latest approved for self-open | RFI blocked; KYC-001–009 |
+| Approved/no Customer | Onboarding/My Accounts, case/profile | Separate Customer upsert | Approved latest case | No auto-create Account; KYC-011–014 |
+| CUSTOMER linked Customer | Dashboard/owned account/branch | Open if eligible | Approved latest KYC, product/branch/minima | No interest/maturity; ACC-001–009 |
+| Eligible ACTIVE Account | Web Pay/deposit/withdraw/history/receipt; native own reads | Web internal commands | Owner/ACTIVE/amount/currency/funds; current KYC/Customer.status not universally rechecked | Native previews; TXN/PAY |
+| TELLER | Shared staff Customer/Account directory/history | Linked Customer create/edit, assisted open, metadata/zero close | Teller-only opening; shared staff reads and allowed writes | No cash desk/branch scope; STAFF-CUST/STAFF-ACC |
+| MANAGER | Shared staff + Teller workspace, candidate list | Permitted staff actions, assign/edit/remove Teller/revoke | Manager-only Teller lifecycle; not Teller opening or Admin actions | No native Manager; MGR-TELLER |
+| ADMIN | KYC queue/docs/checks, identity dirs, shared staff history | Decide KYC, role/Employee, bounded Customer deletion; direct reversal API | Admin guards; not superset of Manager/Teller | No full journal/reversal UI or reconcile endpoint; ADMIN-KYC/ID/FIN |
+| Internal service | Core orchestrator / FastAPI main | Assessment; Core persists decision | Internal service key, not ordinary banking role | No direct ledger mutation; AUTH-015/KYC-004/015 |
+| Conditional provider | Hosted/return routes if enabled | Verified conditional callback metadata | Callback verification not JWT; disabled default | No settlement; EXT-PAY |
+| Developer/operator | Config/schema/debug/calibration/reconcile internal | Controlled startup/schema operations only with authorization | Internal/operator scope; separate debug lacks explicit route auth | No verified backup/readiness/deployment; PLATFORM-009–016 |
+
+Customer stages are lifecycle prerequisites, not roles. UI guards do not confer authority; staff auth in Android not a native staff workspace.
+
+#### 16.E Cross-channel map
+
+| Capability | Web | Core HTTP | Core internal | FastAPI main | FastAPI debug | Android debug | Android nondebug | Provider / refs |
+|---|---|---|---|---|---|---|---|---|
+| Auth/profile | Connected; web contact edit gap | Auth/User real; rotation backend only | Session/role eligibility | N/A | N/A | Real, native verification/reset/relogin partial | Same | AUTH |
+| KYC/onboarding | Connected except RFI | Real KYC/admin/customer | Case/storage/retention/orchestrator | Internal aggregate and standalone checks | Developer diagnostics | Capture/status/upsert partial recovery | Same | KYC/ADMIN-KYC |
+| Accounts | Connected owner/staff | Reads/open/edit/close real; branch writes stub | Funding and internal status setter | N/A | N/A | Real own list/open/history, opening contract gap | Same | ACC/STAFF-ACC |
+| Deposit/withdraw/Pay | Connected | CUSTOMER real; transfer receipt GET | Posting/idempotency/retry | N/A | N/A | UI-only preview | UI-only preview | No external funds; TXN/PAY |
+| History/correction | Scoped CSV/history, reversal helper only | Scoped history, generic literals, ADMIN reversal POST | Read-only reconcile | N/A | N/A | Real per-account history, Home fixtures | Same | ADMIN-FIN/TXN |
+| Staff/Admin | Role-specific connected partial lifecycle | Role-gated operations | Transactional associations/revoke | KYC via Core | N/A | Absent workspace | Absent workspace | STAFF-CUST/ACC/MGR/ADMIN |
+| Wallet | Absent; provider paths blocked | Metadata real, creation 422, hosted 404, retired 410 | Local intent/card metadata | N/A | N/A | Real Wallet, gated creation | Fake runtime repo | Conditional disabled, no settlement; EXT-PAY |
+| Other business stubs | No connected UI | Literal branch writes/schedule/feedback/chatbot/analytics/report/maintenance/utility/loan | Scaffold where present | Optional missing routers not active | N/A | Absent/inert | Absent/inert | PLATFORM-001–008/EXT-PAY-006 |
+| Infrastructure | BFF errors/diagnostics | Basic health; selective errors | Migrations/seed/mail/logging/KYC jobs | Health/assessment/calibration | Separate debug | Local policies/network | Release endpoint unverified | PLATFORM-009–016/ANDROID |
+
+Connected means actual source path, not runtime. Partial, backend-only, internal-only, preview, fake, conditional, disabled, literal and schema-only are distinct.
+
+#### 16.F Principal journeys
+
+| Journey | Implemented source path | Missing/partial | Actual attainable outcome and references |
+|---|---|---|---|
+| New web Customer | Register→verify→login→KYC upload/consent→assessment/manual decision→approved→Customer upsert→open→list→posting/receipt/history/profile | RFI blocked; mail/ML runtime evidence absent | Eligible approved customer can complete internal banking, not external money; AUTH/KYC/ACC/TXN/PAY |
+| Existing Customer | Login→owned ACTIVE account→deposit/withdraw/Pay→journal→receipt/history; Pay GET and same-key retry | Deposit/withdraw receipt GET absent, reload state volatile, UUID destination | Internal posted receipt and history; TXN/PAY |
+| Native Customer | Register/login→encrypted token/local lock→KYC→approved Customer→open/list/history→preview/Wallet | Verification/reset, RFI and exact opening recovery partial; no financial posting; Wallet fake/gated | Real onboarding/accounts/read history subject to Core; AUTH/KYC/DASH/ACC/TXN-017/018/PAY-015/EXT-PAY |
+| Teller | Login→search existing User/Customer→link/create/edit→assisted opening→inspect/history | Opening uncertainty, no cash desk | Linked Customer and internally funded account; STAFF-CUST/STAFF-ACC |
+| Manager | Login→directory→assign existing User→Employee edit→remove/detach→revoke | Target/restore/receipt/audit gaps | Teller role and employment lifecycle; MGR-TELLER |
+| Admin KYC | Queue→case/docs/checks→approve/reject/RFI→state/readback | RFI resolution, applicant context, historical audit/receipt | Eligible decision persists; approved not Customer creation; ADMIN-KYC/KYC-008 |
+| Admin identity | Users/Employees→role/employment change→session revoke→directory | Provision/activation/restore/self/last-admin/receipt | Actual role/status changes; ADMIN-ID-001–010 |
+| Admin deletion | Customer selection→confirm→FK check→delete/error→refresh | No dependency preview/causal receipt/restore | Eligible Customer delete retains User; dependent closed Account blocks; ADMIN-ID-011–013 |
+| Admin correction | History→missing journal discovery/detail→missing confirmation→existing ADMIN POST UUID/reason→compensating journal→missing read-only result→history | No operational UI/GET; repeat POST may perform first mutation | Direct API correction possible; operator journey incomplete; ADMIN-FIN/TXN-015 |
+| External payment | Conditional selection→intent→hosted checkout→callback metadata→missing settlement/fulfilment/receipt/reconcile | Disabled default; fake variant; no provider-to-ledger path | No verified external settlement; EXT-PAY |
+
+#### 16.G Financial authority map
+
+| Action | Actual authoritative effect | Boundary |
+|---|---|---|
+| Account opening with initial deposit | Atomic Account/liability mapping and nonzero funding journal | Savings LKR 1,000, Checking 0, Fixed Deposit 5,000 minima; type label not interest/maturity; zero funding no journal |
+| Deposit | Vault asset debit/customer liability credit; balance/history/receipt | No actual external collection proof |
+| Withdrawal | Opposite liability/vault accounting, no overdraft | No payout/cash delivery proof |
+| Transfer/Internal Pay | Atomic debit payer liability/credit recipient liability, two histories, payer receipt | No interbank or recipient balance exposure |
+| Admin reversal | New compensating opposite legs, original retained; natural original identity replay | Not client key; repeat POST not safe status probe; no inquiry/result GET |
+| Reconciliation | Read-only stored vs derived liability balance | No repair or exposed operator job/API |
+| Android financial preview and Home fixture | None | UI demonstration |
+| Nondebug Wallet fake | None | Local simulation |
+| Conditional provider callback | Local PaymentIntent/card metadata only | No authoritative ledger posting/settlement; return/cancel navigation not evidence |
+| External collection/payout/refund/settlement | No established integration | Requires approved product and settlement/accounting evidence |
+
+Core BigDecimal/exact decimal text, scale-four storage, atomic locks, balanced immutable journal/postings, durable keys and bounded fresh transaction retry are meaningful foundations. Account closure checks stored and derived zero under lock; retains account/history. TXN-004–009/019, PAY-004–009, TXN-015, ACC-012, EXT-PAY. Never direct balance manipulation for reconciliation.
+
+#### 16.H Incomplete catalogue and backend-only reachability
+
+| Gap type | Feature references / actual boundary |
+|---|---|
+| Backend-only/one-sided | AUTH-013/017, DASH-007, ACC-013, STAFF-CUST-009, STAFF-ACC-009, TXN-014/015, ADMIN-FIN; appropriate consumer not automatically public |
+| Frontend demo | DASH-009/010, TXN-017, PAY-015; capture indicators, fake nondebug Wallet |
+| Lifecycle incomplete | KYC-008, ADMIN-KYC-009/011/012, ACC-005/008/015, TXN-010, PAY-011/014, MGR-TELLER-008/011, ADMIN-ID-008/010/013 |
+| Config-dependent | AUTH-009 email link, KYC-004/015 optional models, PLATFORM-011/015/016, ANDROID-001 endpoint |
+| Intentionally disabled | AUTH-013 browser route; EXT-PAY-001/002/004; 003/005 partial gated creation |
+| Literal responses | TXN-016, EXT-PAY-006, PLATFORM-001–008 |
+| Schema-only | Card, Loan/Repayment, CreditScore, AIModel, scheduled, feedback, audit, notification, device, support, generic config/file storage; V3 marker actual |
+| Evidence | All 181 source-confirmed; no real stack/test/model/device/provider/deployment evidence |
+
+| Capability | Actual exposure / client | Current authorized actor | Missing and appropriate extension | Plan |
+|---|---|---|---|---|
+| AUTH-013 rotation | POST auth/refresh-token; BFF blocked, no native | Currently valid JWT/session | No independent refresh credential; choose retain/retire/extend | PLAN-003 |
+| AUTH-017 recheck | POST users/verify-password; no client | Authenticated | Optional sensitive-action policy, not MFA | PLAN-003 |
+| DASH-007 User edit | PUT users/me; native, not general web editor | Authenticated principal | Field ownership and verified contacts | PLAN-006 |
+| ACC-013 / STAFF-ACC-009 | Internal changeAccountStatus, no HTTP; staff PUT metadata only | Internal caller | Transition policy before role-gated API/UI | PLAN-008 |
+| STAFF-CUST-009 | Staff PUT customers; UI copies old status | Shared staff | Dedicated policy-defined status control and effects | PLAN-008 |
+| TXN-014 | Internal reconcileAll/reconcileAccount; no HTTP/job | Internal operator service | Restricted read-only report/tool, no repair | PLAN-015 |
+| TXN-015 / ADMIN-FIN | ADMIN reversal POST, TS helper no caller | Admin only | Journal reads, read-only result, deliberate UI | PLAN-014 |
+| KYC-015 | Standalone internal check routes; aggregate only Core consumer | Service-key actor | Reusable internal primitive; no required public exposure | PLAN-005 |
+| PLATFORM-009/010/011/013 | Schema/bootstrap/SMTP/diagnostics, no standalone business route | Operator/internal | Verify and extend config, not public exposure | PLAN-001/021 |
+| PLATFORM-015/016 | Separate debug and optional CSV/offline tools | Controlled ML developer | Isolate, evaluation evidence, no banking workflow | PLAN-005 |
+
+#### 16.I Placeholders and optional products
+
+| Domain | Observed classification | Scope implication |
+|---|---|---|
+| TXN-016 global/own/detail transactions | HTTP literals; scoped Account history actual | Purpose-specific authorized reads only |
+| PLATFORM-001 branch writes | HTTP placeholder; read real | Optional branch lifecycle |
+| PLATFORM-002 scheduled transactions | Schema + HTTP literal; KYC jobs unrelated | New instruction/worker/accounting product |
+| PLATFORM-003/004 feedback/chatbot | Literal; feedback schema; optional chatbot router absent | Optional support/assistant |
+| PLATFORM-005 fraud/spending | Literal; CreditScore/AIModel scaffold | Optional evaluated analytics |
+| PLATFORM-006 reports | Literal; real Account CSV not report engine | Optional report definitions |
+| PLATFORM-007 logs/backup/restore | Literal; console logs not operational retrieval/restore | Operator recovery evidence |
+| PLATFORM-008 enum utilities | Literal; Admin roles and product rules real | Consolidate or remove |
+| EXT-PAY-006 loans, repayments, issued cards, credit | Loan API literal, remaining schema-only | New products |
+| Interest, FD maturity, fees/holds, interbank | Absent established lifecycle | Separate product definition |
+| Notifications/devices/support | Schema-only, inert native notification control | Optional engagement |
+| DASH-009/010, TXN-017, PAY-015 | UI-only fixtures/previews | Connect or label honestly |
+| EXT-PAY provider | Disabled default: direct 404, new payment/card session 422, retired webhook 410, BFF blocks | No enablement until approved lifecycle/settlement/acceptance |
+| AUTH-013 | Browser refresh intentionally disabled; Core valid-token rotation | Separate refresh policy |
+
+Completing existing workflow (RFI, financial recovery, Admin journal inquiry, native posting) is not the same as developing new business products. No placeholder is mandatory solely because it is L1.
+
+#### 16.J Dependency graph and implementation reuse
+
+```mermaid
+
+flowchart TD
+
+ E["Trusted evidence / shared contracts: PLAN-001/002"]
+
+ K["KYC correction policy"] --> KC["Owned correction contract PLAN-004"] --> KR["Reassessment / reviewer decision"] --> KU["Existing Customer eligibility"]
+
+ J["Admin inquiry/approval policy"] --> JD["Journal discovery + detail PLAN-014"] --> JS["Read-only reversal result"] --> UI["Explicit confirmation UI"] --> ENG["Existing reversal command"] --> H["Corrected history"]
+
+ R["Exact amount + durable key / receipt PLAN-009"] --> N["Native posting PLAN-016"] --> NR["Recovery and balance/history refresh"]
+
+ O["Opening identity PLAN-007"] --> ON["Native/Teller opening recovery"]
+
+ I["Privilege/employment policy"] --> IT["PLAN-012 transitions + session revoke"] --> IA["PLAN-013 selected audit / receipts"]
+
+ X["Approved provider/product scope"] --> XV["PLAN-020 verified intent/event"] --> XS["Settlement/accounting/fulfilment"] --> XR["Reconciliation + sandbox acceptance"] --> XA["Separate activation decision"]
+
+ E -.-> KC
+
+ E -.-> JD
+
+ E -.-> R
+
+ E -.-> IT
+
+ E -.-> XV
+
+ RE["Existing reconcile service"] --> RO["Restricted read-only consumer PLAN-015"]
+
+```
+
+Solid arrows hard implementation prerequisites or selected policy gate; dotted recommended sequencing/evidence. Scope decisions unapproved. Existing transfer GET already available; deposit/withdraw GET proposed. Admin inquiry and result required for complete operator UI, not for current reversal API. Reconciliation independent, provider not prerequisite for internal banking, audit slices not blanket dependency. No vendor/architecture mandate.
+
+| Existing implementation | Future reuse | Required extension/caution |
+|---|---|---|
+| AUTH/session/revoke and BFF | Native credential lifecycle, role transitions | Valid-session rotation only, no independent refresh/MFA |
+| KYC case/checks/upload/review | Same-case correction and context | New owned correction/transition; no accuracy claim |
+| User/Customer/Employee links | Staff creation and restore | Target/field policy and causal receipt |
+| Account open/branch/closure | Native/Teller recovery, status | Exact key/result, status policy; preserve closure |
+| Posting, exact money, retries, idempotency, transfer GET | Native commands, improved receipt recovery | No deposit/withdraw GET yet, no external settlement |
+| Scoped history, reversal, internal reconciliation | Admin journal inquiry and operator reports | Missing journal/detail/read-only reversal result; no reconcile route |
+| Native AuthStore/network/preferences | Native posting and real dashboard | Exact DTOs/durable identity, no staff parity assumption |
+| Wallet metadata | Approved provider lifecycle | Disabled/fake boundary, no settlement |
+| Flyway/bootstrap/SMTP/errors/logs/health | Trusted evidence and readiness | No actual delivery/backup/deployment proof |
+| FastAPI debug/calibration | Controlled evaluation | Not automatic policy or validated model quality |
+
+#### 16.K Consolidated planning backlog
+
+Priority A: foundational dependency or high-value current workflow/correctness/recovery; B: significant usability/lifecycle/channel improvement; C: dependent extension; Optional: scope decision; Deferred: gated by unmet prerequisites. Mixed priority distinguishes slices. Qualitative recommendation, not numerical scores, deadlines or authorization. Existing candidate history and all detail fields retained. Packages group by distinct outcome; shared RFI, journal identity, recovery and Wallet variant not duplicated. All 181 feature IDs referenced (not every record requires code changes). 24 stable PLAN IDs, not feature IDs.
+
+| Plan | Title | Repos | Actor | Priority |
+|---|---|---|---|---|
+| PLAN-001 | Trusted baseline and repeatable integrated acceptance | all four | Developer/operator; existing actors | A |
+| PLAN-002 | Shared contracts, diagnostics and readiness | all four | Developer/operator; callers | A |
+| PLAN-003 | Identity, credential and session lifecycle | core/web/app; service for internal credential policy | Visitor/customer/operator | A/B |
+| PLAN-004 | KYC correction and resumable applicant lifecycle | core/web/app; service if reassessment contract changes | Customer/Admin | A |
+| PLAN-005 | KYC assurance and reviewer context | core/service/web/app | Reviewer and ML developer | B (A if automated assurance required) |
+| PLAN-006 | Customer profile and onboarding presentation | core/web/app | Customer | B |
+| PLAN-007 | Account opening exactness and durable recovery | core/web/app | Customer/Teller | A |
+| PLAN-008 | Customer and Account status transitions | core/web; app read if needed | Authorized staff; Customer read | B/A if required |
+| PLAN-009 | Durable financial operation and receipt recovery | core/web/app | Customer; related Teller opening | A |
+| PLAN-010 | Recipient discovery, history and statements | core/web/app | Customer/authorized staff | B |
+| PLAN-011 | Staff directories, context and linked identity eligibility | core/web | Staff within existing roles | B |
+| PLAN-012 | Employment and privileged-role lifecycle | core/web; app reauth | Manager/Admin | A/B |
+| PLAN-013 | Administrative receipts, audit and deletion visibility | core/web | Admin/Manager/staff; restricted operator | A/B |
+| PLAN-014 | Administrative journal inquiry and reversal completion | core/web | Admin | A |
+| PLAN-015 | Restricted read-only ledger reconciliation | core; web if chosen | Restricted operator/explicit Admin | A/B |
+| PLAN-016 | Native authoritative financial commands | app/core; web reference | Android Customer | B/A if primary native |
+| PLAN-017 | Native dashboard and accurate local state | app/core | Android Customer | B |
+| PLAN-018 | Optional staff cash desk and branch lifecycle | core/web; app only if selected | Teller/Manager/Admin by policy | Optional/C |
+| PLAN-019 | Wallet variant and saved-card metadata lifecycle | app/core | Customer/developer | B truthfulness; Deferred enrollment |
+| PLAN-020 | External provider lifecycle and settlement (gated) | core/app; web if selected; provider | Customer/provider/operator | Deferred |
+| PLAN-021 | Operational recovery, retention and backup evidence | all relevant repos/operator environment | Restricted operator | B/A if deployment |
+| PLAN-022 | Optional banking products and scheduled instructions | core/web/app if selected | Customer/authorized product roles | Optional |
+| PLAN-023 | Optional reporting, engagement, support and analytics | core/web/service/app as selected | Customer/staff/operator | Optional |
+| PLAN-024 | Native staff and Admin scope | app/core; web reference | Teller/Manager/Admin if selected | Optional |
+
+##### PLAN-001 — Trusted baseline and repeatable integrated acceptance
+
+- **Objective:** Establish attributable, repeatable evidence for the existing source-defined banking workflows.
+- **Actor:** Developer/operator; existing actors.
+- **Current implementation:** Source tests, local setup and migration tooling; no attributable integrated execution.
+- **Relevant existing records:** [AUTH-001](#auth-001--public-loginidentity-registration-and-username-availability), [AUTH-002](#auth-002--registration-email-confirmation-and-resend), [AUTH-003](#auth-003--credentials-login-and-eligibility-enforcement), [AUTH-004](#auth-004--browser-cookiebacked-session-bootstrap-protected-transport-and-csrf), [AUTH-005](#auth-005--logout-and-serversession-termination), [AUTH-006](#auth-006--forgottenpassword-email-recovery-and-reset), [AUTH-007](#auth-007--authenticated-password-change-and-forced-reauthentication), [AUTH-008](#auth-008--rolebased-access-and-authorizationstate-revocation), [AUTH-009](#auth-009--verified-emailaddress-change), [AUTH-010](#auth-010--currentuser-identity-and-profile-read), [AUTH-011](#auth-011--android-encrypted-bearertoken-persistence-and-session-restoration), [AUTH-012](#auth-012--android-local-pinbiometric-app-lock), [AUTH-013](#auth-013--backendonly-jwtsession-rotation-endpoint), [AUTH-014](#auth-014--account-username-change-with-android-relogin), [AUTH-015](#auth-015--springtofastapi-internal-service-authentication), [AUTH-016](#auth-016--layered-login-attempt-throttling), [AUTH-017](#auth-017--backend-credential-recheck-endpoint), [KYC-001](#kyc-001-authenticated-kyc-entry-and-eligibility-discovery), [KYC-002](#kyc-002-four-document-upload-and-spring-file-persistence), [KYC-003](#kyc-003-consent-based-case-submission-and-duplicate-handling), [KYC-004](#kyc-004-automated-fastapi-assessment-and-spring-decision-mapping), [KYC-005](#kyc-005-customer-kyc-status-and-check-visibility), [KYC-006](#kyc-006-admin-kyc-decision-affecting-customer-status), [KYC-007](#kyc-007-rejected-case-new-verification-application), [KYC-008](#kyc-008-needs-more-information-correction-and-resubmission), [KYC-009](#kyc-009-protected-kyc-document-retrieval-and-admin-preview), [KYC-010](#kyc-010-scheduled-kyc-image-retention-cleanup), [KYC-011](#kyc-011-post-approval-banking-customer-self-registrationupsert), [KYC-012](#kyc-012-approved-kyc-and-customer-gate-for-self-service-account-opening), [KYC-013](#kyc-013-android-multi-step-document-capture-and-kyc-submission), [KYC-014](#kyc-014-android-kyc-polling-and-approved-customer-registration), [KYC-015](#kyc-015-standalone-fastapi-identity-check-endpoints), [ACC-001](#acc-001-account-types-and-minimum-deposit-product-rules), [ACC-002](#acc-002-persisted-branch-directory-and-account-opening-branch-selection), [ACC-003](#acc-003-core-enforced-self-service-account-opening-eligibility), [ACC-004](#acc-004-web-customer-self-service-account-opening-and-confirmation), [ACC-005](#acc-005-durable-idempotent-self-service-opening-and-uncertain-response-recovery), [ACC-006](#acc-006-account-identifiers-ownership-and-atomic-account-persistence), [ACC-007](#acc-007-opening-funding-and-liability-ledger-integration), [ACC-008](#acc-008-teller-assisted-opening-with-linked-customer-user), [ACC-009](#acc-009-owner-scoped-account-list-and-account-uuid-detail-retrieval), [ACC-010](#acc-010-authorized-staff-account-directory-and-detail-access), [ACC-011](#acc-011-staff-account-type-and-branch-maintenance), [ACC-012](#acc-012-staff-only-zero-balance-account-closure-with-posting-compatible-lock), [ACC-013](#acc-013-backend-only-accountstatus-change-and-freezereactivation-service), [ACC-014](#acc-014-closed-account-retention-and-owner-history-visibility), [ACC-015](#acc-015-android-native-account-opening-and-mobile-completeness-gap), [TXN-001](#txn-001-customer-web-deposit-and-posted-deposit-receipt), [TXN-002](#txn-002-customer-web-withdrawal-and-no-overdraft-enforcement), [TXN-003](#txn-003-customer-transaction-authorization-ownership-and-financial-eligibility), [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture), [TXN-005](#txn-005-balanced-immutable-journal-and-posting-engine), [TXN-006](#txn-006-atomic-balance-updates-locked-posting-and-overdraft-prevention), [TXN-007](#txn-007-strict-decimal-text-monetary-contract-and-lkr-precision), [TXN-008](#txn-008-persisted-financial-operation-idempotency-and-receipt-replay), [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands), [TXN-010](#txn-010-web-depositwithdraw-uncertain-response-retry-experience), [TXN-011](#txn-011-synchronous-ledger-to-legacy-transaction-history-projection), [TXN-012](#txn-012-customer-account-scoped-transaction-history-and-csv-export), [TXN-013](#txn-013-staff-account-scoped-transaction-history-visibility), [TXN-014](#txn-014-read-only-stored-vs-ledger-balance-reconciliation-service), [TXN-015](#txn-015-admin-only-journal-reversal-and-compensating-postings-api), [TXN-016](#txn-016-generic-transaction-list-own-list-and-individual-detail-endpoints), [TXN-017](#txn-017-android-deposit-and-withdrawal-payment-preview-screens), [TXN-018](#txn-018-android-real-per-account-transaction-history-distinct-from-home-demo), [TXN-019](#txn-019-ledger-migration-balance-cutover-and-legacy-history-compatibility), [PAY-001](#pay-001-customer-pay-entry-and-eligible-source-account-selection), [PAY-002](#pay-002-destination-identification-by-account-uuid-and-recipient-privacy), [PAY-003](#pay-003-exact-lkr-payment-draft-review-edit-and-explicit-confirmation), [PAY-004](#pay-004-authenticated-internal-pay-post-through-nextjs-bff-into-core-transfer), [PAY-005](#pay-005-transfer-ownership-account-eligibility-and-insufficient-funds-enforcement), [PAY-006](#pay-006-atomic-two-account-double-entry-settlement-and-history-effects), [PAY-007](#pay-007-durable-per-payment-idempotency-duplicate-prevention-and-conflict-handling), [PAY-008](#pay-008-authoritative-payment-receipt-creation-privacy-and-confirmation-display), [PAY-009](#pay-009-customer-authorized-read-only-receipt-lookup-by-original-key), [PAY-010](#pay-010-automatic-post-commit-lost-response-recovery-by-receipt-get), [PAY-011](#pay-011-unresolved-pre-commit-receipt-and-manual-check-receipt-flow), [PAY-012](#pay-012-manual-same-key-payment-retry-after-unresolved-outcome), [PAY-013](#pay-013-payment-specific-validation-errors-conflict-and-recovery-messaging), [PAY-014](#pay-014-pay-specific-history-visibility-and-later-receipt-discoverability), [PAY-015](#pay-015-android-transferpayments-preview-without-core-posting), [STAFF-CUST-001](#staff-cust-001-shared-staff-customer-workspace-navigation-and-role-guards), [STAFF-CUST-002](#staff-cust-002-unpaginated-staff-customer-directory-and-operational-states), [STAFF-CUST-003](#staff-cust-003-local-staff-customer-directory-multi-field-search), [STAFF-CUST-004](#staff-cust-004-staff-customer-detail-retrieval-with-distinct-user-and-customer-fields), [STAFF-CUST-005](#staff-cust-005-existing-customer-user-search-and-selection-for-staff-creation), [STAFF-CUST-006](#staff-cust-006-staff-assisted-customer-creation-using-existing-user-link), [STAFF-CUST-007](#staff-cust-007-customer-user-one-to-one-association-and-duplicate-identity-protection), [STAFF-CUST-008](#staff-cust-008-staff-editing-of-banking-customer-personal-details), [STAFF-CUST-009](#staff-cust-009-existing-customer-status-change-via-staff-api-without-connected-ui), [STAFF-CUST-010](#staff-cust-010-teller-handoff-from-customer-record-to-account-opening-context), [STAFF-ACC-001](#staff-acc-001-staff-account-workspace-navigation-and-role-gated-operations), [STAFF-ACC-002](#staff-acc-002-global-staff-account-directory-with-loading-failures-and-closed-account-rows), [STAFF-ACC-003](#staff-acc-003-authorized-staff-account-uuid-detail-lookup-and-operational-context), [STAFF-ACC-004](#staff-acc-004-teller-beneficiary-selection-and-user-uuid-targeting-within-opening-form), [STAFF-ACC-005](#staff-acc-005-teller-assisted-opening-product-and-branch-rules-and-atomic-initial-funding), [STAFF-ACC-006](#staff-acc-006-staff-account-opening-receipt-read-back-and-history-navigation), [STAFF-ACC-007](#staff-acc-007-teller-opening-uncertain-outcome-protection-without-durable-reconciliation), [STAFF-ACC-008](#staff-acc-008-staff-account-type-and-branch-metadata-review-change-and-limited-verification), [STAFF-ACC-009](#staff-acc-009-staff-account-status-visibility-with-backend-only-freezereactivate-boundary), [STAFF-ACC-010](#staff-acc-010-staff-confirmation-based-zero-balance-account-closure-and-retention), [STAFF-ACC-011](#staff-acc-011-closure-timeout-stale-state-and-read-back-recovery-without-duplicate-delete), [STAFF-ACC-012](#staff-acc-012-authorized-staff-account-scoped-transaction-history-and-csv-export), [MGR-TELLER-001](#mgr-teller-001-manager-only-teller-management-workspace-and-role-authorization), [MGR-TELLER-002](#mgr-teller-002-unpaginated-teller-employee-directory-and-local-search), [MGR-TELLER-003](#mgr-teller-003-existing-active-customer-user-candidate-discovery-and-prepopulation), [MGR-TELLER-004](#mgr-teller-004-manager-teller-assignment-from-existing-login-and-transactional-teller-promotion), [MGR-TELLER-005](#mgr-teller-005-user-employee-uuid-linkage-email-uniqueness-and-atomic-conflict-handling), [MGR-TELLER-006](#mgr-teller-006-selected-teller-details-and-employee-versus-user-field-presentation), [MGR-TELLER-007](#mgr-teller-007-manager-teller-profile-editing-with-forced-active-state-synchronization), [MGR-TELLER-008](#mgr-teller-008-inactive-teller-activation-and-conditional-reattachment-after-removal), [MGR-TELLER-009](#mgr-teller-009-confirmed-teller-removal-customer-demotion-and-retained-former-employee), [MGR-TELLER-010](#mgr-teller-010-role-and-employee-eligibility-enforcement-with-persisted-session-revocation), [MGR-TELLER-011](#mgr-teller-011-read-only-reconciliation-after-ambiguous-manager-teller-mutations), [ADMIN-KYC-001](#admin-kyc-001-protected-admin-workspace-and-navigation), [ADMIN-KYC-002](#admin-kyc-002-status-based-kyc-case-queues), [ADMIN-KYC-003](#admin-kyc-003-status-filtering-and-server-side-pagination), [ADMIN-KYC-004](#admin-kyc-004-selected-case-details-and-applicant-context), [ADMIN-KYC-005](#admin-kyc-005-protected-submitted-document-inspection), [ADMIN-KYC-006](#admin-kyc-006-recorded-automated-verification-check-presentation), [ADMIN-KYC-007](#admin-kyc-007-manual-case-approval), [ADMIN-KYC-008](#admin-kyc-008-manual-case-rejection), [ADMIN-KYC-009](#admin-kyc-009-additional-information-request-and-resolution), [ADMIN-KYC-010](#admin-kyc-010-decision-authorization-transition-and-concurrency-enforcement), [ADMIN-KYC-011](#admin-kyc-011-decision-confirmation-and-uncertain-response-recovery), [ADMIN-KYC-012](#admin-kyc-012-historical-case-review-and-decision-metadata), [ADMIN-ID-001](#admin-id-001--protected-admin-identity-workspace), [ADMIN-ID-002](#admin-id-002--global-user-directory-and-local-search), [ADMIN-ID-003](#admin-id-003--user-details-and-linked-identity-context), [ADMIN-ID-004](#admin-id-004--global-employee-directory-and-inspection), [ADMIN-ID-005](#admin-id-005--general-role-assignment-and-replacement), [ADMIN-ID-006](#admin-id-006--employee-creation-reuse-and-user-association), [ADMIN-ID-007](#admin-id-007--employee-profile-and-employment-status-updates), [ADMIN-ID-008](#admin-id-008--customer-role-demotion-and-employee-detachment), [ADMIN-ID-009](#admin-id-009--administrative-session-revocation), [ADMIN-ID-010](#admin-id-010--role-change-confirmation-and-recovery), [ADMIN-ID-011](#admin-id-011--confirmed-admin-customer-deletion), [ADMIN-ID-012](#admin-id-012--customer-deletion-dependency-protection), [ADMIN-ID-013](#admin-id-013--customer-deletion-uncertain-response-recovery), [ADMIN-FIN-001](#admin-fin-001--administrative-financial-investigation-and-correction-history-context), [ADMIN-FIN-002](#admin-fin-002--administrative-reversal-preparation-and-web-request-integration), [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy), [ANDROID-002](#android-002--native-app-private-data-backup-and-device-transfer-exclusion), [PLATFORM-009](#platform-009--versioned-database-schema-lifecycle-and-baseline-tooling), [PLATFORM-010](#platform-010--startup-role-and-login-bootstrap), [PLATFORM-011](#platform-011--shared-templated-smtp-delivery), [PLATFORM-012](#platform-012--shared-api-error-translation-and-client-propagation), [PLATFORM-013](#platform-013--authentication-aware-diagnostic-logging), [PLATFORM-014](#platform-014--process-health-and-readiness-boundary).
+- **Existing functionality to reuse:** Existing test/build definitions, disposable MySQL/Mailpit setup, Flyway, actual domain invariants.
+- **Remaining work:** Capture commit/config/fixture/expected and observed evidence; run separately authorized unit/mock/real DB/browser/native/ML baseline. Verify clean and legacy migration, startup, SMTP links and session eligibility.
+- **Affected repositories:** all four.
+- **Hard prerequisites:** Controlled synthetic environment and appropriate dependency configuration.
+- **Sequencing / related packages:** Evidence gate for selected connected slice; other designs can proceed independently.
+- **Product decision:** Deployment target and required evidence level.
+- **Expected outcome:** An evidence manifest establishes actual baseline successes/failures and remaining unverified paths.
+- **Acceptance criteria / evidence required:** Reproducible actual pass/fail evidence; separate mock and real-stack results, DB/ledger effects, no broad L5.
+- **Priority / complexity:** A; Medium–high, environment dependent.
+- **Exclusions:** No production data, provider activation or automatic CI changes.
+
+##### PLAN-002 — Shared contracts, diagnostics and readiness
+
+- **Objective:** Make errors actionable across channels and distinguish process availability from dependency readiness.
+- **Actor:** Developer/operator; callers.
+- **Current implementation:** Core selective advice, BFF typed errors, scoped logging and basic health; native/FastAPI differ.
+- **Relevant existing records:** [AUTH-004](#auth-004--browser-cookiebacked-session-bootstrap-protected-transport-and-csrf), [AUTH-015](#auth-015--springtofastapi-internal-service-authentication), [AUTH-016](#auth-016--layered-login-attempt-throttling), [KYC-002](#kyc-002-four-document-upload-and-spring-file-persistence), [PAY-013](#pay-013-payment-specific-validation-errors-conflict-and-recovery-messaging), [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands), [PLATFORM-012](#platform-012--shared-api-error-translation-and-client-propagation), [PLATFORM-013](#platform-013--authentication-aware-diagnostic-logging), [PLATFORM-014](#platform-014--process-health-and-readiness-boundary), [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy).
+- **Existing functionality to reuse:** GlobalExceptionHandler, BFF ApiError, correlation/request IDs, health mechanisms.
+- **Remaining work:** Align actionable status/code/fields/timeout semantics and native propagation, selected limits; safe diagnostic correlation, dependency readiness and monitored startup. Distributed limiter only if multi-instance required.
+- **Affected repositories:** all four.
+- **Hard prerequisites:** Agreed dependency/error contract and deployment goals.
+- **Sequencing / related packages:** Early alongside PLAN-001; relevant contracts before client recovery.
+- **Product decision:** Readiness scope and multi-instance requirements.
+- **Expected outcome:** Clients distinguish unavailable, invalid, conflict and unresolved states; operators identify failing dependencies.
+- **Acceptance criteria / evidence required:** Missing dependency and invalid/conflict/unknown states clearly distinguishable; contract and actual-stack evidence, no protected logging.
+- **Priority / complexity:** A; Medium.
+- **Exclusions:** No global automatic mutation retry or speculative distributed architecture.
+
+##### PLAN-003 — Identity, credential and session lifecycle
+
+- **Objective:** Complete credential and session lifecycle across browser and native channels.
+- **Actor:** Visitor/customer/operator.
+- **Current implementation:** Web auth real; native verification/reset/relogin gaps; valid-session rotation browser blocked.
+- **Relevant existing records:** [AUTH-001](#auth-001--public-loginidentity-registration-and-username-availability), [AUTH-002](#auth-002--registration-email-confirmation-and-resend), [AUTH-003](#auth-003--credentials-login-and-eligibility-enforcement), [AUTH-004](#auth-004--browser-cookiebacked-session-bootstrap-protected-transport-and-csrf), [AUTH-005](#auth-005--logout-and-serversession-termination), [AUTH-006](#auth-006--forgottenpassword-email-recovery-and-reset), [AUTH-007](#auth-007--authenticated-password-change-and-forced-reauthentication), [AUTH-008](#auth-008--rolebased-access-and-authorizationstate-revocation), [AUTH-009](#auth-009--verified-emailaddress-change), [AUTH-010](#auth-010--currentuser-identity-and-profile-read), [AUTH-011](#auth-011--android-encrypted-bearertoken-persistence-and-session-restoration), [AUTH-012](#auth-012--android-local-pinbiometric-app-lock), [AUTH-013](#auth-013--backendonly-jwtsession-rotation-endpoint), [AUTH-014](#auth-014--account-username-change-with-android-relogin), [AUTH-015](#auth-015--springtofastapi-internal-service-authentication), [AUTH-016](#auth-016--layered-login-attempt-throttling), [AUTH-017](#auth-017--backend-credential-recheck-endpoint), [DASH-013](#dash-013-android-inline-user-contact-edits), [ANDROID-002](#android-002--native-app-private-data-backup-and-device-transfer-exclusion), [PLATFORM-011](#platform-011--shared-templated-smtp-delivery).
+- **Existing functionality to reuse:** Auth/User/PasswordReset services, session fingerprint/revoke, BFF, AuthStore, local lock, SMTP.
+- **Remaining work:** Align email link origin, native verification/resend/reset handoff, username/email/password changes and authoritative re-login, uncertain logout/restore. Decide keep/retire/extend rotation; optional device sessions, credential recheck, MFA and local lock/resume; internal key rotation policy.
+- **Affected repositories:** core/web/app; service for internal credential policy.
+- **Hard prerequisites:** Mail/link config and explicit expiry/refresh/step-up policy.
+- **Sequencing / related packages:** Early link/re-auth; optional device/MFA later.
+- **Product decision:** Session duration, server MFA, selective revoke, username policy and PIN storage/resume.
+- **Expected outcome:** Customers can verify/recover credentials and reauthenticate consistently without stale sessions.
+- **Acceptance criteria / evidence required:** Real web/native credential lifecycle and revoked/expired token handling; local PIN not MFA.
+- **Priority / complexity:** A/B; Medium; MFA scope uncertain.
+- **Exclusions:** No new authentication architecture or default refresh enablement.
+
+##### PLAN-004 — KYC correction and resumable applicant lifecycle
+
+- **Objective:** Enable an applicant to resolve NEEDS_MORE_INFO within the existing case lifecycle.
+- **Actor:** Customer/Admin.
+- **Current implementation:** RFI decision exists; active submit returns existing case; no correction endpoint/UI.
+- **Relevant existing records:** [KYC-001](#kyc-001-authenticated-kyc-entry-and-eligibility-discovery), [KYC-002](#kyc-002-four-document-upload-and-spring-file-persistence), [KYC-003](#kyc-003-consent-based-case-submission-and-duplicate-handling), [KYC-005](#kyc-005-customer-kyc-status-and-check-visibility), [KYC-006](#kyc-006-admin-kyc-decision-affecting-customer-status), [KYC-007](#kyc-007-rejected-case-new-verification-application), [KYC-008](#kyc-008-needs-more-information-correction-and-resubmission), [KYC-009](#kyc-009-protected-kyc-document-retrieval-and-admin-preview), [KYC-010](#kyc-010-scheduled-kyc-image-retention-cleanup), [KYC-011](#kyc-011-post-approval-banking-customer-self-registrationupsert), [KYC-012](#kyc-012-approved-kyc-and-customer-gate-for-self-service-account-opening), [KYC-013](#kyc-013-android-multi-step-document-capture-and-kyc-submission), [KYC-014](#kyc-014-android-kyc-polling-and-approved-customer-registration), [ADMIN-KYC-004](#admin-kyc-004-selected-case-details-and-applicant-context), [ADMIN-KYC-005](#admin-kyc-005-protected-submitted-document-inspection), [ADMIN-KYC-006](#admin-kyc-006-recorded-automated-verification-check-presentation), [ADMIN-KYC-007](#admin-kyc-007-manual-case-approval), [ADMIN-KYC-008](#admin-kyc-008-manual-case-rejection), [ADMIN-KYC-009](#admin-kyc-009-additional-information-request-and-resolution), [ADMIN-KYC-010](#admin-kyc-010-decision-authorization-transition-and-concurrency-enforcement), [ADMIN-KYC-011](#admin-kyc-011-decision-confirmation-and-uncertain-response-recovery), [ADMIN-KYC-012](#admin-kyc-012-historical-case-review-and-decision-metadata), [DASH-003](#dash-003-web-dashboard-onboarding-and-kyc-next-step-prompts), [DASH-016](#dash-016-android-my-accounts-onboarding-guidance).
+- **Existing functionality to reuse:** KycCase state/version, owned uploads/consent, assessment, case/check reads, Admin review and Customer upsert.
+- **Remaining work:** Define structured request and permitted replacement documents, same-case owned correction/consent/version/idempotency, return to review/reassessment, direct case readback, history and draft recovery. Align limits/orphan retention; rejected restart and supersession guidance.
+- **Affected repositories:** core/web/app; service if reassessment contract changes.
+- **Hard prerequisites:** Approved correction/retention transition policy; authoritative correction contract before UI.
+- **Sequencing / related packages:** Web first; native after contract; PLAN-005 context parallel.
+- **Product decision:** Reason/checklist, correction/reassessment and supersession policy.
+- **Expected outcome:** Applicant resolves requested correction and reviewer decides the updated case.
+- **Acceptance criteria / evidence required:** Actual RFI→replacement→review→decision→Customer gate; invalid owner/state and duplicate/conflict/lost response controlled.
+- **Priority / complexity:** A; Medium–high.
+- **Exclusions:** No automatic Customer/Account creation or change of automatic decision thresholds.
+
+##### PLAN-005 — KYC assurance and reviewer context
+
+- **Objective:** Improve reviewer context and establish the assurance of selected verification processing.
+- **Actor:** Reviewer and ML developer.
+- **Current implementation:** Heuristic aggregate; optional artifacts absent; check display, debug/calibration; accuracy unverified.
+- **Relevant existing records:** [AUTH-015](#auth-015--springtofastapi-internal-service-authentication), [KYC-004](#kyc-004-automated-fastapi-assessment-and-spring-decision-mapping), [KYC-009](#kyc-009-protected-kyc-document-retrieval-and-admin-preview), [KYC-010](#kyc-010-scheduled-kyc-image-retention-cleanup), [KYC-013](#kyc-013-android-multi-step-document-capture-and-kyc-submission), [KYC-015](#kyc-015-standalone-fastapi-identity-check-endpoints), [ADMIN-KYC-002](#admin-kyc-002-status-based-kyc-case-queues), [ADMIN-KYC-003](#admin-kyc-003-status-filtering-and-server-side-pagination), [ADMIN-KYC-004](#admin-kyc-004-selected-case-details-and-applicant-context), [ADMIN-KYC-005](#admin-kyc-005-protected-submitted-document-inspection), [ADMIN-KYC-006](#admin-kyc-006-recorded-automated-verification-check-presentation), [ADMIN-KYC-007](#admin-kyc-007-manual-case-approval), [ADMIN-KYC-008](#admin-kyc-008-manual-case-rejection), [ADMIN-KYC-009](#admin-kyc-009-additional-information-request-and-resolution), [ADMIN-KYC-010](#admin-kyc-010-decision-authorization-transition-and-concurrency-enforcement), [ADMIN-KYC-011](#admin-kyc-011-decision-confirmation-and-uncertain-response-recovery), [ADMIN-KYC-012](#admin-kyc-012-historical-case-review-and-decision-metadata), [PLATFORM-015](#platform-015--separate-verification-debug-application), [PLATFORM-016](#platform-016--optional-verification-calibration-telemetry-and-offline-tooling).
+- **Existing functionality to reuse:** Aggregate/factory/internal auth, stored checks, protected docs, queue, debug/calibration.
+- **Remaining work:** Minimal authorized applicant/case detail, stable bounded queue filters, reviewer attribution and unavailable/expired states; replace or label local capture scores. Verify permitted fixture/model provenance and actual accuracy separately; decide address/validity policy.
+- **Affected repositories:** core/service/web/app.
+- **Hard prerequisites:** Approved test data, chosen artifacts and policy before changing approval logic.
+- **Sequencing / related packages:** Parallel with PLAN-004; policy separately approved.
+- **Product decision:** Auto-decision inputs, accuracy/evidence requirements, reviewer assignment and retention.
+- **Expected outcome:** Reviewer sees authorized applicant and assessment context with clearly bounded evidence.
+- **Acceptance criteria / evidence required:** Controlled aggregate/failure tests, correct check display/ownership, actual evaluation evidence for accuracy.
+- **Priority / complexity:** B (A if automated assurance required); High model/policy uncertainty.
+- **Exclusions:** No biometric or compliance claim, no public debug exposure.
+
+##### PLAN-006 — Customer profile and onboarding presentation
+
+- **Objective:** Present authoritative User, Customer and Account facts without conflating their ownership.
+- **Actor:** Customer.
+- **Current implementation:** Web profile separate from onboarding Customer editor; native broader User edit; status and field ownership gaps.
+- **Relevant existing records:** [DASH-001](#dash-001-web-protected-customer-dashboard-and-entry), [DASH-002](#dash-002-web-owned-account-cards-and-displayed-balance), [DASH-003](#dash-003-web-dashboard-onboarding-and-kyc-next-step-prompts), [DASH-004](#dash-004-web-customer-menu-and-banking-destination-shortcuts), [DASH-005](#dash-005-web-user-identity-and-profile-presentation), [DASH-006](#dash-006-banking-customer-details-maintenance-accessible-from-onboarding), [DASH-007](#dash-007-backend-user-contact-edit-api-not-exposed-in-web-profile), [DASH-008](#dash-008-android-home-real-single-account-balance), [DASH-009](#dash-009-android-recent-transaction-home-widget), [DASH-010](#dash-010-android-home-quick-action-and-notification-controls), [DASH-011](#dash-011-android-sidebar-and-destination-navigation), [DASH-012](#dash-012-android-user-profile-reading-and-field-display), [DASH-013](#dash-013-android-inline-user-contact-edits), [DASH-014](#dash-014-android-my-accounts-owner-scoped-list-and-refresh), [DASH-015](#dash-015-android-device-local-default-account-choice), [DASH-016](#dash-016-android-my-accounts-onboarding-guidance), [AUTH-010](#auth-010--currentuser-identity-and-profile-read), [AUTH-014](#auth-014--account-username-change-with-android-relogin), [KYC-011](#kyc-011-post-approval-banking-customer-self-registrationupsert), [ACC-009](#acc-009-owner-scoped-account-list-and-account-uuid-detail-retrieval).
+- **Existing functionality to reuse:** users/me, customers/me, latest case and owned accounts.
+- **Remaining work:** Define User vs Customer ownership and permitted verified contact synchronization; display both accurately, pending email and reread, clear status/retry, selected Account/currency and optional totals. Native activity PLAN-017.
+- **Affected repositories:** core/web/app.
+- **Hard prerequisites:** Field ownership and state semantics; credential changes PLAN-003.
+- **Sequencing / related packages:** Alongside correction/identity work.
+- **Product decision:** Profile breadth, synchronization, totals/settings.
+- **Expected outcome:** Customer understands eligibility and sees accurate authoritative profile and Account state.
+- **Acceptance criteria / evidence required:** Accurate approved/unapproved/no-Customer and failure/empty states; persisted owner fields reread, no misleading success.
+- **Priority / complexity:** B; Medium.
+- **Exclusions:** No invented unified identity or verified-field auto-promotion.
+
+##### PLAN-007 — Account opening exactness and durable recovery
+
+- **Objective:** Recover a committed logical Account opening without opening another Account.
+- **Actor:** Customer/Teller.
+- **Current implementation:** Self opening durable optional key and funding; Teller/native no equivalent recovery, native Double.
+- **Relevant existing records:** [ACC-001](#acc-001-account-types-and-minimum-deposit-product-rules), [ACC-002](#acc-002-persisted-branch-directory-and-account-opening-branch-selection), [ACC-003](#acc-003-core-enforced-self-service-account-opening-eligibility), [ACC-004](#acc-004-web-customer-self-service-account-opening-and-confirmation), [ACC-005](#acc-005-durable-idempotent-self-service-opening-and-uncertain-response-recovery), [ACC-006](#acc-006-account-identifiers-ownership-and-atomic-account-persistence), [ACC-007](#acc-007-opening-funding-and-liability-ledger-integration), [ACC-008](#acc-008-teller-assisted-opening-with-linked-customer-user), [ACC-009](#acc-009-owner-scoped-account-list-and-account-uuid-detail-retrieval), [ACC-010](#acc-010-authorized-staff-account-directory-and-detail-access), [ACC-011](#acc-011-staff-account-type-and-branch-maintenance), [ACC-012](#acc-012-staff-only-zero-balance-account-closure-with-posting-compatible-lock), [ACC-013](#acc-013-backend-only-accountstatus-change-and-freezereactivation-service), [ACC-014](#acc-014-closed-account-retention-and-owner-history-visibility), [ACC-015](#acc-015-android-native-account-opening-and-mobile-completeness-gap), [STAFF-ACC-004](#staff-acc-004-teller-beneficiary-selection-and-user-uuid-targeting-within-opening-form), [STAFF-ACC-005](#staff-acc-005-teller-assisted-opening-product-and-branch-rules-and-atomic-initial-funding), [STAFF-ACC-006](#staff-acc-006-staff-account-opening-receipt-read-back-and-history-navigation), [STAFF-ACC-007](#staff-acc-007-teller-opening-uncertain-outcome-protection-without-durable-reconciliation), [DASH-014](#dash-014-android-my-accounts-owner-scoped-list-and-refresh), [KYC-012](#kyc-012-approved-kyc-and-customer-gate-for-self-service-account-opening).
+- **Existing functionality to reuse:** AccountService, product/branch rules, opening claim/receipt, posting/retry and reads.
+- **Remaining work:** Exact monetary DTO/key for logical opening; durable pending identity, authorized Teller result lookup/replay and customer reload recovery; explicit assisted eligibility, branch/currency/owner-safe receipt, concurrent number collision and confirmation policy.
+- **Affected repositories:** core/web/app.
+- **Hard prerequisites:** Assisted eligibility and funding provenance policy; Core operation identity/read contract.
+- **Sequencing / related packages:** Before native/Teller safe retry; coordinate PLAN-009.
+- **Product decision:** Assisted KYC/status, account limits, confirmation/custody.
+- **Expected outcome:** One Account per logical opening and an identifiable recoverable committed result.
+- **Acceptance criteria / evidence required:** Minima and decimals, wrong owner/branch, same-key replay/conflict/lost response, correct journal counts; real DB/web/native.
+- **Priority / complexity:** A; Medium–high.
+- **Exclusions:** No product maturity or external funding claim.
+
+##### PLAN-008 — Customer and Account status transitions
+
+- **Objective:** Expose only policy-authorized Customer and Account transitions, preserving closure invariants.
+- **Actor:** Authorized staff; Customer read.
+- **Current implementation:** Customer PUT status accepted but not editable; internal Account status setter; zero-balance closure real.
+- **Relevant existing records:** [ACC-003](#acc-003-core-enforced-self-service-account-opening-eligibility), [ACC-011](#acc-011-staff-account-type-and-branch-maintenance), [ACC-012](#acc-012-staff-only-zero-balance-account-closure-with-posting-compatible-lock), [ACC-013](#acc-013-backend-only-accountstatus-change-and-freezereactivation-service), [ACC-014](#acc-014-closed-account-retention-and-owner-history-visibility), [STAFF-CUST-008](#staff-cust-008-staff-editing-of-banking-customer-personal-details), [STAFF-CUST-009](#staff-cust-009-existing-customer-status-change-via-staff-api-without-connected-ui), [STAFF-ACC-008](#staff-acc-008-staff-account-type-and-branch-metadata-review-change-and-limited-verification), [STAFF-ACC-009](#staff-acc-009-staff-account-status-visibility-with-backend-only-freezereactivate-boundary), [STAFF-ACC-010](#staff-acc-010-staff-confirmation-based-zero-balance-account-closure-and-retention), [STAFF-ACC-011](#staff-acc-011-closure-timeout-stale-state-and-read-back-recovery-without-duplicate-delete), [TXN-003](#txn-003-customer-transaction-authorization-ownership-and-financial-eligibility), [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture).
+- **Existing functionality to reuse:** CustomerService, locked AccountService closure/status and ACTIVE posting gate.
+- **Remaining work:** Decide independent state effects and valid transitions, guarded freeze/reactivate and read contract, separate metadata DTO/branch readback, version/reason; retain closed history; optional closure request and settlement scope.
+- **Affected repositories:** core/web; app read if needed.
+- **Hard prerequisites:** Explicit transition/role and ledger status policy.
+- **Sequencing / related packages:** Policy before writes; independent of reversal inquiry.
+- **Product decision:** Who may freeze/reactivate, closed finality, Customer/KYC effect on existing money.
+- **Expected outcome:** Authorized staff performs allowed status changes with reliable readback and retained history.
+- **Acceptance criteria / evidence required:** Allowed/invalid transitions, race with posting, retained history and exact zero closure, role rejection.
+- **Priority / complexity:** B/A if required; Medium–high.
+- **Exclusions:** No direct balance edit or closed-finality bypass.
+
+##### PLAN-009 — Durable financial operation and receipt recovery
+
+- **Objective:** Recover unknown financial outcomes without creating another logical operation.
+- **Actor:** Customer; related Teller opening.
+- **Current implementation:** Durable keys, transfer receipt GET; deposit/withdraw GET absent; client key lost on reload.
+- **Relevant existing records:** [TXN-001](#txn-001-customer-web-deposit-and-posted-deposit-receipt), [TXN-002](#txn-002-customer-web-withdrawal-and-no-overdraft-enforcement), [TXN-007](#txn-007-strict-decimal-text-monetary-contract-and-lkr-precision), [TXN-008](#txn-008-persisted-financial-operation-idempotency-and-receipt-replay), [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands), [TXN-010](#txn-010-web-depositwithdraw-uncertain-response-retry-experience), [PAY-001](#pay-001-customer-pay-entry-and-eligible-source-account-selection), [PAY-007](#pay-007-durable-per-payment-idempotency-duplicate-prevention-and-conflict-handling), [PAY-008](#pay-008-authoritative-payment-receipt-creation-privacy-and-confirmation-display), [PAY-009](#pay-009-customer-authorized-read-only-receipt-lookup-by-original-key), [PAY-010](#pay-010-automatic-post-commit-lost-response-recovery-by-receipt-get), [PAY-011](#pay-011-unresolved-pre-commit-receipt-and-manual-check-receipt-flow), [PAY-012](#pay-012-manual-same-key-payment-retry-after-unresolved-outcome), [PAY-013](#pay-013-payment-specific-validation-errors-conflict-and-recovery-messaging), [PAY-014](#pay-014-pay-specific-history-visibility-and-later-receipt-discoverability), [ACC-005](#acc-005-durable-idempotent-self-service-opening-and-uncertain-response-recovery), [STAFF-ACC-007](#staff-acc-007-teller-opening-uncertain-outcome-protection-without-durable-reconciliation).
+- **Existing functionality to reuse:** Existing key/fingerprint/replay and payer-scoped transfer receipt, web recovery.
+- **Remaining work:** Persist scoped minimum operation identity/payload, authorized read-only deposit/withdraw result and past receipt discovery where needed; distinguish unresolved 404, conflict, session expiry; deliberate same-key retry; define retention.
+- **Affected repositories:** core/web/app.
+- **Hard prerequisites:** Existing exact monetary and actor-owned receipt contract; read must never mutate.
+- **Sequencing / related packages:** Before PLAN-016; coordinate PLAN-007 and journal link PLAN-014.
+- **Product decision:** Receipt retention, export, cross-device recovery and confirmations.
+- **Expected outcome:** Customer can recover a committed operation or retain an explicitly unresolved result after reload.
+- **Acceptance criteria / evidence required:** Postcommit loss recovered by GET; absent remains unresolved; explicit same-key retry; no other-user receipt, exactly one journal.
+- **Priority / complexity:** A; Medium–high.
+- **Exclusions:** No new-key automatic retry or 404-as-failure.
+
+##### PLAN-010 — Recipient discovery, history and statements
+
+- **Objective:** Improve safe destination confirmation and discovery of authorized history and receipts.
+- **Actor:** Customer/authorized staff.
+- **Current implementation:** Raw destination UUID; scoped history/CSV; missing journal identity/filtering.
+- **Relevant existing records:** [PAY-002](#pay-002-destination-identification-by-account-uuid-and-recipient-privacy), [PAY-003](#pay-003-exact-lkr-payment-draft-review-edit-and-explicit-confirmation), [PAY-005](#pay-005-transfer-ownership-account-eligibility-and-insufficient-funds-enforcement), [PAY-008](#pay-008-authoritative-payment-receipt-creation-privacy-and-confirmation-display), [PAY-009](#pay-009-customer-authorized-read-only-receipt-lookup-by-original-key), [PAY-014](#pay-014-pay-specific-history-visibility-and-later-receipt-discoverability), [TXN-011](#txn-011-synchronous-ledger-to-legacy-transaction-history-projection), [TXN-012](#txn-012-customer-account-scoped-transaction-history-and-csv-export), [TXN-013](#txn-013-staff-account-scoped-transaction-history-visibility), [TXN-016](#txn-016-generic-transaction-list-own-list-and-individual-detail-endpoints), [TXN-018](#txn-018-android-real-per-account-transaction-history-distinct-from-home-demo), [ACC-009](#acc-009-owner-scoped-account-list-and-account-uuid-detail-retrieval), [ACC-010](#acc-010-authorized-staff-account-directory-and-detail-access), [STAFF-ACC-012](#staff-acc-012-authorized-staff-account-scoped-transaction-history-and-csv-export).
+- **Existing functionality to reuse:** Account UUID/number, owner gate, transfer review, history query and receipt.
+- **Remaining work:** Privacy-minimal account-number confirmation and optional beneficiaries; scoped search/filter/page, correct signs, receipt linkage; coordinate journal link with PLAN-014; no needless global transaction API.
+- **Affected repositories:** core/web/app.
+- **Hard prerequisites:** Privacy and authorized lookup scope.
+- **Sequencing / related packages:** After recovery semantics; independent scoped read work.
+- **Product decision:** Beneficiaries, statement/export, fee/limit rules.
+- **Expected outcome:** Customer confirms destination and finds authoritative receipts/history within access scope.
+- **Acceptance criteria / evidence required:** Recipient confirmation without balance/identity leakage; accurate signed history and authorized receipt links.
+- **Priority / complexity:** B; Medium.
+- **Exclusions:** No external transfer or unrestricted global inquiry.
+
+##### PLAN-011 — Staff directories, context and linked identity eligibility
+
+- **Objective:** Help staff identify the correct eligible linked records and operational context.
+- **Actor:** Staff within existing roles.
+- **Current implementation:** Global unpaged lists/local search, missing branch/owner fields and target eligibility.
+- **Relevant existing records:** [STAFF-CUST-001](#staff-cust-001-shared-staff-customer-workspace-navigation-and-role-guards), [STAFF-CUST-002](#staff-cust-002-unpaginated-staff-customer-directory-and-operational-states), [STAFF-CUST-003](#staff-cust-003-local-staff-customer-directory-multi-field-search), [STAFF-CUST-004](#staff-cust-004-staff-customer-detail-retrieval-with-distinct-user-and-customer-fields), [STAFF-CUST-005](#staff-cust-005-existing-customer-user-search-and-selection-for-staff-creation), [STAFF-CUST-006](#staff-cust-006-staff-assisted-customer-creation-using-existing-user-link), [STAFF-CUST-007](#staff-cust-007-customer-user-one-to-one-association-and-duplicate-identity-protection), [STAFF-CUST-008](#staff-cust-008-staff-editing-of-banking-customer-personal-details), [STAFF-CUST-009](#staff-cust-009-existing-customer-status-change-via-staff-api-without-connected-ui), [STAFF-CUST-010](#staff-cust-010-teller-handoff-from-customer-record-to-account-opening-context), [STAFF-ACC-001](#staff-acc-001-staff-account-workspace-navigation-and-role-gated-operations), [STAFF-ACC-002](#staff-acc-002-global-staff-account-directory-with-loading-failures-and-closed-account-rows), [STAFF-ACC-003](#staff-acc-003-authorized-staff-account-uuid-detail-lookup-and-operational-context), [STAFF-ACC-004](#staff-acc-004-teller-beneficiary-selection-and-user-uuid-targeting-within-opening-form), [STAFF-ACC-005](#staff-acc-005-teller-assisted-opening-product-and-branch-rules-and-atomic-initial-funding), [STAFF-ACC-006](#staff-acc-006-staff-account-opening-receipt-read-back-and-history-navigation), [STAFF-ACC-008](#staff-acc-008-staff-account-type-and-branch-metadata-review-change-and-limited-verification), [MGR-TELLER-002](#mgr-teller-002-unpaginated-teller-employee-directory-and-local-search), [MGR-TELLER-003](#mgr-teller-003-existing-active-customer-user-candidate-discovery-and-prepopulation), [MGR-TELLER-006](#mgr-teller-006-selected-teller-details-and-employee-versus-user-field-presentation), [ADMIN-ID-002](#admin-id-002--global-user-directory-and-local-search), [ADMIN-ID-003](#admin-id-003--user-details-and-linked-identity-context), [ADMIN-ID-004](#admin-id-004--global-employee-directory-and-inspection), [ACC-002](#acc-002-persisted-branch-directory-and-account-opening-branch-selection), [ACC-006](#acc-006-account-identifiers-ownership-and-atomic-account-persistence), [ACC-010](#acc-010-authorized-staff-account-directory-and-detail-access), [ACC-011](#acc-011-staff-account-type-and-branch-maintenance).
+- **Existing functionality to reuse:** User/Customer/Employee/Account repos, staff routes, Branch reads.
+- **Remaining work:** Page/filter/search, minimally necessary IDs and related-account context, consistent target role/link and duplicate conflict, field ownership; explicit relink/merge policy if chosen.
+- **Affected repositories:** core/web.
+- **Hard prerequisites:** Role/data scope and identifier semantics.
+- **Sequencing / related packages:** Eligibility portions support PLAN-007/012; scale optional.
+- **Product decision:** Branch scope, related data, relink/merge.
+- **Expected outcome:** Staff select the correct eligible User/Customer/Account without identifier confusion.
+- **Acceptance criteria / evidence required:** Correct eligible record selection and duplicate handling, role-appropriate reads and page behavior.
+- **Priority / complexity:** B; Medium–high.
+- **Exclusions:** No physical deletion of financial history or role-model replacement.
+
+##### PLAN-012 — Employment and privileged-role lifecycle
+
+- **Objective:** Make employment and privileged-role transitions explicit and preserve session invalidation.
+- **Actor:** Manager/Admin.
+- **Current implementation:** Assign/edit/remove Teller, Admin role/Employee changes and revoke; restore and target policy incomplete.
+- **Relevant existing records:** [AUTH-008](#auth-008--rolebased-access-and-authorizationstate-revocation), [MGR-TELLER-001](#mgr-teller-001-manager-only-teller-management-workspace-and-role-authorization), [MGR-TELLER-002](#mgr-teller-002-unpaginated-teller-employee-directory-and-local-search), [MGR-TELLER-003](#mgr-teller-003-existing-active-customer-user-candidate-discovery-and-prepopulation), [MGR-TELLER-004](#mgr-teller-004-manager-teller-assignment-from-existing-login-and-transactional-teller-promotion), [MGR-TELLER-005](#mgr-teller-005-user-employee-uuid-linkage-email-uniqueness-and-atomic-conflict-handling), [MGR-TELLER-006](#mgr-teller-006-selected-teller-details-and-employee-versus-user-field-presentation), [MGR-TELLER-007](#mgr-teller-007-manager-teller-profile-editing-with-forced-active-state-synchronization), [MGR-TELLER-008](#mgr-teller-008-inactive-teller-activation-and-conditional-reattachment-after-removal), [MGR-TELLER-009](#mgr-teller-009-confirmed-teller-removal-customer-demotion-and-retained-former-employee), [MGR-TELLER-010](#mgr-teller-010-role-and-employee-eligibility-enforcement-with-persisted-session-revocation), [MGR-TELLER-011](#mgr-teller-011-read-only-reconciliation-after-ambiguous-manager-teller-mutations), [ADMIN-ID-001](#admin-id-001--protected-admin-identity-workspace), [ADMIN-ID-002](#admin-id-002--global-user-directory-and-local-search), [ADMIN-ID-003](#admin-id-003--user-details-and-linked-identity-context), [ADMIN-ID-004](#admin-id-004--global-employee-directory-and-inspection), [ADMIN-ID-005](#admin-id-005--general-role-assignment-and-replacement), [ADMIN-ID-006](#admin-id-006--employee-creation-reuse-and-user-association), [ADMIN-ID-007](#admin-id-007--employee-profile-and-employment-status-updates), [ADMIN-ID-008](#admin-id-008--customer-role-demotion-and-employee-detachment), [ADMIN-ID-009](#admin-id-009--administrative-session-revocation), [ADMIN-ID-010](#admin-id-010--role-change-confirmation-and-recovery), [STAFF-CUST-007](#staff-cust-007-customer-user-one-to-one-association-and-duplicate-identity-protection).
+- **Existing functionality to reuse:** Transactional role and Employee association/revocation services.
+- **Remaining work:** Separate profile/status/role actions, validate targets/self/last eligible Admin policy, stable Employee UUID/manager/email, explicit detach/restore/rehire; optional provision/activation/invitation.
+- **Affected repositories:** core/web; app reauth.
+- **Hard prerequisites:** Approved privileged-role and employment policy.
+- **Sequencing / related packages:** Before new lifecycle mutations; audit PLAN-013.
+- **Product decision:** Provisioning, activation, self/last-admin and restoration.
+- **Expected outcome:** Intended lifecycle state, retained former Employee and revoked stale authorization.
+- **Acceptance criteria / evidence required:** Valid/invalid transitions, retained former Employee, old token rejected and current role correct on fresh login.
+- **Priority / complexity:** A/B; High policy uncertainty.
+- **Exclusions:** No User deletion or granting Manager-only routes to Admin.
+
+##### PLAN-013 — Administrative receipts, audit and deletion visibility
+
+- **Objective:** Attribute and reconcile selected administrative mutations and explain deletion dependencies.
+- **Actor:** Admin/Manager/staff; restricted operator.
+- **Current implementation:** Readback not causal proof; AuditLog scaffold; FK deletion protection.
+- **Relevant existing records:** [ADMIN-ID-005](#admin-id-005--general-role-assignment-and-replacement), [ADMIN-ID-006](#admin-id-006--employee-creation-reuse-and-user-association), [ADMIN-ID-007](#admin-id-007--employee-profile-and-employment-status-updates), [ADMIN-ID-008](#admin-id-008--customer-role-demotion-and-employee-detachment), [ADMIN-ID-009](#admin-id-009--administrative-session-revocation), [ADMIN-ID-010](#admin-id-010--role-change-confirmation-and-recovery), [ADMIN-ID-011](#admin-id-011--confirmed-admin-customer-deletion), [ADMIN-ID-012](#admin-id-012--customer-deletion-dependency-protection), [ADMIN-ID-013](#admin-id-013--customer-deletion-uncertain-response-recovery), [MGR-TELLER-005](#mgr-teller-005-user-employee-uuid-linkage-email-uniqueness-and-atomic-conflict-handling), [MGR-TELLER-009](#mgr-teller-009-confirmed-teller-removal-customer-demotion-and-retained-former-employee), [MGR-TELLER-010](#mgr-teller-010-role-and-employee-eligibility-enforcement-with-persisted-session-revocation), [MGR-TELLER-011](#mgr-teller-011-read-only-reconciliation-after-ambiguous-manager-teller-mutations), [ADMIN-KYC-010](#admin-kyc-010-decision-authorization-transition-and-concurrency-enforcement), [ADMIN-KYC-011](#admin-kyc-011-decision-confirmation-and-uncertain-response-recovery), [ADMIN-KYC-012](#admin-kyc-012-historical-case-review-and-decision-metadata), [STAFF-CUST-006](#staff-cust-006-staff-assisted-customer-creation-using-existing-user-link), [STAFF-CUST-007](#staff-cust-007-customer-user-one-to-one-association-and-duplicate-identity-protection), [STAFF-CUST-008](#staff-cust-008-staff-editing-of-banking-customer-personal-details), [STAFF-CUST-009](#staff-cust-009-existing-customer-status-change-via-staff-api-without-connected-ui), [STAFF-ACC-007](#staff-acc-007-teller-opening-uncertain-outcome-protection-without-durable-reconciliation), [STAFF-ACC-008](#staff-acc-008-staff-account-type-and-branch-metadata-review-change-and-limited-verification), [STAFF-ACC-009](#staff-acc-009-staff-account-status-visibility-with-backend-only-freezereactivate-boundary), [STAFF-ACC-010](#staff-acc-010-staff-confirmation-based-zero-balance-account-closure-and-retention), [STAFF-ACC-011](#staff-acc-011-closure-timeout-stale-state-and-read-back-recovery-without-duplicate-delete), [PLATFORM-007](#platform-007--system-maintenance-placeholders), [PLATFORM-013](#platform-013--authentication-aware-diagnostic-logging).
+- **Existing functionality to reuse:** Current state readback, existing transactional mutations, revocation and DB constraints.
+- **Remaining work:** Actor/target/reason/version/operation identity and immutable domain event, read-only result, durable unresolved UI; dependency preview/counts/errors for deletion, preserve FKs. Deliver selected mutations rather than generic audit rewrite.
+- **Affected repositories:** core/web.
+- **Hard prerequisites:** Approved event retention and mutation semantics.
+- **Sequencing / related packages:** Coordinate PLAN-004/012; slices by impact, not all features prerequisite.
+- **Product decision:** Audit retention, approval and operation receipt scope.
+- **Expected outcome:** Authorized operator can establish mutation outcome and attribution and understand deletion blockers.
+- **Acceptance criteria / evidence required:** Lost response and conflicts attributable; closed zero Account still blocks deletion; User retained.
+- **Priority / complexity:** A/B; High cross-domain uncertainty.
+- **Exclusions:** No FK bypass, arbitrary audit rewriting or direct repair.
+
+##### PLAN-014 — Administrative journal inquiry and reversal completion
+
+- **Objective:** Connect existing compensating-journal capability to a deliberate Admin correction workflow.
+- **Actor:** Admin.
+- **Current implementation:** ADMIN POST by original UUID/reason, natural replay, web helper; no journal lookup or read-only result.
+- **Relevant existing records:** [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture), [TXN-005](#txn-005-balanced-immutable-journal-and-posting-engine), [TXN-006](#txn-006-atomic-balance-updates-locked-posting-and-overdraft-prevention), [TXN-011](#txn-011-synchronous-ledger-to-legacy-transaction-history-projection), [TXN-012](#txn-012-customer-account-scoped-transaction-history-and-csv-export), [TXN-013](#txn-013-staff-account-scoped-transaction-history-visibility), [TXN-014](#txn-014-read-only-stored-vs-ledger-balance-reconciliation-service), [TXN-015](#txn-015-admin-only-journal-reversal-and-compensating-postings-api), [TXN-016](#txn-016-generic-transaction-list-own-list-and-individual-detail-endpoints), [ADMIN-FIN-001](#admin-fin-001--administrative-financial-investigation-and-correction-history-context), [ADMIN-FIN-002](#admin-fin-002--administrative-reversal-preparation-and-web-request-integration), [STAFF-ACC-012](#staff-acc-012-authorized-staff-account-scoped-transaction-history-and-csv-export), [PAY-009](#pay-009-customer-authorized-read-only-receipt-lookup-by-original-key), [PAY-014](#pay-014-pay-specific-history-visibility-and-later-receipt-discoverability).
+- **Existing functionality to reuse:** PostingEngine, ReversalWorkflow, journal/posting repos, projection, existing BFF/helper.
+- **Remaining work:** Authorized journal list/search/detail and permitted history-to-journal/original-reversal links; read-only reversal result by original identity, align response; explicit reason/review/confirm UI, pending recovery and corrected history.
+- **Affected repositories:** core/web.
+- **Hard prerequisites:** Approved inquiry/correction policy; journal and result contracts before UI.
+- **Sequencing / related packages:** Inquiry→result GET→confirmed write→history/acceptance; PLAN-015 independent.
+- **Product decision:** Admin visibility, correction approval/reason, receipt retention.
+- **Expected outcome:** Admin can inspect original journal, deliberately correct once and recover result read-only.
+- **Acceptance criteria / evidence required:** Original retained, balanced opposite postings, natural replay, no negative balance; GET outcome/absence no mutation; actual DB/browser acceptance.
+- **Priority / complexity:** A; Medium–high, engine exists.
+- **Exclusions:** No engine replacement, direct repair, repeat POST as status probe or provider settlement.
+
+##### PLAN-015 — Restricted read-only ledger reconciliation
+
+- **Objective:** Make stored-versus-derived discrepancies observable without mutating financial state.
+- **Actor:** Restricted operator/explicit Admin.
+- **Current implementation:** Internal reconcileAll/reconcileAccount result/log; no endpoint/job/repair.
+- **Relevant existing records:** [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture), [TXN-005](#txn-005-balanced-immutable-journal-and-posting-engine), [TXN-006](#txn-006-atomic-balance-updates-locked-posting-and-overdraft-prevention), [TXN-014](#txn-014-read-only-stored-vs-ledger-balance-reconciliation-service), [TXN-019](#txn-019-ledger-migration-balance-cutover-and-legacy-history-compatibility), [ACC-012](#acc-012-staff-only-zero-balance-account-closure-with-posting-compatible-lock), [PLATFORM-014](#platform-014--process-health-and-readiness-boundary).
+- **Existing functionality to reuse:** LedgerReconciliationServiceImpl and derived balance query.
+- **Remaining work:** Define restricted consumer, consistency/snapshot semantics, report/run metadata/cadence and discrepancy escalation; approved reversal only when appropriate.
+- **Affected repositories:** core; web if chosen.
+- **Hard prerequisites:** Authorized scope and consistency policy.
+- **Sequencing / related packages:** Parallel PLAN-014; not prerequisite to journal inquiry.
+- **Product decision:** Cadence, audience, incident retention/correction process.
+- **Expected outcome:** Restricted operator sees accurate discrepancy evidence without any balance repair.
+- **Acceptance criteria / evidence required:** Matching/drift fixtures produce accurate stored/derived/difference with zero writes and allowed actor.
+- **Priority / complexity:** A/B; Medium.
+- **Exclusions:** No automatic balance repair.
+
+##### PLAN-016 — Native authoritative financial commands
+
+- **Objective:** Replace approved native financial previews with authoritative Core posting and recovery.
+- **Actor:** Android Customer.
+- **Current implementation:** Real account/history, no posting Retrofit client; preview screens.
+- **Relevant existing records:** [AUTH-011](#auth-011--android-encrypted-bearertoken-persistence-and-session-restoration), [TXN-001](#txn-001-customer-web-deposit-and-posted-deposit-receipt), [TXN-002](#txn-002-customer-web-withdrawal-and-no-overdraft-enforcement), [TXN-003](#txn-003-customer-transaction-authorization-ownership-and-financial-eligibility), [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture), [TXN-005](#txn-005-balanced-immutable-journal-and-posting-engine), [TXN-006](#txn-006-atomic-balance-updates-locked-posting-and-overdraft-prevention), [TXN-007](#txn-007-strict-decimal-text-monetary-contract-and-lkr-precision), [TXN-008](#txn-008-persisted-financial-operation-idempotency-and-receipt-replay), [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands), [TXN-010](#txn-010-web-depositwithdraw-uncertain-response-retry-experience), [TXN-017](#txn-017-android-deposit-and-withdrawal-payment-preview-screens), [TXN-018](#txn-018-android-real-per-account-transaction-history-distinct-from-home-demo), [PAY-001](#pay-001-customer-pay-entry-and-eligible-source-account-selection), [PAY-002](#pay-002-destination-identification-by-account-uuid-and-recipient-privacy), [PAY-003](#pay-003-exact-lkr-payment-draft-review-edit-and-explicit-confirmation), [PAY-004](#pay-004-authenticated-internal-pay-post-through-nextjs-bff-into-core-transfer), [PAY-005](#pay-005-transfer-ownership-account-eligibility-and-insufficient-funds-enforcement), [PAY-006](#pay-006-atomic-two-account-double-entry-settlement-and-history-effects), [PAY-007](#pay-007-durable-per-payment-idempotency-duplicate-prevention-and-conflict-handling), [PAY-008](#pay-008-authoritative-payment-receipt-creation-privacy-and-confirmation-display), [PAY-009](#pay-009-customer-authorized-read-only-receipt-lookup-by-original-key), [PAY-010](#pay-010-automatic-post-commit-lost-response-recovery-by-receipt-get), [PAY-011](#pay-011-unresolved-pre-commit-receipt-and-manual-check-receipt-flow), [PAY-012](#pay-012-manual-same-key-payment-retry-after-unresolved-outcome), [PAY-013](#pay-013-payment-specific-validation-errors-conflict-and-recovery-messaging), [PAY-014](#pay-014-pay-specific-history-visibility-and-later-receipt-discoverability), [PAY-015](#pay-015-android-transferpayments-preview-without-core-posting), [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy), [DASH-010](#dash-010-android-home-quick-action-and-notification-controls).
+- **Existing functionality to reuse:** Core deposit/withdraw/transfer, exact decimal/key, transfer GET, native networking and web recovery.
+- **Remaining work:** Exact DTOs, durable scoped logical operation identity, review and actual protected posting, authoritative receipt, pending/restart recovery and balance/history refresh. Deposit/withdraw result GET PLAN-009.
+- **Affected repositories:** app/core; web reference.
+- **Hard prerequisites:** Approved parity, exact amount and recovery contracts, usable Core endpoint.
+- **Sequencing / related packages:** After PLAN-009; Internal Pay first using existing GET; other commands after chosen receipt contract.
+- **Product decision:** Native parity, selected commands and confirmation UX.
+- **Expected outcome:** Native Customer sees an authoritative posted receipt and accurate balances/history.
+- **Acceptance criteria / evidence required:** Real device/Core/DB exact LKR, ownership/funds, lost response/restart same-key recovery, one journal.
+- **Priority / complexity:** B/A if primary native; High.
+- **Exclusions:** No external funding/payout, Wallet or staff expansion.
+
+##### PLAN-017 — Native dashboard and accurate local state
+
+- **Objective:** Ensure native financial and KYC presentation reflects real data or honest preview labels.
+- **Actor:** Android Customer.
+- **Current implementation:** Real single-account balance, fictional recent activity, inert controls, Double display, local preference.
+- **Relevant existing records:** [DASH-008](#dash-008-android-home-real-single-account-balance), [DASH-009](#dash-009-android-recent-transaction-home-widget), [DASH-010](#dash-010-android-home-quick-action-and-notification-controls), [DASH-011](#dash-011-android-sidebar-and-destination-navigation), [DASH-012](#dash-012-android-user-profile-reading-and-field-display), [DASH-013](#dash-013-android-inline-user-contact-edits), [DASH-014](#dash-014-android-my-accounts-owner-scoped-list-and-refresh), [DASH-015](#dash-015-android-device-local-default-account-choice), [DASH-016](#dash-016-android-my-accounts-onboarding-guidance), [TXN-018](#txn-018-android-real-per-account-transaction-history-distinct-from-home-demo), [ACC-015](#acc-015-android-native-account-opening-and-mobile-completeness-gap), [KYC-013](#kyc-013-android-multi-step-document-capture-and-kyc-submission), [KYC-014](#kyc-014-android-kyc-polling-and-approved-customer-registration), [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy), [ANDROID-002](#android-002--native-app-private-data-backup-and-device-transfer-exclusion), [PAY-015](#pay-015-android-transferpayments-preview-without-core-posting).
+- **Existing functionality to reuse:** Owned Account/history/profile/KYC and app policy.
+- **Remaining work:** LKR/exact signed values, account label, loading/error/empty, real scoped activity or remove fixture, user-scoped preferences if desired, safe shortcuts and capture states with PLAN-004/005. Keep preview labels.
+- **Affected repositories:** app/core.
+- **Hard prerequisites:** Authoritative reads and scope.
+- **Sequencing / related packages:** Can precede native posting.
+- **Product decision:** Recent activity/default-account policy and notification scope.
+- **Expected outcome:** Native dashboard cannot present fictional activity or unknown data as actual money.
+- **Acceptance criteria / evidence required:** Real owned history/precision/error/user-switch, no false success for demos.
+- **Priority / complexity:** B; Medium.
+- **Exclusions:** No fake history treated as actual transactions.
+
+##### PLAN-018 — Optional staff cash desk and branch lifecycle
+
+- **Objective:** Define approved staff cash and branch operations rather than assume them from opening funding.
+- **Actor:** Teller/Manager/Admin by policy.
+- **Current implementation:** Assisted opening, branch read; no staff cash desk or branch-scope authority; branch writes stubs.
+- **Relevant existing records:** [STAFF-CUST-001](#staff-cust-001-shared-staff-customer-workspace-navigation-and-role-guards), [STAFF-ACC-001](#staff-acc-001-staff-account-workspace-navigation-and-role-gated-operations), [STAFF-ACC-004](#staff-acc-004-teller-beneficiary-selection-and-user-uuid-targeting-within-opening-form), [STAFF-ACC-005](#staff-acc-005-teller-assisted-opening-product-and-branch-rules-and-atomic-initial-funding), [MGR-TELLER-001](#mgr-teller-001-manager-only-teller-management-workspace-and-role-authorization), [ACC-002](#acc-002-persisted-branch-directory-and-account-opening-branch-selection), [ACC-007](#acc-007-opening-funding-and-liability-ledger-integration), [ACC-008](#acc-008-teller-assisted-opening-with-linked-customer-user), [TXN-001](#txn-001-customer-web-deposit-and-posted-deposit-receipt), [TXN-002](#txn-002-customer-web-withdrawal-and-no-overdraft-enforcement), [TXN-003](#txn-003-customer-transaction-authorization-ownership-and-financial-eligibility), [PLATFORM-001](#platform-001--branch-mutation-placeholders).
+- **Existing functionality to reuse:** Existing branch/account/customer data and posting invariants.
+- **Remaining work:** Define branch lifecycle, staff actor/beneficiary permissions, cash custody and actual collection/disbursement proof, then explicit commands, recovery and branch writes if needed.
+- **Affected repositories:** core/web; app only if selected.
+- **Hard prerequisites:** Approved cash/branch scope before any financial mutation; recovery/audit contracts.
+- **Sequencing / related packages:** C/optional after relevant lifecycle; branch maintenance separate.
+- **Product decision:** Cash desk required? branch access and maintenance?.
+- **Expected outcome:** If selected, staff can execute authorized cash/branch workflow with explicit custody boundary.
+- **Acceptance criteria / evidence required:** Role/branch/beneficiary, exactly-once journal/receipt and separate cash evidence if claimed.
+- **Priority / complexity:** Optional/C; High policy uncertainty.
+- **Exclusions:** No infer external cash from system vault; no automatic staff mobile.
+
+##### PLAN-019 — Wallet variant and saved-card metadata lifecycle
+
+- **Objective:** Make simulated Wallet behavior explicit and improve the approved metadata lifecycle.
+- **Actor:** Customer/developer.
+- **Current implementation:** Debug real, nondebug fake; metadata list/default/delete; disabled creation; QR preview and local billers.
+- **Relevant existing records:** [EXT-PAY-001](#ext-pay-001--payhere-wallet-payment-initiation-and-hosted-checkout), [EXT-PAY-002](#ext-pay-002--payhere-notification-and-external-payment-lifecycle-metadata), [EXT-PAY-003](#ext-pay-003--wallet-payment-status-retrieval-and-initiation-replay), [EXT-PAY-004](#ext-pay-004--payhere-saved-card-enrollment-and-preapproval-callback), [EXT-PAY-005](#ext-pay-005--wallet-saved-card-directory-and-local-metadata-management), [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy), [DASH-010](#dash-010-android-home-quick-action-and-notification-controls).
+- **Existing functionality to reuse:** WalletService, owner metadata, Retrofit DI, conditional enrollment.
+- **Remaining work:** Label/isolate fake runtime, correct non-2xx/default handling, owner status/recovery; QR/biller scope; session lifetime/consumption and token/return alignment only after provider approval.
+- **Affected repositories:** app/core.
+- **Hard prerequisites:** Variant/product policy; provider enrollment gated PLAN-020.
+- **Sequencing / related packages:** Truthful labels early; actual enrollment later.
+- **Product decision:** Demo vs real; QR/reload/bill/saved cards/stored value.
+- **Expected outcome:** No fake Wallet is mistaken for actual external payment; metadata changes reflect real result.
+- **Acceptance criteria / evidence required:** Controlled variants demonstrate honest labels, correct errors and disablement; no unauthorized provider call.
+- **Priority / complexity:** B truthfulness; Deferred enrollment; Medium/high provider uncertainty.
+- **Exclusions:** No stored-value domain implied; no enablement.
+
+##### PLAN-020 — External provider lifecycle and settlement (gated)
+
+- **Objective:** Establish verified provider lifecycle and settlement prerequisites before any activation.
+- **Actor:** Customer/provider/operator.
+- **Current implementation:** Conditional intent/checkout/callback local metadata, false default; no complete verified binding/dedup or settlement.
+- **Relevant existing records:** [EXT-PAY-001](#ext-pay-001--payhere-wallet-payment-initiation-and-hosted-checkout), [EXT-PAY-002](#ext-pay-002--payhere-notification-and-external-payment-lifecycle-metadata), [EXT-PAY-003](#ext-pay-003--wallet-payment-status-retrieval-and-initiation-replay), [EXT-PAY-004](#ext-pay-004--payhere-saved-card-enrollment-and-preapproval-callback), [EXT-PAY-005](#ext-pay-005--wallet-saved-card-directory-and-local-metadata-management), [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture), [TXN-005](#txn-005-balanced-immutable-journal-and-posting-engine), [TXN-006](#txn-006-atomic-balance-updates-locked-posting-and-overdraft-prevention), [TXN-007](#txn-007-strict-decimal-text-monetary-contract-and-lkr-precision), [TXN-008](#txn-008-persisted-financial-operation-idempotency-and-receipt-replay), [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands), [TXN-014](#txn-014-read-only-stored-vs-ledger-balance-reconciliation-service), [TXN-015](#txn-015-admin-only-journal-reversal-and-compensating-postings-api), [PAY-007](#pay-007-durable-per-payment-idempotency-duplicate-prevention-and-conflict-handling).
+- **Existing functionality to reuse:** PayHere gated routes, intent/card metadata, local idempotency and ledger primitives only as approved.
+- **Remaining work:** Select product/provider and authoritative commercial facts, expected amount/currency/destination, callback event identity/transitions, recovery/token lifecycle, settlement/clearing/fulfilment and posting where required, reconciliation/refund/payout if chosen; sandbox acceptance and separate enablement.
+- **Affected repositories:** core/app; web if selected; provider.
+- **Hard prerequisites:** Explicit provider/product/accounting scope and verified lifecycle/reconciliation.
+- **Sequencing / related packages:** Deferred; independent of internal Pay.
+- **Product decision:** Provider/collection/stored-value/merchant/bill/reload/refund/payout/interbank.
+- **Expected outcome:** If approved later, verified provider outcome reconciles to intended commercial and accounting facts.
+- **Acceptance criteria / evidence required:** Controlled sandbox mismatch/duplicate/out-of-order/lost return; verified settlement and correct ledger where required; separate activation decision.
+- **Priority / complexity:** Deferred; High external uncertainty.
+- **Exclusions:** No activation or real external operation; SUCCESS metadata not settlement.
+
+##### PLAN-021 — Operational recovery, retention and backup evidence
+
+- **Objective:** Establish operational recovery and retention evidence for the chosen deployment scope.
+- **Actor:** Restricted operator.
+- **Current implementation:** Migrations/storage/logging/SMTP/retention source; backup/restore literal; no deployment proof.
+- **Relevant existing records:** [PLATFORM-007](#platform-007--system-maintenance-placeholders), [PLATFORM-009](#platform-009--versioned-database-schema-lifecycle-and-baseline-tooling), [PLATFORM-010](#platform-010--startup-role-and-login-bootstrap), [PLATFORM-011](#platform-011--shared-templated-smtp-delivery), [PLATFORM-012](#platform-012--shared-api-error-translation-and-client-propagation), [PLATFORM-013](#platform-013--authentication-aware-diagnostic-logging), [PLATFORM-014](#platform-014--process-health-and-readiness-boundary), [KYC-002](#kyc-002-four-document-upload-and-spring-file-persistence), [KYC-010](#kyc-010-scheduled-kyc-image-retention-cleanup), [TXN-008](#txn-008-persisted-financial-operation-idempotency-and-receipt-replay), [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands), [TXN-019](#txn-019-ledger-migration-balance-cutover-and-legacy-history-compatibility), [ANDROID-002](#android-002--native-app-private-data-backup-and-device-transfer-exclusion), [EXT-PAY-003](#ext-pay-003--wallet-payment-status-retrieval-and-initiation-replay).
+- **Existing functionality to reuse:** Flyway verifier, configs, diagnostics, KYC retention.
+- **Remaining work:** Define DB/file consistency backup/restore drills, orphan/token/key retention, mail observability/optional durable retry, safe operator tools and actual deployment/CI evidence as required.
+- **Affected repositories:** all relevant repos/operator environment.
+- **Hard prerequisites:** Environment, retention/recovery goals, authorized restore target.
+- **Sequencing / related packages:** Baseline planning early, full tooling by selected scope.
+- **Product decision:** Hosting, recovery targets and monitoring.
+- **Expected outcome:** Operator can demonstrate controlled restore and agreed lifecycle/retention handling.
+- **Acceptance criteria / evidence required:** Controlled restore consistency, schema/readiness, mail failure, retention and log privacy evidence.
+- **Priority / complexity:** B/A if deployment; High environment uncertainty.
+- **Exclusions:** No infrastructure change or fake maintenance success.
+
+##### PLAN-022 — Optional banking products and scheduled instructions
+
+- **Objective:** Develop only explicitly approved new banking products with coherent financial lifecycle.
+- **Actor:** Customer/authorized product roles.
+- **Current implementation:** Basic product labels; loans/scheduled literal; card/credit/repayment scaffold; no interest/maturity.
+- **Relevant existing records:** [ACC-001](#acc-001-account-types-and-minimum-deposit-product-rules), [ACC-003](#acc-003-core-enforced-self-service-account-opening-eligibility), [TXN-002](#txn-002-customer-web-withdrawal-and-no-overdraft-enforcement), [TXN-003](#txn-003-customer-transaction-authorization-ownership-and-financial-eligibility), [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture), [TXN-007](#txn-007-strict-decimal-text-monetary-contract-and-lkr-precision), [EXT-PAY-006](#ext-pay-006--deferred-loan-application-and-decision-api-placeholders), [PLATFORM-002](#platform-002--scheduled-transaction-placeholders).
+- **Existing functionality to reuse:** Existing account rules, posting/idempotency and auth primitives.
+- **Remaining work:** For each approved product define lifecycle, terms, eligibility, funding, repayment/maturity/fee/hold calculations and accounting; schedule/cancel/execute safely if selected.
+- **Affected repositories:** core/web/app if selected.
+- **Hard prerequisites:** Explicit product and accounting policy.
+- **Sequencing / related packages:** Optional, independent of existing internal Pay.
+- **Product decision:** Loans/cards/credit/interest/maturity/fees/holds/scheduling.
+- **Expected outcome:** Only approved product has persisted lifecycle and valid accounting effects.
+- **Acceptance criteria / evidence required:** Product-specific authorized persisted lifecycle and balanced idempotent effects, attributable acceptance.
+- **Priority / complexity:** Optional; High new business scope.
+- **Exclusions:** No product inferred from schema or type label.
+
+##### PLAN-023 — Optional reporting, engagement, support and analytics
+
+- **Objective:** Develop only selected meaningful engagement, reporting or analytics features.
+- **Actor:** Customer/staff/operator.
+- **Current implementation:** Feedback/chatbot/analytics/report/utility literals; notification/support/device/AI scaffolds.
+- **Relevant existing records:** [DASH-009](#dash-009-android-recent-transaction-home-widget), [DASH-010](#dash-010-android-home-quick-action-and-notification-controls), [KYC-005](#kyc-005-customer-kyc-status-and-check-visibility), [KYC-006](#kyc-006-admin-kyc-decision-affecting-customer-status), [ADMIN-KYC-012](#admin-kyc-012-historical-case-review-and-decision-metadata), [MGR-TELLER-010](#mgr-teller-010-role-and-employee-eligibility-enforcement-with-persisted-session-revocation), [PLATFORM-003](#platform-003--feedback-submission-and-listing-placeholders), [PLATFORM-004](#platform-004--chatbot-placeholder), [PLATFORM-005](#platform-005--fraud-and-spending-analytics-placeholders), [PLATFORM-006](#platform-006--operational-report-placeholders), [PLATFORM-008](#platform-008--role-and-account-type-utility-placeholders), [PLATFORM-016](#platform-016--optional-verification-calibration-telemetry-and-offline-tooling), [TXN-012](#txn-012-customer-account-scoped-transaction-history-and-csv-export), [TXN-013](#txn-013-staff-account-scoped-transaction-history-visibility), [TXN-014](#txn-014-read-only-stored-vs-ledger-balance-reconciliation-service).
+- **Existing functionality to reuse:** Authorized history/data, SMTP and actual reference reads; no existing analytics or notification pipeline.
+- **Remaining work:** Select actual report definitions and role scope; feedback/support/notifications preferences and delivery; chatbot/privacy and fraud/spending evaluation separately; consolidate redundant utility endpoints.
+- **Affected repositories:** core/web/service/app as selected.
+- **Hard prerequisites:** Explicit product/data/evaluation policy.
+- **Sequencing / related packages:** Optional; reconciliation PLAN-015 separate.
+- **Product decision:** Reports, support, chatbot, notifications, fraud/spending, utility APIs.
+- **Expected outcome:** Chosen feature produces actual authorized data or delivery rather than literal/demo success.
+- **Acceptance criteria / evidence required:** Authorized data and correct computation/delivery/error/empty states; evaluation where applicable.
+- **Priority / complexity:** Optional; Variable/high.
+- **Exclusions:** No blanket implementation of all scaffolds.
+
+##### PLAN-024 — Native staff and Admin scope
+
+- **Objective:** Decide and, if approved, connect specific native staff or Admin journeys.
+- **Actor:** Teller/Manager/Admin if selected.
+- **Current implementation:** Native role auth but no complete staff/Admin workspace.
+- **Relevant existing records:** [AUTH-008](#auth-008--rolebased-access-and-authorizationstate-revocation), [DASH-011](#dash-011-android-sidebar-and-destination-navigation), [STAFF-CUST-001](#staff-cust-001-shared-staff-customer-workspace-navigation-and-role-guards), [STAFF-ACC-001](#staff-acc-001-staff-account-workspace-navigation-and-role-gated-operations), [MGR-TELLER-001](#mgr-teller-001-manager-only-teller-management-workspace-and-role-authorization), [ADMIN-KYC-001](#admin-kyc-001-protected-admin-workspace-and-navigation), [ADMIN-ID-001](#admin-id-001--protected-admin-identity-workspace), [ADMIN-FIN-001](#admin-fin-001--administrative-financial-investigation-and-correction-history-context), [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy).
+- **Existing functionality to reuse:** Existing Core role-gated APIs and native networking/navigation.
+- **Remaining work:** If approved, choose limited staff journeys and actual appropriate route/API integration after relevant Core contracts; role-specific navigation, no customer-screen substitution.
+- **Affected repositories:** app/core; web reference.
+- **Hard prerequisites:** Explicit native staff scope and authorized Core contracts.
+- **Sequencing / related packages:** Optional, not prerequisite for native customer posting.
+- **Product decision:** Customer-only vs selected staff/Admin workflows.
+- **Expected outcome:** Supported native roles and selected journeys are deliberate and demonstrable.
+- **Acceptance criteria / evidence required:** Real device role-specific allow/deny and workflow acceptance.
+- **Priority / complexity:** Optional; High scope dependent.
+- **Exclusions:** No assumption from successful staff login.
+
+
+
+##### Candidate traceability index (existing record → planning packages)
+
+This is a planning cross-reference, not a second completeness inventory. Each link opens the preserved original record including its specific future opportunity and unsupported behavior. PLAN-001 baseline acceptance applies to its referenced records in addition to the work packages below. No feature requires implementation merely because it is referenced.
+
+| Existing record | Consolidated planning packages |
+|---|---|
+| [AUTH-001](#auth-001--public-loginidentity-registration-and-username-availability) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-002](#auth-002--registration-email-confirmation-and-resend) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-003](#auth-003--credentials-login-and-eligibility-enforcement) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-004](#auth-004--browser-cookiebacked-session-bootstrap-protected-transport-and-csrf) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-005](#auth-005--logout-and-serversession-termination) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-006](#auth-006--forgottenpassword-email-recovery-and-reset) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-007](#auth-007--authenticated-password-change-and-forced-reauthentication) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-008](#auth-008--rolebased-access-and-authorizationstate-revocation) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [AUTH-009](#auth-009--verified-emailaddress-change) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-010](#auth-010--currentuser-identity-and-profile-read) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [AUTH-011](#auth-011--android-encrypted-bearertoken-persistence-and-session-restoration) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [AUTH-012](#auth-012--android-local-pinbiometric-app-lock) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-013](#auth-013--backendonly-jwtsession-rotation-endpoint) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-014](#auth-014--account-username-change-with-android-relogin) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [AUTH-015](#auth-015--springtofastapi-internal-service-authentication) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [AUTH-016](#auth-016--layered-login-attempt-throttling) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [AUTH-017](#auth-017--backend-credential-recheck-endpoint) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle) |
+| [KYC-001](#kyc-001-authenticated-kyc-entry-and-eligibility-discovery) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle) |
+| [KYC-002](#kyc-002-four-document-upload-and-spring-file-persistence) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [KYC-003](#kyc-003-consent-based-case-submission-and-duplicate-handling) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle) |
+| [KYC-004](#kyc-004-automated-fastapi-assessment-and-spring-decision-mapping) | [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [KYC-005](#kyc-005-customer-kyc-status-and-check-visibility) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [KYC-006](#kyc-006-admin-kyc-decision-affecting-customer-status) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [KYC-007](#kyc-007-rejected-case-new-verification-application) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle) |
+| [KYC-008](#kyc-008-needs-more-information-correction-and-resubmission) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle) |
+| [KYC-009](#kyc-009-protected-kyc-document-retrieval-and-admin-preview) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [KYC-010](#kyc-010-scheduled-kyc-image-retention-cleanup) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [KYC-011](#kyc-011-post-approval-banking-customer-self-registrationupsert) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [KYC-012](#kyc-012-approved-kyc-and-customer-gate-for-self-service-account-opening) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery) |
+| [KYC-013](#kyc-013-android-multi-step-document-capture-and-kyc-submission) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [KYC-014](#kyc-014-android-kyc-polling-and-approved-customer-registration) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [KYC-015](#kyc-015-standalone-fastapi-identity-check-endpoints) | [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [DASH-001](#dash-001-web-protected-customer-dashboard-and-entry) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [DASH-002](#dash-002-web-owned-account-cards-and-displayed-balance) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [DASH-003](#dash-003-web-dashboard-onboarding-and-kyc-next-step-prompts) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [DASH-004](#dash-004-web-customer-menu-and-banking-destination-shortcuts) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [DASH-005](#dash-005-web-user-identity-and-profile-presentation) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [DASH-006](#dash-006-banking-customer-details-maintenance-accessible-from-onboarding) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [DASH-007](#dash-007-backend-user-contact-edit-api-not-exposed-in-web-profile) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation) |
+| [DASH-008](#dash-008-android-home-real-single-account-balance) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [DASH-009](#dash-009-android-recent-transaction-home-widget) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [DASH-010](#dash-010-android-home-quick-action-and-notification-controls) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state), [PLAN-019](#plan-019--wallet-variant-and-saved-card-metadata-lifecycle), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [DASH-011](#dash-011-android-sidebar-and-destination-navigation) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [DASH-012](#dash-012-android-user-profile-reading-and-field-display) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [DASH-013](#dash-013-android-inline-user-contact-edits) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [DASH-014](#dash-014-android-my-accounts-owner-scoped-list-and-refresh) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [DASH-015](#dash-015-android-device-local-default-account-choice) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [DASH-016](#dash-016-android-my-accounts-onboarding-guidance) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [ACC-001](#acc-001-account-types-and-minimum-deposit-product-rules) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [ACC-002](#acc-002-persisted-branch-directory-and-account-opening-branch-selection) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle) |
+| [ACC-003](#acc-003-core-enforced-self-service-account-opening-eligibility) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [ACC-004](#acc-004-web-customer-self-service-account-opening-and-confirmation) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery) |
+| [ACC-005](#acc-005-durable-idempotent-self-service-opening-and-uncertain-response-recovery) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery) |
+| [ACC-006](#acc-006-account-identifiers-ownership-and-atomic-account-persistence) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [ACC-007](#acc-007-opening-funding-and-liability-ledger-integration) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle) |
+| [ACC-008](#acc-008-teller-assisted-opening-with-linked-customer-user) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle) |
+| [ACC-009](#acc-009-owner-scoped-account-list-and-account-uuid-detail-retrieval) | [PLAN-006](#plan-006--customer-profile-and-onboarding-presentation), [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-010](#plan-010--recipient-discovery-history-and-statements) |
+| [ACC-010](#acc-010-authorized-staff-account-directory-and-detail-access) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [ACC-011](#acc-011-staff-account-type-and-branch-maintenance) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [ACC-012](#acc-012-staff-only-zero-balance-account-closure-with-posting-compatible-lock) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-015](#plan-015--restricted-read-only-ledger-reconciliation) |
+| [ACC-013](#acc-013-backend-only-accountstatus-change-and-freezereactivation-service) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-008](#plan-008--customer-and-account-status-transitions) |
+| [ACC-014](#acc-014-closed-account-retention-and-owner-history-visibility) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-008](#plan-008--customer-and-account-status-transitions) |
+| [ACC-015](#acc-015-android-native-account-opening-and-mobile-completeness-gap) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [TXN-001](#txn-001-customer-web-deposit-and-posted-deposit-receipt) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle) |
+| [TXN-002](#txn-002-customer-web-withdrawal-and-no-overdraft-enforcement) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle), [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [TXN-003](#txn-003-customer-transaction-authorization-ownership-and-financial-eligibility) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle), [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [TXN-004](#txn-004-customer-liability-and-system-vault-ledger-account-architecture) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-015](#plan-015--restricted-read-only-ledger-reconciliation), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated), [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [TXN-005](#txn-005-balanced-immutable-journal-and-posting-engine) | [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-015](#plan-015--restricted-read-only-ledger-reconciliation), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [TXN-006](#txn-006-atomic-balance-updates-locked-posting-and-overdraft-prevention) | [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-015](#plan-015--restricted-read-only-ledger-reconciliation), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [TXN-007](#txn-007-strict-decimal-text-monetary-contract-and-lkr-precision) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated), [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [TXN-008](#txn-008-persisted-financial-operation-idempotency-and-receipt-replay) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [TXN-010](#txn-010-web-depositwithdraw-uncertain-response-retry-experience) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [TXN-011](#txn-011-synchronous-ledger-to-legacy-transaction-history-projection) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion) |
+| [TXN-012](#txn-012-customer-account-scoped-transaction-history-and-csv-export) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [TXN-013](#txn-013-staff-account-scoped-transaction-history-visibility) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [TXN-014](#txn-014-read-only-stored-vs-ledger-balance-reconciliation-service) | [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-015](#plan-015--restricted-read-only-ledger-reconciliation), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [TXN-015](#txn-015-admin-only-journal-reversal-and-compensating-postings-api) | [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [TXN-016](#txn-016-generic-transaction-list-own-list-and-individual-detail-endpoints) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion) |
+| [TXN-017](#txn-017-android-deposit-and-withdrawal-payment-preview-screens) | [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [TXN-018](#txn-018-android-real-per-account-transaction-history-distinct-from-home-demo) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [TXN-019](#txn-019-ledger-migration-balance-cutover-and-legacy-history-compatibility) | [PLAN-015](#plan-015--restricted-read-only-ledger-reconciliation), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PAY-001](#pay-001-customer-pay-entry-and-eligible-source-account-selection) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-002](#pay-002-destination-identification-by-account-uuid-and-recipient-privacy) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-003](#pay-003-exact-lkr-payment-draft-review-edit-and-explicit-confirmation) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-004](#pay-004-authenticated-internal-pay-post-through-nextjs-bff-into-core-transfer) | [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-005](#pay-005-transfer-ownership-account-eligibility-and-insufficient-funds-enforcement) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-006](#pay-006-atomic-two-account-double-entry-settlement-and-history-effects) | [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-007](#pay-007-durable-per-payment-idempotency-duplicate-prevention-and-conflict-handling) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [PAY-008](#pay-008-authoritative-payment-receipt-creation-privacy-and-confirmation-display) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-009](#pay-009-customer-authorized-read-only-receipt-lookup-by-original-key) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-010](#pay-010-automatic-post-commit-lost-response-recovery-by-receipt-get) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-011](#pay-011-unresolved-pre-commit-receipt-and-manual-check-receipt-flow) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-012](#pay-012-manual-same-key-payment-retry-after-unresolved-outcome) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-013](#pay-013-payment-specific-validation-errors-conflict-and-recovery-messaging) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-014](#pay-014-pay-specific-history-visibility-and-later-receipt-discoverability) | [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-016](#plan-016--native-authoritative-financial-commands) |
+| [PAY-015](#pay-015-android-transferpayments-preview-without-core-posting) | [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state) |
+| [STAFF-CUST-001](#staff-cust-001-shared-staff-customer-workspace-navigation-and-role-guards) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [STAFF-CUST-002](#staff-cust-002-unpaginated-staff-customer-directory-and-operational-states) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-CUST-003](#staff-cust-003-local-staff-customer-directory-multi-field-search) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-CUST-004](#staff-cust-004-staff-customer-detail-retrieval-with-distinct-user-and-customer-fields) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-CUST-005](#staff-cust-005-existing-customer-user-search-and-selection-for-staff-creation) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-CUST-006](#staff-cust-006-staff-assisted-customer-creation-using-existing-user-link) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-CUST-007](#staff-cust-007-customer-user-one-to-one-association-and-duplicate-identity-protection) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-CUST-008](#staff-cust-008-staff-editing-of-banking-customer-personal-details) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-CUST-009](#staff-cust-009-existing-customer-status-change-via-staff-api-without-connected-ui) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-CUST-010](#staff-cust-010-teller-handoff-from-customer-record-to-account-opening-context) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-ACC-001](#staff-acc-001-staff-account-workspace-navigation-and-role-gated-operations) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [STAFF-ACC-002](#staff-acc-002-global-staff-account-directory-with-loading-failures-and-closed-account-rows) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-ACC-003](#staff-acc-003-authorized-staff-account-uuid-detail-lookup-and-operational-context) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-ACC-004](#staff-acc-004-teller-beneficiary-selection-and-user-uuid-targeting-within-opening-form) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle) |
+| [STAFF-ACC-005](#staff-acc-005-teller-assisted-opening-product-and-branch-rules-and-atomic-initial-funding) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle) |
+| [STAFF-ACC-006](#staff-acc-006-staff-account-opening-receipt-read-back-and-history-navigation) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility) |
+| [STAFF-ACC-007](#staff-acc-007-teller-opening-uncertain-outcome-protection-without-durable-reconciliation) | [PLAN-007](#plan-007--account-opening-exactness-and-durable-recovery), [PLAN-009](#plan-009--durable-financial-operation-and-receipt-recovery), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-ACC-008](#staff-acc-008-staff-account-type-and-branch-metadata-review-change-and-limited-verification) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-ACC-009](#staff-acc-009-staff-account-status-visibility-with-backend-only-freezereactivate-boundary) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-ACC-010](#staff-acc-010-staff-confirmation-based-zero-balance-account-closure-and-retention) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-ACC-011](#staff-acc-011-closure-timeout-stale-state-and-read-back-recovery-without-duplicate-delete) | [PLAN-008](#plan-008--customer-and-account-status-transitions), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [STAFF-ACC-012](#staff-acc-012-authorized-staff-account-scoped-transaction-history-and-csv-export) | [PLAN-010](#plan-010--recipient-discovery-history-and-statements), [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion) |
+| [MGR-TELLER-001](#mgr-teller-001-manager-only-teller-management-workspace-and-role-authorization) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [MGR-TELLER-002](#mgr-teller-002-unpaginated-teller-employee-directory-and-local-search) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [MGR-TELLER-003](#mgr-teller-003-existing-active-customer-user-candidate-discovery-and-prepopulation) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [MGR-TELLER-004](#mgr-teller-004-manager-teller-assignment-from-existing-login-and-transactional-teller-promotion) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [MGR-TELLER-005](#mgr-teller-005-user-employee-uuid-linkage-email-uniqueness-and-atomic-conflict-handling) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [MGR-TELLER-006](#mgr-teller-006-selected-teller-details-and-employee-versus-user-field-presentation) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [MGR-TELLER-007](#mgr-teller-007-manager-teller-profile-editing-with-forced-active-state-synchronization) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [MGR-TELLER-008](#mgr-teller-008-inactive-teller-activation-and-conditional-reattachment-after-removal) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [MGR-TELLER-009](#mgr-teller-009-confirmed-teller-removal-customer-demotion-and-retained-former-employee) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [MGR-TELLER-010](#mgr-teller-010-role-and-employee-eligibility-enforcement-with-persisted-session-revocation) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [MGR-TELLER-011](#mgr-teller-011-read-only-reconciliation-after-ambiguous-manager-teller-mutations) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-KYC-001](#admin-kyc-001-protected-admin-workspace-and-navigation) | [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [ADMIN-KYC-002](#admin-kyc-002-status-based-kyc-case-queues) | [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-003](#admin-kyc-003-status-filtering-and-server-side-pagination) | [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-004](#admin-kyc-004-selected-case-details-and-applicant-context) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-005](#admin-kyc-005-protected-submitted-document-inspection) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-006](#admin-kyc-006-recorded-automated-verification-check-presentation) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-007](#admin-kyc-007-manual-case-approval) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-008](#admin-kyc-008-manual-case-rejection) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-009](#admin-kyc-009-additional-information-request-and-resolution) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [ADMIN-KYC-010](#admin-kyc-010-decision-authorization-transition-and-concurrency-enforcement) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-KYC-011](#admin-kyc-011-decision-confirmation-and-uncertain-response-recovery) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-KYC-012](#admin-kyc-012-historical-case-review-and-decision-metadata) | [PLAN-004](#plan-004--kyc-correction-and-resumable-applicant-lifecycle), [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [ADMIN-ID-001](#admin-id-001--protected-admin-identity-workspace) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [ADMIN-ID-002](#admin-id-002--global-user-directory-and-local-search) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [ADMIN-ID-003](#admin-id-003--user-details-and-linked-identity-context) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [ADMIN-ID-004](#admin-id-004--global-employee-directory-and-inspection) | [PLAN-011](#plan-011--staff-directories-context-and-linked-identity-eligibility), [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle) |
+| [ADMIN-ID-005](#admin-id-005--general-role-assignment-and-replacement) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-006](#admin-id-006--employee-creation-reuse-and-user-association) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-007](#admin-id-007--employee-profile-and-employment-status-updates) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-008](#admin-id-008--customer-role-demotion-and-employee-detachment) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-009](#admin-id-009--administrative-session-revocation) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-010](#admin-id-010--role-change-confirmation-and-recovery) | [PLAN-012](#plan-012--employment-and-privileged-role-lifecycle), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-011](#admin-id-011--confirmed-admin-customer-deletion) | [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-012](#admin-id-012--customer-deletion-dependency-protection) | [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-ID-013](#admin-id-013--customer-deletion-uncertain-response-recovery) | [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility) |
+| [ADMIN-FIN-001](#admin-fin-001--administrative-financial-investigation-and-correction-history-context) | [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [ADMIN-FIN-002](#admin-fin-002--administrative-reversal-preparation-and-web-request-integration) | [PLAN-014](#plan-014--administrative-journal-inquiry-and-reversal-completion) |
+| [EXT-PAY-001](#ext-pay-001--payhere-wallet-payment-initiation-and-hosted-checkout) | [PLAN-019](#plan-019--wallet-variant-and-saved-card-metadata-lifecycle), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [EXT-PAY-002](#ext-pay-002--payhere-notification-and-external-payment-lifecycle-metadata) | [PLAN-019](#plan-019--wallet-variant-and-saved-card-metadata-lifecycle), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [EXT-PAY-003](#ext-pay-003--wallet-payment-status-retrieval-and-initiation-replay) | [PLAN-019](#plan-019--wallet-variant-and-saved-card-metadata-lifecycle), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [EXT-PAY-004](#ext-pay-004--payhere-saved-card-enrollment-and-preapproval-callback) | [PLAN-019](#plan-019--wallet-variant-and-saved-card-metadata-lifecycle), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [EXT-PAY-005](#ext-pay-005--wallet-saved-card-directory-and-local-metadata-management) | [PLAN-019](#plan-019--wallet-variant-and-saved-card-metadata-lifecycle), [PLAN-020](#plan-020--external-provider-lifecycle-and-settlement-gated) |
+| [EXT-PAY-006](#ext-pay-006--deferred-loan-application-and-decision-api-placeholders) | [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-016](#plan-016--native-authoritative-financial-commands), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state), [PLAN-019](#plan-019--wallet-variant-and-saved-card-metadata-lifecycle), [PLAN-024](#plan-024--native-staff-and-admin-scope) |
+| [ANDROID-002](#android-002--native-app-private-data-backup-and-device-transfer-exclusion) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-017](#plan-017--native-dashboard-and-accurate-local-state), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-001](#platform-001--branch-mutation-placeholders) | [PLAN-018](#plan-018--optional-staff-cash-desk-and-branch-lifecycle) |
+| [PLATFORM-002](#platform-002--scheduled-transaction-placeholders) | [PLAN-022](#plan-022--optional-banking-products-and-scheduled-instructions) |
+| [PLATFORM-003](#platform-003--feedback-submission-and-listing-placeholders) | [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [PLATFORM-004](#platform-004--chatbot-placeholder) | [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [PLATFORM-005](#platform-005--fraud-and-spending-analytics-placeholders) | [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [PLATFORM-006](#platform-006--operational-report-placeholders) | [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [PLATFORM-007](#platform-007--system-maintenance-placeholders) | [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-008](#platform-008--role-and-account-type-utility-placeholders) | [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+| [PLATFORM-009](#platform-009--versioned-database-schema-lifecycle-and-baseline-tooling) | [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-010](#platform-010--startup-role-and-login-bootstrap) | [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-011](#platform-011--shared-templated-smtp-delivery) | [PLAN-003](#plan-003--identity-credential-and-session-lifecycle), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-012](#platform-012--shared-api-error-translation-and-client-propagation) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-013](#platform-013--authentication-aware-diagnostic-logging) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-013](#plan-013--administrative-receipts-audit-and-deletion-visibility), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-014](#platform-014--process-health-and-readiness-boundary) | [PLAN-002](#plan-002--shared-contracts-diagnostics-and-readiness), [PLAN-015](#plan-015--restricted-read-only-ledger-reconciliation), [PLAN-021](#plan-021--operational-recovery-retention-and-backup-evidence) |
+| [PLATFORM-015](#platform-015--separate-verification-debug-application) | [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context) |
+| [PLATFORM-016](#platform-016--optional-verification-calibration-telemetry-and-offline-tooling) | [PLAN-005](#plan-005--kyc-assurance-and-reviewer-context), [PLAN-023](#plan-023--optional-reporting-engagement-support-and-analytics) |
+
+#### 16.L Phases and minimum useful milestones
+
+| Phase | Work packages | Sequencing | Observable milestone / evidence |
+|---|---|---|---|
+| A Trusted baseline | 001/002, link/relogin slice 003 | Controlled synthetic evidence and actionable contracts; no blanket barrier to design | M1 repeatable actual browser/Core/DB/ML and native evidence manifest, distinguish mocks and readiness |
+| B Existing lifecycle completion | 004/007/009; policy slices 003/008/012/013 | Owned correction and durable operation contracts before corresponding UI | M2 RFI replacement/consent→review→decision→Customer gate; M3 opening/payment pending state recovered with one journal |
+| C Financial administration | 014/015 | Journal/detail→read-only result→confirmed UI; reconciliation independent, can overlap B | M4 Admin original inspection + compensating journal + GET after response loss, original retained; M5 restricted read-only drift report |
+| D Native parity if approved | 016/017; native portions 003/004/007 | Exact amount/key/result before posting; honest display may precede | M6 actual native Pay receipt, restart recovery, same-key exactly once and real history; later deposit/withdraw |
+| E Selected staff/ops | 006/008/010/011/012/013/021, optional 018 | Transition/authority policies then selected lifecycle/audit/scale | M7 attributable staff mutation and revoke; deletion protection; dependency readiness and controlled restore if required |
+| F Gated expansion | 019/020/022/023/024 | Fake labels early; provider disabled until product, verified events/settlement/reconcile and acceptance; optional products independent | M8 sandbox evidence only after approval, separate activation; selected product milestone |
+
+Each milestone inherits feature IDs, affected repositories, prerequisites and actual acceptance criteria from referenced PLAN records. No fixed sprint or deadline. Independent work may overlap.
+
+#### 16.M Product-scope decision register
+
+| Decision | Requires user approval | Conditional effect |
+|---|---|---|
+| S01 | Internal demo/simulator vs external financial services | Internal completion useful either way; real external requires PLAN-020/021 |
+| S02 | Native customer parity or staff/Admin scope | PLAN-016 if parity, PLAN-024 separately; otherwise truthful previews |
+| S03 | Teller cash desk, branch scoping, branch maintenance | Authority/custody before PLAN-018; no inference from assisted funding |
+| S04 | Privileged provisioning/activation/self/last-admin/restore, MFA/session policy | PLAN-003/012/013 policies before writes |
+| S05 | KYC RFI, retention/reason, automated check/accuracy policy | PLAN-004/005; address/validity not current gates |
+| S06 | Customer/Account status effects, closure requests, assisted eligibility/product limits | PLAN-007/008/022; preserve closure history |
+| S07 | Journal inquiry/correction authority, approval, reconciliation cadence | PLAN-014/015; read scope, reason, result, no direct repair |
+| S08 | Recipient search, history/statement, fees/holds/limits, notifications | Privacy/product terms PLAN-009/010/022/023 |
+| S09 | PayHere or alternative, collection/merchant/bill/reload/saved card vs stored value, external refund/payout/interbank | PLAN-019/020; disabled until separately selected and verified |
+| S10 | Loans, cards, credit scores, repayment, interest/maturity, scheduling | Separate new products PLAN-022, not mandatory |
+| S11 | Feedback/support/chatbot/fraud/spending/report/notification | Approved data and evaluation PLAN-023 |
+| S12 | Deployment target, monitoring, retention, recovery and acceptance level | PLAN-001/002/021; no speculative infrastructure |
+
+All remain open. Roadmap conditional, not blocked by lack of answers.
+
+#### 16.N Verification and acceptance roadmap
+
+| Evidence tier | Existing evidence | Proposed acceptance (separately authorized) | Plans |
+|---|---|---|---|
+| Unit/mock/source | Core unit/MockMvc, web Vitest and mock-Core Playwright, FastAPI TestClient, Android API/policy source | Record actual build/unit/mock runs with pinned commits/fixtures; mock not integrated acceptance | 001 |
+| Real DB/migrations | V1–V6, schema verifier, financial integration sources | Fresh/compatible legacy and drift refusal, seeds, rollback, concurrent exact posting/key conflict, closure race and reconciliation | 001/007/008/009 |
+| Web auth/SMTP | Cookie/CSRF/session/token and mail templates | Register/verify via controlled mail sink, login role and inactive rejection, reset/change/revoke/logout and correct links | 001/003 |
+| Real KYC stack | Core orchestration, protected files and FastAPI aggregate | Consent, owner, duplicate submission, approval/reject/RFI, protected docs/checks, Customer eligibility; future correction conflict/retention | 004/005 |
+| Web internal finance | Opening/deposit/withdraw/Pay/history and receipt source | Minima/decimal/owner/funds, atomic balance and journal/history, lost response GET/same-key replay/conflict and no duplicate | 007/009/010 |
+| Staff/Admin | Role-specific UI/service and test source | Linked Customer create/edit/duplicate, Teller assign/edit/remove/revoke, staff opening/close/history, Admin KYC concurrent decision/role mutation, Customer deletion FK and retained User | 011/012/013 |
+| Admin correction/reconciliation | Core reversal and reconcile code/tests | Original UUID uniqueness, opposite legs, no overdraft or invalid journal type; future inquiry/read-only receipt, drift report no mutation | 014/015 |
+| Native device/emulator | Policy/API test source; no actual build/device | Both variants, encrypted auth/lock/revoke, KYC capture/upsert, real opening/list/history, backup/transport, fake Wallet truthful; future exact posting/restart recovery | 003/004/007/016/017/019 |
+| Optional ML | Main/internal auth/debug/calibration source | Permitted fixtures, failure states; chosen artifact provenance/installation and representative labeled metrics if approved | 005 |
+| Provider/deployment | Conditional provider/config/local guide, no external acceptance | If separately approved sandbox verifies facts/events/settlement/reconciliation and recovery; deployment config, readiness/restore/monitoring for selected environment | 020/021 |
+
+Capture exact commits/profile, synthetic fixture identity, expected/actual results, persisted effects, redacted receipts and failures; never credentials. Historical F1–F8 reports only reported context, no attributable readable execution artifacts in reviewed trees. Codeac success on four pinned commits; zero matching Actions runs established in Part 15, not passing integration tests. No tests executed now. No L5 upgrade on source/mock evidence; no production/regulatory/accuracy certification.
+
+#### 16.O Recommended next development package
+
+**PLAN-014 — Administrative journal inquiry and reversal completion**, with scoped PLAN-001 acceptance before relying on it. This connects the existing underlying engine rather than inventing one. Admin can already inspect Account history and directly invoke reversal by original UUID/reason, but cannot discover/inspect that journal or recover result read-only. Decide authorized visibility, correction approval/reason and receipt retention first. Core/web: (1) authorized journal list/detail and original/reversal IDs in permitted history; (2) read-only reversal result by original identity and exact TS response mapping, absence unresolved not success; (3) explicit review/reason/confirm UI, deliberate existing ADMIN POST, readback and corrected history. Verify with controlled DB/browser: original immutable, opposite balanced postings, natural replay, no negative balance, unauthorized/ineligible rejected, GET after lost response and absent result does not mutate. Reconciliation PLAN-015 independent. No engine replacement, direct balance edit, provider enablement, production operation, general reporting or new product. Related [ADMIN-FIN-001](#admin-fin-001--administrative-financial-investigation-and-correction-history-context), [ADMIN-FIN-002](#admin-fin-002--administrative-reversal-preparation-and-web-request-integration), [TXN-005](#txn-005-balanced-immutable-journal-and-posting-engine), [TXN-006](#txn-006-atomic-balance-updates-locked-posting-and-overdraft-prevention), [TXN-007](#txn-007-strict-decimal-text-monetary-contract-and-lkr-precision), [TXN-008](#txn-008-persisted-financial-operation-idempotency-and-receipt-replay), [TXN-009](#txn-009-bounded-fresh-transaction-deadlock-retry-for-financial-commands), [TXN-011](#txn-011-synchronous-ledger-to-legacy-transaction-history-projection), [TXN-014](#txn-014-read-only-stored-vs-ledger-balance-reconciliation-service), [TXN-015](#txn-015-admin-only-journal-reversal-and-compensating-postings-api).
+
+Comparable alternatives: PLAN-004 if completing applicant onboarding is most valuable; PLAN-009 then PLAN-016 if native retail is priority; PLAN-001 alone if the immediate goal is attributable baseline acceptance. User chooses. No implementation prompt, new branch, issue, PR or code change authorized.
+
+#### 16.P Whole-platform conclusion and evidence limits
+
+This is a substantial role-based internal banking platform, not just mock screens. Core owns authoritative relational identities, KYC decisions, Accounts and a double-entry posting engine; web completes customer and meaningful staff/Admin workflows; FastAPI supplies assessment; Android connects customer onboarding, accounts and real scoped history but not financial posting. Visitor registers/verifies/login; eligible applicant submits KYC and separately creates Customer and Account; existing customer posts internal deposits/withdrawals/transfers and recovers Pay receipt. Teller manages linked Customers/assisted Accounts, Manager assigns/removes Tellers, Admin handles KYC/identity/constrained Customer deletion and underlying reversal. Native previews, fake Wallet, provider metadata and external settlement are distinct. Main missing dependencies: RFI, durable client recovery, journal discovery/read-only reversal, explicit lifecycle policy, native exact financial integration and actual evidence. Optional products are separate scope, not mandatory unfinished features.
+
+Established: pinned sources, actual connected paths, ownership/authorization/persistence, source-defined policies and test source, disabled/literal/schema-only boundaries, dependencies. Not established: successful builds/tests across repos, actual integrated acceptance, deployment/availability, SMTP recipient delivery, actual external settlement, biometric accuracy, universal Android behavior, operational resilience, regulatory/legal compliance or production readiness. No application/database/authentication/financial/KYC/email/model/provider/build/test/deployment action performed. 17/17 review parts means review scope complete, not platform implementation complete.
+
+Reconciliation notes: preserve earlier historical tracker wording as dated snapshots. PLATFORM-001–008 L1 status None retained as written; no silent status change. Eight unversioned KYC pairs (3 case + 1 file + 1 upload + 3 review) in canonical Part 15, earlier conversational shorthand of seven not authoritative. AUTH-013 valid-session rotation not independent expired-token refresh, ADMIN-FIN-002 helper not reachable page. No new feature or score proposed. §7 primary inventory unchanged; historical candidates and dependencies preserved.
 
 
 ## 10. Standard feature record template
@@ -6721,6 +7717,10 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 - PLATFORM-015/016: separate debug and local calibration developer tools, not verified accuracy or banking workflows.
 - PLATFORM-001–008: no implemented domain logic merely because a route responds successfully.
 
+### Part 16 final dependency reference
+
+See Part 16.J for hard dependencies, recommended sequencing and product gates; Part 16.K–N for distinct PLAN packages, scope and evidence. Earlier dependencies preserved; no architecture replacement or external activation required for internal banking.
+
 ## 12. Future implementation candidates
 
 **Part 01 candidates based on traced auth implementation.** Ideas only; no work authorized. Do not implement these during review or treat an opportunity as a proven defect.
@@ -6922,6 +7922,10 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 - PLATFORM-015: Isolate debug service and verify access policy.
 - PLATFORM-016: Use approved evaluation data and report reproducible performance before tuning.
 
+### Part 16 consolidated planning reference
+
+Historical candidates above and all per-record opportunity fields preserved. Part 16.K groups 24 planning packages with all 181 existing IDs referenced, phases/milestones 16.L, decisions 16.M, verification 16.N, recommendation 16.O. Planning IDs not feature IDs; priorities are recommendations, not approved tasks.
+
 ## 13. Known evidence limitations
 
 - Part 00 inspected GitHub repository metadata, the default-branch refs, three known commits and root-level directories **only**.
@@ -7035,9 +8039,13 @@ No APK built/installed/launched; no device, emulator, migration, endpoint, live 
 
 Complete pinned recursive tree and API declaration reconciliation; no runtime registration, deployment, build/test, DB, mail, model, financial or identity operation. No Actions runs at pinned heads; Codeac success is static status only. Prior 165 records preserved; 181 unique records L4 112/L3 41/L2 14/L1 14. Part 16 NOT REVIEWED; no completion percentage.
 
+### Part 16 final evidence interpretation
+
+181 Source-confirmed records: L4 112, L3 41, L2 14, L1 14, L0/L5 0. No new test/build/DB/mail/ML/provider/deployment action; no attributable integrated acceptance or production readiness, actual external settlement, accuracy, compliance or all-device behavior. Static statuses and source tests not observed passing. Historical statements preserved. See 16.N/P. All 17 review parts complete; no implementation percentage.
+
 ## 14. Final planning summary
 
-**Reserved for Part 16.** Synthesize evidenced feature coverage, actual supported workflows, incomplete and deferred functions, dependencies, future development options and explicit limitations. Do not prefill it from conversation summaries.
+**Final synthesis (Part 16 COMPLETE).** Substantial internal banking platform: Core authoritative identity/KYC/Accounts and balanced journal/posting/retry/idempotency/reversal; web connected customer/staff/Admin paths; FastAPI assessment, native real onboarding/accounts/history with previews and fake/real Wallet. 181 preserved records (112 L4, 41 L3, 14 L2, 14 L1; all Source-confirmed; zero L5/L0). §7 authoritative map; Part 16.B–I architecture, domain, role, channel, journey, financial and incomplete maps; 16.J–N dependencies, 24 PLAN packages, milestones, scope and verification. Recommended next PLAN-014 journal inquiry, read-only reversal result and confirmed correction UI leveraging existing engine with scoped PLAN-001 acceptance. Alternatives PLAN-004 RFI, PLAN-009/016 native recovery/posting, or PLAN-001 baseline. Product scope remains user decision; external settlement absent and PayHere disabled. No development authorized. 17/17 review parts complete, not implementation completion.
 
 ## 15. Review-document change log
 
@@ -7065,6 +8073,8 @@ Complete pinned recursive tree and API declaration reconciliation; no runtime re
 | 2026-11-24 | 14 | Complete native Android inventory: 227 source-tree files, 11 authenticated destinations, all 27 Retrofit methods, actual DI/variant behavior, auth/local protection, KYC, Accounts, preview and Wallet boundaries, parity and recovery. Added ANDROID-001/002 (both L4); preserved all 163 earlier records and scores; 165 total (L4 106, L3 39, L2 14, L1 6). No builds, tests or runtime operations. | `docs/feature-completeness-review` (this documentation branch) |
 | 2026-11-24 | 15 | Source-reconciled 24 Core controllers/105 pairs, 32 web pages/7 BFF handlers, 27 native methods, 8 main/7 debug service mappings; shared infrastructure and remaining placeholders. Added PLATFORM-001–016 (L4 6/L3 2/L1 8); preserved 165 prior records/scores, 181 total. No tests/builds/runtime operations. | `docs/feature-completeness-review` (this documentation branch) |
 
+| 2026-11-24 | 16 | Final architecture/domain/role/channel/journey and authority maps, incomplete boundaries, 24 dependency-aware PLAN packages, milestones, scope decisions, acceptance roadmap and recommendation. All 181 historical feature records/inventory/classifications preserved; no new scores; Parts 00–16 complete. No implementation/build/test/runtime action. | `docs/feature-completeness-review` (this documentation branch) |
+
 ---
 
-**Next review:** Part 16 — Final completeness map and future development planning, only in a separate ChatGPT conversation when specifically requested. **Do not start Part 16 automatically.**
+**Final review complete:** Parts 00–16 (17/17) COMPLETE. All 181 historical feature records and master inventory entries preserved, reflecting the four pinned application source commits in Sections 3–4. Part 16 roadmap is a planning recommendation only; implementation requires separate explicit user instruction. No additional review part or development task is automatically scheduled.

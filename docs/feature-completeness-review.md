@@ -59,6 +59,8 @@ For bank-app, no prior local commit baseline was supplied; GitHub main was obser
 
 Part 14 source verification: all four main HEADs reverified unchanged; bank-app full tree (367 entries, 227 blobs), 27 Retrofit methods and actual DI/navigation sources inspected. Canonical parent 2cab87725a78aa35c8f8779dcf9c124cec404ceb; previous blob cfef26babb16aaaefdc65412ae16d78e1a377f2f. No runtime/test/build verification.
 
+**Part 15 source freshness (2026-11-24):** four pinned main heads unchanged; complete recursive trees. Documentation parent 4d4f8ca35e904b7ecffdf96deb7d4981ba6acd55, original blob 79f3ed5914efbe5c6094f3555aaf0b1a66c038ce. No application source changes.
+
 ## 5. Mandatory review methodology
 
 Review each actual feature from user intent to visible result. Apply, where relevant:
@@ -273,6 +275,22 @@ At Part 00 this table was deliberately **unscored**. Part 01 now contains source
 | [EXT-PAY-006](#ext-pay-006--deferred-loan-application-and-decision-api-placeholders) | Deferred loan application and decision API placeholders | 13 | CUSTOMER (apply/own), ADMIN/TELLER (list), MANAGER (approve/reject) | Literal loan application/list/decision endpoints. | **L1** | Deferred | Source-confirmed | [Part 13 record](#ext-pay-006--deferred-loan-application-and-decision-api-placeholders) |
 | [ANDROID-001](#android-001--native-build-endpoint-selection-and-transport-policy) | Native build endpoint selection and transport policy | 14 | Developer/operator; all native users | Variant base URL validation, debug-only transport exception and client policy | **L4** | None | Source-confirmed | [Part 14 record](#android-001--native-build-endpoint-selection-and-transport-policy) |
 | [ANDROID-002](#android-002--native-app-private-data-backup-and-device-transfer-exclusion) | Native app-private data backup and device-transfer exclusion | 14 | All native users | Standard Android backup and device-transfer resource exclusion | **L4** | None | Source-confirmed | [Part 14 record](#android-002--native-app-private-data-backup-and-device-transfer-exclusion) |
+| [PLATFORM-001](#platform-001--branch-mutation-placeholders) | Branch mutation placeholders | 15 | Admin | Maintain branches | **L1** | None | Source-confirmed | [Part 15 record](#platform-001--branch-mutation-placeholders) |
+| [PLATFORM-002](#platform-002--scheduled-transaction-placeholders) | Scheduled transaction placeholders | 15 | Customer | Schedule or cancel banking action | **L1** | None | Source-confirmed | [Part 15 record](#platform-002--scheduled-transaction-placeholders) |
+| [PLATFORM-003](#platform-003--feedback-submission-and-listing-placeholders) | Feedback submission and listing placeholders | 15 | Customer/Teller; Admin list | Send or inspect feedback | **L1** | None | Source-confirmed | [Part 15 record](#platform-003--feedback-submission-and-listing-placeholders) |
+| [PLATFORM-004](#platform-004--chatbot-placeholder) | Chatbot placeholder | 15 | Customer/Teller/Admin | Ask banking assistant | **L1** | None | Source-confirmed | [Part 15 record](#platform-004--chatbot-placeholder) |
+| [PLATFORM-005](#platform-005--fraud-and-spending-analytics-placeholders) | Fraud and spending analytics placeholders | 15 | Admin; Manager for spending | Inspect fraud or spending patterns | **L1** | None | Source-confirmed | [Part 15 record](#platform-005--fraud-and-spending-analytics-placeholders) |
+| [PLATFORM-006](#platform-006--operational-report-placeholders) | Operational report placeholders | 15 | Manager/Teller; monthly Manager | View daily/monthly/customer reports | **L1** | None | Source-confirmed | [Part 15 record](#platform-006--operational-report-placeholders) |
+| [PLATFORM-007](#platform-007--system-maintenance-placeholders) | System maintenance placeholders | 15 | Admin | Inspect logs or request backup/restore | **L1** | None | Source-confirmed | [Part 15 record](#platform-007--system-maintenance-placeholders) |
+| [PLATFORM-008](#platform-008--role-and-account-type-utility-placeholders) | Role and account-type utility placeholders | 15 | Authenticated caller | Discover supported enumerations | **L1** | None | Source-confirmed | [Part 15 record](#platform-008--role-and-account-type-utility-placeholders) |
+| [PLATFORM-009](#platform-009--versioned-database-schema-lifecycle-and-baseline-tooling) | Versioned database schema lifecycle and baseline tooling | 15 | Operator/developer | Initialize and evolve schema | **L4** | None | Source-confirmed | [Part 15 record](#platform-009--versioned-database-schema-lifecycle-and-baseline-tooling) |
+| [PLATFORM-010](#platform-010--startup-role-and-login-bootstrap) | Startup role and login bootstrap | 15 | Operator; configured logins | Initialize roles and initial identities | **L4** | None | Source-confirmed | [Part 15 record](#platform-010--startup-role-and-login-bootstrap) |
+| [PLATFORM-011](#platform-011--shared-templated-smtp-delivery) | Shared templated SMTP delivery | 15 | Auth workflows; operator | Send verification/reset/change-email messages | **L4** | None | Source-confirmed | [Part 15 record](#platform-011--shared-templated-smtp-delivery) |
+| [PLATFORM-012](#platform-012--shared-api-error-translation-and-client-propagation) | Shared API error translation and client propagation | 15 | All API callers | Understand request/business failures | **L3** | None | Source-confirmed | [Part 15 record](#platform-012--shared-api-error-translation-and-client-propagation) |
+| [PLATFORM-013](#platform-013--authentication-aware-diagnostic-logging) | Authentication-aware diagnostic logging | 15 | Developer/operator | Diagnose requests without exposing protected auth payloads | **L4** | None | Source-confirmed | [Part 15 record](#platform-013--authentication-aware-diagnostic-logging) |
+| [PLATFORM-014](#platform-014--process-health-and-readiness-boundary) | Process health and readiness boundary | 15 | Operator; authenticated Core caller | Check process and dependency availability | **L3** | None | Source-confirmed | [Part 15 record](#platform-014--process-health-and-readiness-boundary) |
+| [PLATFORM-015](#platform-015--separate-verification-debug-application) | Separate verification debug application | 15 | ML developer/operator | Exercise verification components independently | **L4** | None | Source-confirmed | [Part 15 record](#platform-015--separate-verification-debug-application) |
+| [PLATFORM-016](#platform-016--optional-verification-calibration-telemetry-and-offline-tooling) | Optional verification calibration telemetry and offline tooling | 15 | ML developer/operator | Collect verification scores and evaluate labelled results | **L4** | None | Source-confirmed | [Part 15 record](#platform-016--optional-verification-calibration-telemetry-and-offline-tooling) |
 
 Use stable feature IDs e.g. `AUTH-001`, `KYC-001`. Do not equate review area names with discovered features. On future edits, replace the placeholder row with evidenced records.
 
@@ -295,7 +313,7 @@ Use stable feature IDs e.g. `AUTH-001`, `KYC-001`. Do not equate review area nam
 | 12 | Financial administration and backend-only financial capabilities | **COMPLETE** | Two distinct ADMIN-FIN records; operational journal-read blocker, reversal natural replay, compensating effects and internal reconciliation detailed; existing TXN scores retained; no integrated-stack run |
 | 13 | External payments, wallet capabilities, and deferred features | **COMPLETE** | Six distinct EXT-PAY records; PayHere default disabled, wallet metadata and fake/real Android boundaries, no provider ledger/settlement, deferred loan placeholders; no tests executed |
 | 14 | Android bank-app | **COMPLETE** | 227-file inventory, 27 API methods, 11 destinations; 2 new policy records; existing Android and Wallet ownership preserved |
-| 15 | Cross-cutting platform capabilities and remaining API inventory | **NOT REVIEWED** | Pending source-based feature review |
+| 15 | Cross-cutting platform capabilities and remaining API inventory | **COMPLETE** | 16 source-reviewed capabilities; 24 Core controllers/105 method-path pairs, 32 web pages/7 BFF handlers, 27 native methods, 8 main/7 debug service mappings; no runtime acceptance |
 | 16 | Final completeness map and future development planning | **NOT REVIEWED** | Pending source-based feature review |
 
 ## 9. Individual part sections
@@ -5847,9 +5865,653 @@ Prior Android-specific ownership: AUTH-011/012/014; KYC-013/014; DASH-008–016;
 
 ### Part 15 — Cross-cutting platform capabilities and remaining API inventory
 
-**Status:** NOT REVIEWED.
+**Status:** COMPLETE — source-reviewed, not runtime-verified. Sixteen new PLATFORM records, all prior Parts 00–14 scores retained; Part 16 NOT REVIEWED.
 
-**Review boundary:** Cross-cutting platform capabilities and remaining API inventory. Future reviewer must discover the actual features, trace relevant user journeys end-to-end, link repository evidence, and record individual feature classifications. **No findings or scores recorded yet.**
+## 15.A Source and module reconciliation
+
+Documentation parent 4d4f8ca35e904b7ecffdf96deb7d4981ba6acd55; original canonical blob 79f3ed5914efbe5c6094f3555aaf0b1a66c038ce; 1,879,643 characters / 1,881,657 bytes, 165 prior records. Application heads reconfirmed unchanged; all four complete recursive trees, not truncated.
+
+| Repository | Pinned main | Tree | Entries | Files | Directories | Truncated |
+|---|---|---|---|---|---|---|
+| bank-core | 9f58e595a653db9d8aa59b70a35af8e2b0e725d3 | 54b966a6b7e91cc23265d373ca96aa2d4c0137d2 | 550 | 377 | 173 | false |
+| bank-web | 012fbc6ff2687d126c67c85ce54cfc8d16f79f27 | 72296957dd010cbe3de29570e588c0ae31d1a3da | 252 | 181 | 71 | false |
+| bank-service | cabdd323b4aa394910cb192ead6d233e9a12d9d3 | b5b92dceed78f3dfd0fe5cf9dd8ae16d4928c9f1 | 114 | 92 | 22 | false |
+| bank-app | 9d98ba24cb754b8295bd58770cd502438d3b7b38 | 25aeb9a3c6816ef03c2a9a1edc9c40defdeb294e | 367 | 227 | 140 | false |
+
+877 files, 406 directories, 1,283 entries. Files include code, configuration, documentation, tests and assets, not 877 features. Existing Core auth/User/access control/Customer/Teller/Account/transaction/ledger/KYC/wallet/loan/branch-read modules map to Parts 01–13; web journeys to Parts 01–13; Android navigation, all Retrofit APIs, DI, local protection and previews to Part 14; FastAPI KYC inference to Part 02. This part reconciles remaining literal APIs and shared infrastructure without rescoring existing features. Card/CreditScore/AuditLog/Notification/Device/SupportTicket/SystemConfig entities do not by themselves prove operational features; SystemConfig cutover marker already ledger scope. No dedicated notification, device registry, support-ticket or audit workflow established.
+
+## 15.B Core HTTP declarations and reachability
+
+24 controllers / 105 unique method-path pairs, including eight conditional PayHere mappings (disabled by default) and eight unversioned KYC mappings. 97 nonconditional declarations include retired/literal operations; not a runtime registration count. Actuator/error framework routes excluded. Staff means Admin/Teller/Manager unless stated otherwise; token/callback checks remain distinct from role gates. Earlier records retain detailed DTOs, validation, persistence, outcomes and errors for established workflows. New placeholders return literal strings or empty response, not business DTOs.
+
+| Controller source | Method/path | Access boundary | Behavior | Consumer / reachability | Record ownership |
+|---|---|---|---|---|---|
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | GET /api/v1/auth/available | public | username availability | web/native | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | POST /api/v1/auth/register | public | user registration and verification mail | web/native | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | POST /api/v1/auth/login | public | session and bearer | web/native | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | POST /api/v1/auth/logout | authenticated | session invalidation | web/native | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | PUT /api/v1/auth/change-password | authenticated | password update/revoke | web/native | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | POST /api/v1/auth/forgot-password | public | reset initiation | web/native | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | GET /api/v1/auth/reset-password | token | validate reset token | web | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | POST /api/v1/auth/reset-password | token | reset password | web | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | GET /api/v1/auth/verify-email | token | consume verification | web | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | POST /api/v1/auth/resend-verification | public | resend verification | web | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | GET /api/v1/auth/validate-token | authenticated | token validation | web/native | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/AuthController.java) | POST /api/v1/auth/refresh-token | session/token | refresh | generic BFF blocks | AUTH 01 |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java) | GET /api/v1/users/all | staff | user list | staff | AUTH 01 / ADMIN-ID / Android |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java) | GET /api/v1/users/me | authenticated | profile read | web/native | AUTH 01 / ADMIN-ID / Android |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java) | PUT /api/v1/users/me | authenticated | profile update | native | AUTH 01 / ADMIN-ID / Android |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java) | POST /api/v1/users/verify-password | authenticated | verify password | auth/profile | AUTH 01 / ADMIN-ID / Android |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java) | PUT /api/v1/users/me/email | authenticated | email change initiation | web | AUTH 01 / ADMIN-ID / Android |
+| [src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/auth/interfaces/UserController.java) | GET /api/v1/users/me/email/verify | token | email change verification | web | AUTH 01 / ADMIN-ID / Android |
+| [src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java) | GET /api/v1/access-control/roles | admin | role list | admin UI | ADMIN-ID 11 |
+| [src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java) | GET /api/v1/access-control/employees | admin | employee list | admin UI | ADMIN-ID 11 |
+| [src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java) | GET /api/v1/access-control/employees/managers | admin | manager list | admin UI | ADMIN-ID 11 |
+| [src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java) | GET /api/v1/access-control/users | admin | user directory | admin UI | ADMIN-ID 11 |
+| [src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java) | GET /api/v1/access-control/users/{userName} | admin | user context | admin UI | ADMIN-ID 11 |
+| [src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accesscontrol/interfaces/AccessControlController.java) | PUT /api/v1/access-control/roles/{userId} | admin | role assignment/employee/session effects | admin UI | ADMIN-ID 11 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | GET /api/v1/accounts | staff | account directory | staff | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | POST /api/v1/accounts | customer | self opening | web/native (native key gap) | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | POST /api/v1/accounts/{id} | teller | assisted opening | staff | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | GET /api/v1/accounts/{id}/transactions | staff or owner | account history | web/native | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | GET /api/v1/accounts/{id} | staff or owner | account detail | web | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | PUT /api/v1/accounts/{id} | staff | account update | staff | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | DELETE /api/v1/accounts/{id} | staff | zero-balance closure | staff | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/accounts/interfaces/AccountController.java) | GET /api/v1/accounts/my | customer | own accounts | web/native | ACC/STAFF-ACC/TXN 04/05/08 |
+| [src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java) | GET /api/v1/branches | four roles | actual repository list | opening web/native | ACC-002 reads; PLATFORM-001 writes |
+| [src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java) | POST /api/v1/branches | admin | literal 201 Branch created | none | ACC-002 reads; PLATFORM-001 writes |
+| [src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java) | GET /api/v1/branches/{id} | four roles | actual repository detail | read API | ACC-002 reads; PLATFORM-001 writes |
+| [src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java) | PUT /api/v1/branches/{id} | admin | literal Branch updated | none | ACC-002 reads; PLATFORM-001 writes |
+| [src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java) | DELETE /api/v1/branches/{id} | admin | 204 without delete | none | ACC-002 reads; PLATFORM-001 writes |
+| [src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | GET /api/v1/customers | staff | directory | staff | STAFF-CUST / ADMIN-ID / KYC |
+| [src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | POST /api/v1/customers | staff | linked customer creation | staff/native incompatible fallback | STAFF-CUST / ADMIN-ID / KYC |
+| [src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | PUT /api/v1/customers | staff | customer update | staff | STAFF-CUST / ADMIN-ID / KYC |
+| [src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | GET /api/v1/customers/{id} | staff | customer detail | staff | STAFF-CUST / ADMIN-ID / KYC |
+| [src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | DELETE /api/v1/customers/{id} | admin | FK-bounded delete | admin UI | STAFF-CUST / ADMIN-ID / KYC |
+| [src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | GET /api/v1/customers/me | authenticated | own customer | web | STAFF-CUST / ADMIN-ID / KYC |
+| [src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/customer/interfaces/CustomerController.java) | PUT /api/v1/customers/me | authenticated | self registration/update | web/native | STAFF-CUST / ADMIN-ID / KYC |
+| [src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java) | GET /api/v1/tellers | manager | teller list | manager UI | MGR-TELLER 09 |
+| [src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java) | GET /api/v1/tellers/users | manager | existing user lookup | manager UI | MGR-TELLER 09 |
+| [src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java) | POST /api/v1/tellers | manager | assign | manager UI | MGR-TELLER 09 |
+| [src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java) | PUT /api/v1/tellers/{id} | manager | profile/status | manager UI | MGR-TELLER 09 |
+| [src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/employee/interfaces/TellerController.java) | DELETE /api/v1/tellers/{id} | manager | remove/detach | manager UI | MGR-TELLER 09 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | POST /api/v1/transactions/deposit | customer | posting/receipt | web | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | POST /api/v1/transactions/withdraw | customer | posting/receipt | web | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | POST /api/v1/transactions/transfer | customer | posting/receipt | web | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | GET /api/v1/transactions/transfer/receipt | customer | payer receipt recovery | web | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | POST /api/v1/transactions/{journalEntryId}/reversal | admin | reason/compensating posting/natural replay | helper no page | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | GET /api/v1/transactions | admin/teller | literal list | none | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | GET /api/v1/transactions/my | customer | literal own list | none | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/transactions/interfaces/TransactionController.java) | GET /api/v1/transactions/{id} | admin/teller or owner | literal detail | none | TXN/PAY/ADMIN-FIN 05/06/12 |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java) | POST /kyc/submit | authenticated | submit case | specialized BFF/native | KYC 02 |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java) | GET /kyc/me | authenticated | own status | specialized BFF/native | KYC 02 |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycCaseController.java) | GET /kyc/{id}/checks | authenticated ownership | checks | specialized BFF/native | KYC 02 |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycFileController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycFileController.java) | GET /kyc/file/{id} | owner/admin | stored document | specialized BFF | KYC/ADMIN-KYC |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycUploadController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycUploadController.java) | POST /kyc/upload | authenticated | multipart upload | specialized BFF/native | KYC 02 |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java) | GET /admin/kyc | admin | queue/pagination | specialized BFF | ADMIN-KYC 10 |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java) | POST /admin/kyc/{id}/decision | admin | state transition | specialized BFF | ADMIN-KYC 10 |
+| [src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/interfaces/KycReviewController.java) | GET /admin/kyc/{id}/checks | admin | check detail | specialized BFF | ADMIN-KYC 10 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | GET /api/v1/wallet/cards | customer | card metadata | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | POST /api/v1/wallet/cards/session | customer | conditional session disabled 422 | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | PATCH /api/v1/wallet/cards/{id}:default | customer | default card | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | DELETE /api/v1/wallet/cards/{id} | customer | delete metadata | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | POST /api/v1/wallet/payments/qr | customer | conditional intent disabled 422 | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | POST /api/v1/wallet/payments/reload | customer | conditional intent disabled 422 | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | POST /api/v1/wallet/payments/bill | customer | conditional intent disabled 422 | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletController.java) | GET /api/v1/wallet/payments/{intentId} | customer | intent status | native debug real/nondebug fake | EXT-PAY 13 |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java) | GET /api/v1/wallet/payhere/preapprove/{sessionId} | provider/browser | hosted preapprove | conditional external | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java) | POST /api/v1/wallet/payhere/notify/preapprove | callback validation | card callback | conditional provider | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java) | GET /api/v1/wallet/payhere/cards/return | return | deep link | conditional external | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereCardController.java) | GET /api/v1/wallet/payhere/cards/cancel | cancel | deep link | conditional external | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java) | GET /api/v1/wallet/payhere/checkout/{intentId} | provider/browser | hosted checkout | conditional external | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java) | POST /api/v1/wallet/payhere/notify | callback validation | payment callback | conditional provider | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java) | GET /api/v1/wallet/payhere/return | return | deep link | conditional external | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/PayHereGatewayController.java) | GET /api/v1/wallet/payhere/cancel | cancel | deep link | conditional external | EXT-PAY conditional enabled |
+| [src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletWebhookController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/wallet/interfaces/WalletWebhookController.java) | POST /api/v1/wallet/webhook | retired | 410 Gone | BFF blocks | EXT-PAY retired |
+| [src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java) | POST /api/v1/loans/apply | customer | literal 201 | none | EXT-PAY-006 |
+| [src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java) | GET /api/v1/loans | admin/teller | literal all loans | none | EXT-PAY-006 |
+| [src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java) | GET /api/v1/loans/my | customer | literal own loans | none | EXT-PAY-006 |
+| [src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java) | PUT /api/v1/loans/approve/{id} | manager | literal approved | none | EXT-PAY-006 |
+| [src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/loans/interfaces/LoanController.java) | PUT /api/v1/loans/reject/{id} | manager | literal rejected | none | EXT-PAY-006 |
+| [src/main/java/com/bankingsystem/core/features/analytics/interfaces/AnalyticsController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/analytics/interfaces/AnalyticsController.java) | GET /api/v1/analytics/fraud-detection | admin | literal Fraud detection results | none | PLATFORM-005 |
+| [src/main/java/com/bankingsystem/core/features/analytics/interfaces/AnalyticsController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/analytics/interfaces/AnalyticsController.java) | GET /api/v1/analytics/spending-patterns | admin/manager | literal Spending analytics | none | PLATFORM-005 |
+| [src/main/java/com/bankingsystem/core/features/chatbot/interfaces/ChatbotController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/chatbot/interfaces/ChatbotController.java) | POST /api/v1/chatbot/ask | customer/teller/admin | literal Bot response | none | PLATFORM-004 |
+| [src/main/java/com/bankingsystem/core/features/feedback/interfaces/FeedbackController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/feedback/interfaces/FeedbackController.java) | POST /api/v1/feedback | customer/teller | literal 201 Feedback submitted | none | PLATFORM-003 |
+| [src/main/java/com/bankingsystem/core/features/feedback/interfaces/FeedbackController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/feedback/interfaces/FeedbackController.java) | GET /api/v1/feedback | admin | literal All feedback | none | PLATFORM-003 |
+| [src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java) | GET /api/v1/reports/daily | manager/teller | literal Daily report | none | PLATFORM-006 |
+| [src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java) | GET /api/v1/reports/monthly | manager | literal Monthly report | none | PLATFORM-006 |
+| [src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java) | GET /api/v1/reports/customer/{id} | manager/teller | literal Customer report | none | PLATFORM-006 |
+| [src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java) | POST /api/v1/scheduled-transactions | customer | literal 201 Transaction scheduled | none | PLATFORM-002 |
+| [src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java) | GET /api/v1/scheduled-transactions/my | customer | literal Scheduled transactions | none | PLATFORM-002 |
+| [src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java) | DELETE /api/v1/scheduled-transactions/{id} | customer | literal Transaction cancelled | none | PLATFORM-002 |
+| [src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java) | GET /api/v1/system/logs | admin | literal System logs | none | PLATFORM-007/014 |
+| [src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java) | GET /api/v1/system/status | authenticated | literal System is healthy | none | PLATFORM-007/014 |
+| [src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java) | POST /api/v1/system/backup | admin | literal Backup created | none | PLATFORM-007/014 |
+| [src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java) | POST /api/v1/system/restore | admin | literal System restored | none | PLATFORM-007/014 |
+| [src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java) | GET /api/v1/utils/roles | authenticated | literal All roles enum | none | PLATFORM-008/014 |
+| [src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java) | GET /api/v1/utils/account-types | authenticated | literal Account types enum | none | PLATFORM-008/014 |
+| [src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java) | GET /api/v1/utils/health | authenticated | literal API is healthy | none | PLATFORM-008/014 |
+
+All remaining literal domains assigned PLATFORM-001–008, except loan literals EXT-PAY-006 and global transaction literals already TXN. Admin reversal remains ADMIN-FIN; missing journal lookup and readback, no connected reversal UI. No provider-to-ledger settlement. A generic BFF forward is not proof of a working end-user journey.
+
+## 15.C Web, BFF and native coverage
+
+32 web page files, including four compatibility redirects. Paths below derive from App Router groups, not proof of runtime access. Earlier role and journey records retain detailed guards, redirects and components.
+
+| Page route | Pinned source | Area |
+|---|---|---|
+| /admin/kyc | [app/(admin)/admin/kyc/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(admin)/admin/kyc/page.tsx) | Admin |
+| /admin | [app/(admin)/admin/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(admin)/admin/page.tsx) | Admin |
+| /admin/users | [app/(admin)/admin/users/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(admin)/admin/users/page.tsx) | Admin |
+| /customer/accounts/[accountId]/transactions | [app/(customer)/customer/accounts/[accountId]/transactions/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/accounts/%5BaccountId%5D/transactions/page.tsx) | Customer |
+| /customer/accounts/new | [app/(customer)/customer/accounts/new/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/accounts/new/page.tsx) | Customer |
+| /customer/accounts | [app/(customer)/customer/accounts/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/accounts/page.tsx) | Customer |
+| /customer/onboarding | [app/(customer)/customer/onboarding/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/onboarding/page.tsx) | Customer |
+| /customer | [app/(customer)/customer/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/page.tsx) | Customer |
+| /customer/pay | [app/(customer)/customer/pay/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/pay/page.tsx) | Customer |
+| /customer/profile | [app/(customer)/customer/profile/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/profile/page.tsx) | Customer |
+| /customer/transactions/deposit | [app/(customer)/customer/transactions/deposit/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/transactions/deposit/page.tsx) | Customer |
+| /customer/transactions/transfer | [app/(customer)/customer/transactions/transfer/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/transactions/transfer/page.tsx) | Customer |
+| /customer/transactions/withdraw | [app/(customer)/customer/transactions/withdraw/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(customer)/customer/transactions/withdraw/page.tsx) | Customer |
+| /login | [app/(public)/login/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(public)/login/page.tsx) | Public/auth entry or redirect |
+| /register | [app/(public)/register/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(public)/register/page.tsx) | Public/auth entry or redirect |
+| /reset-password | [app/(public)/reset-password/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(public)/reset-password/page.tsx) | Public/auth entry or redirect |
+| /unauthorized | [app/(public)/unauthorized/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(public)/unauthorized/page.tsx) | Public/auth entry or redirect |
+| /verification-result | [app/(public)/verification-result/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(public)/verification-result/page.tsx) | Public/auth entry or redirect |
+| /staff/accounts/[accountId] | [app/(staff)/staff/accounts/[accountId]/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/accounts/%5BaccountId%5D/page.tsx) | Shared staff |
+| /staff/accounts/[accountId]/transactions | [app/(staff)/staff/accounts/[accountId]/transactions/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/accounts/%5BaccountId%5D/transactions/page.tsx) | Shared staff |
+| /staff/accounts/new | [app/(staff)/staff/accounts/new/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/accounts/new/page.tsx) | Shared staff |
+| /staff/accounts | [app/(staff)/staff/accounts/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/accounts/page.tsx) | Shared staff |
+| /staff/customers/[customerId] | [app/(staff)/staff/customers/[customerId]/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/customers/%5BcustomerId%5D/page.tsx) | Shared staff |
+| /staff/customers/new | [app/(staff)/staff/customers/new/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/customers/new/page.tsx) | Shared staff |
+| /staff/customers | [app/(staff)/staff/customers/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/customers/page.tsx) | Shared staff |
+| /staff | [app/(staff)/staff/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/page.tsx) | Shared staff |
+| /staff/tellers | [app/(staff)/staff/tellers/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/(staff)/staff/tellers/page.tsx) | Manager |
+| /accounts/new | [app/accounts/new/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/accounts/new/page.tsx) | Public/auth entry or redirect |
+| /admin/home | [app/admin/home/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/admin/home/page.tsx) | Admin |
+| /customer/home | [app/customer/home/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/customer/home/page.tsx) | Customer |
+| / | [app/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/page.tsx) | Public/auth entry or redirect |
+| /teller/home | [app/teller/home/page.tsx](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/teller/home/page.tsx) | Public/auth entry or redirect |
+
+Seven BFF handlers:
+
+| Route | Pinned source | Boundary |
+|---|---|---|
+| /api/admin/kyc/[[...path]] | [app/api/admin/kyc/[[...path]]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/admin/kyc/%5B%5B...path%5D%5D/route.ts) | Admin KYC |
+| /api/auth/csrf | [app/api/auth/csrf/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/auth/csrf/route.ts) | CSRF issuance |
+| /api/kyc/[...path] | [app/api/kyc/[...path]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/kyc/%5B...path%5D/route.ts) | Customer KYC |
+| /api/v1/[...path] | [app/api/v1/[...path]/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/v1/%5B...path%5D/route.ts) | Generic versioned proxy |
+| /api/v1/auth/change-password | [app/api/v1/auth/change-password/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/v1/auth/change-password/route.ts) | Specialized auth |
+| /api/v1/auth/login | [app/api/v1/auth/login/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/v1/auth/login/route.ts) | Specialized auth |
+| /api/v1/auth/logout | [app/api/v1/auth/logout/route.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/app/api/v1/auth/logout/route.ts) | Specialized auth |
+
+Generic proxy allowlisted request headers accept, accept-language, cache-control, content-type, idempotency-key, if-match, if-none-match, x-correlation-id; response content-type/cache-control/location/retry-after; no-store, upstream stream. Cookie bearer injection and unsafe-method CSRF; specialized auth, 401 cookie deletion; 502/504 transport and 500 misconfiguration; no automatic mutation retry. Generic refresh and provider/wallet webhook blocked. Verify-email redirect token-free 303, prefetch 204; reset query rejected. KYC specialized handlers forward unversioned routes, 11 MiB body bound, X-idempotency-key translation and authorized file response with disposition/sandbox/nosniff. Generic forwarding does not implement literal endpoints. Web API clients accounts/admin-access/auth/customers/kyc/staff/tellers/transactions/users; earlier owners preserved, reversal helper disconnected from page.
+
+| Native Retrofit interface | Methods | Coverage |
+|---|---|---|
+| [app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/remote/api/AccountsApi.kt) | 4 | Part 14; direct Core except nondebug Wallet fake |
+| [app/src/main/java/com/bankingsystem/mobile/features/auth/integration/remote/api/AuthApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/auth/integration/remote/api/AuthApi.kt) | 6 | Part 14; direct Core except nondebug Wallet fake |
+| [app/src/main/java/com/bankingsystem/mobile/features/customer/integration/remote/api/CustomerApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/customer/integration/remote/api/CustomerApi.kt) | 2 | Part 14; direct Core except nondebug Wallet fake |
+| [app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/remote/api/KycApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/kyc/integration/remote/api/KycApi.kt) | 4 | Part 14; direct Core except nondebug Wallet fake |
+| [app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/profile/integration/remote/api/ProfileApi.kt) | 3 | Part 14; direct Core except nondebug Wallet fake |
+| [app/src/main/java/com/bankingsystem/mobile/features/wallet/integration/api/WalletApi.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/wallet/integration/api/WalletApi.kt) | 8 | Part 14; direct Core except nondebug Wallet fake |
+
+27 methods: Auth available/register/login/forgot-password/validate-token/logout; Accounts branches/open/my/history; Customer PUT me and incompatible staff-only POST fallback; KYC upload/submit/me/checks; Profile GET/PUT me/change-password; Wallet list/session/default/delete cards, QR/reload/bill/status. Debug Wallet real, nondebug fake, provider disabled default. No native financial posting/receipt recovery. Native opening key/exact decimal gaps remain. OkHttp connect60s read/write120s connection retry, bearer/401 clear, BASIC debug/NONE release. Connection retry not business recovery.
+
+## 15.D Verification service main and debug inventories
+
+| App | Method/path | Purpose/auth |
+|---|---|---|
+| Main | GET / | Docs redirect |
+| Main | GET /health | Public process status |
+| Main | GET /api/v1/kyc/ping | Internal service key |
+| Main | POST /api/v1/kyc/face/match | Internal key; face |
+| Main | POST /api/v1/kyc/liveness | Internal key; liveness |
+| Main | POST /api/v1/kyc/ocr/id | Internal key; OCR |
+| Main | POST /api/v1/kyc/doc/class | Internal key; classification |
+| Main | POST /api/v1/kyc/aggregate | Internal key; only Core-called operation |
+| Debug | GET / | Separate root |
+| Debug | GET /debug/ping | Debug ping |
+| Debug | POST /debug/face-score | Face score |
+| Debug | POST /debug/face-diag | Face diagnostics |
+| Debug | POST /debug/liveness | Liveness |
+| Debug | POST /debug/ocr | OCR |
+| Debug | POST /debug/doc-classify | Classification |
+
+Eight explicit main and seven separate debug mappings (generated docs/OpenAPI excluded). Debug not mounted into main and no explicit router auth. Optional chatbot/loans router flags false; module files absent. Default simple factory and optional advanced imports/fallback/strict settings do not establish actual model quality. Tracked models: [models/README.md](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/models/README.md); [models/ocr/latin_dict.txt](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/models/ocr/latin_dict.txt); no ONNX artifacts observed. Core aggregate uses JSON base64, internal shared key, connect1000ms/read180000ms/20 MiB codec; captures X-request-ID and blocks; no retry established. No model execution or accuracy assertion. Source: [app/main.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/main.py); [app/api/debug_router.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/api/debug_router.py); [app/debug_app.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/debug_app.py); [app/tools/calibrate.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/tools/calibrate.py); [app/tools/merge_labels.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/tools/merge_labels.py); [tests/test_debug_app.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/tests/test_debug_app.py)
+
+## 15.E Persistence, bootstrap, configuration and storage
+
+Java21/Spring Boot3.4.8, JPA validation, MySQL, Flyway, Security, Validation, Mail, WebFlux and Actuator. Six migrations:
+| Migration | Scope |
+|---|---|
+| [src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql) | 31 baseline domain tables |
+| [src/main/resources/db/migration/V2__core_ledger.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V2__core_ledger.sql) | Four ledger/idempotency tables |
+| [src/main/resources/db/migration/V3__opening_balance_migration.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V3__opening_balance_migration.sql) | Data cutover |
+| [src/main/resources/db/migration/V4__legacy_transaction_projection.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V4__legacy_transaction_projection.sql) | Projection |
+| [src/main/resources/db/migration/V5__customer_account_opening_idempotency.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V5__customer_account_opening_idempotency.sql) | Account-opening idempotency table |
+| [src/main/resources/db/migration/V6__tighten_customer_account_opening_idempotency_result_check.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V6__tighten_customer_account_opening_idempotency_result_check.sql) | Tighten check |
+
+36 domain tables by V6 plus Flyway history. Flyway enabled and baseline-on-migrate false, Hibernate validate. Explicit existing-schema verifier compares schema excluding history, then shell wrapper invokes Gradle JavaExec baseline operator, official Flyway API. No actual DB read/write. RoleSeeder order1 ensures ADMIN/EMPLOYEE/MANAGER/TELLER/CUSTOMER case-insensitively; BranchSeeder order1 creates missing branches (ACC-002); DefaultUsersInitializer order2 creates configured missing users ADMIN/CUSTOMER/TELLER/MANAGER by username, BCrypt/role/active/timestamp. No Employee/Customer creation or profile gate in these classes.
+
+Dev example DB loopback3307/SMTP1025/server8080; JWT expiration86400000ms issuer bank-core audience bank-core-api; verification24h, reset1h; AUTH-016 Caffeine limits IP20/30s, user10/60s, pair5/60s, cache10000/15m, retry cap60s. No secret values. Source config not actual deployment. ML config as above. KYC filesystem default uploads/example ./storage/kyc, date directories and UUID names/checksum/metadata in KycUpload; authorized retrieval and best-effort file deletion then metadata. Upload 10MiB jpg/png/webp, 20 per user UTC day; BFF 11MiB. No remote store or orphan cleanup proven; earlier KYC records retain ownership. Sources: [src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/BranchSeeder.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/BranchSeeder.java); [src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/DefaultUsersInitializer.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/DefaultUsersInitializer.java); [src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/RoleSeeder.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/RoleSeeder.java); [src/main/resources/application-dev.example.yml](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/application-dev.example.yml); [src/main/resources/application.yml](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/application.yml)
+
+## 15.F Scheduled work, email, error, logging and audit boundaries
+
+| Capability | Actual source behavior | Boundary / dependency |
+|---|---|---|
+| Core scheduling | @EnableScheduling; KycAutoReviewOrchestratorImpl default fixed delay 10s, example60s, up to50 pending, conditional processing mark, transaction/checks and under-review fallback; synchronous submission path also exists | Existing KYC ownership; no financial scheduler |
+| Retention | KycRetentionService 03:15 daily, approved/rejected updated before 30 days, attempts four file deletes and catches exceptions | KYC-010; no generic purge |
+| FastAPI background | Aggregate BackgroundTasks log summary; optional calibration CSV write synchronous, default false | No durable queue/retry |
+| Email | EmailServiceImpl JavaMailSender synchronous, configured base/frontend/from/brand, escaped HTML/plain templates registration/resend/reset/change-email | No delivery history, durable queue, retry or actual send proof |
+| Errors | Core advice 400 validation, 403, 404, 422 business except reversal missing404, 409 conflict/key, 503 retry; Jackson Hibernate6/JavaTime no timestamps; Next preserves statuses/code, typed ApiError; native AccountRepo parses message/CustomerMissing; FastAPI detail | No universal envelope or coverage of all filter/default errors |
+| Diagnostics | Logback stdout root INFO/project DEBUG; protected auth MDC/TurboFilter excludes sensitive detail; method/route/status/correlation UUID; Next incoming query suppression; Android debug BASIC/nondebug NONE | No centralized audit/log retention/tracing/alerts |
+| Health | Core literal status/health, Actuator dependency but no explicit dependency readiness mapping; FastAPI basic public process health | No DB/SMTP/ML readiness verified |
+| Audit / retention | AuditLog/Notification/Device/SupportTicket entities no independent service established; token expiry/consume, verification delete, reset used, logout/revoke, KYC terminal file deletion, immutable ledger/retained account closure, Customer deletion FK, wallet local metadata delete | No generalized audit, data purge or backup/restore workflow |
+
+Source: [src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycAutoReviewOrchestratorImpl.java); [src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/kyc/application/impl/KycRetentionService.java); [src/main/java/com/bankingsystem/core/features/system/application/impl/EmailServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/application/impl/EmailServiceImpl.java); [src/main/java/com/bankingsystem/core/modules/common/exceptions/GlobalExceptionHandler.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/exceptions/GlobalExceptionHandler.java); [src/main/java/com/bankingsystem/core/modules/common/logging/AuthenticationLoggingConfiguration.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/logging/AuthenticationLoggingConfiguration.java); [src/main/resources/logback-spring.xml](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/logback-spring.xml); [src/test/java/com/bankingsystem/core/features/auth/AuthenticationLoggingIntegrationTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/auth/AuthenticationLoggingIntegrationTest.java). Calibration CSV includes request/instance/country/doc type and score/pass/reason fields; merge_labels and calibration scripts offline; no verified accuracy or representative labels.
+
+## 15.G Deployment, tests and evidence limitations
+
+| Repository | Test source count | Boundary |
+|---|---|---|
+| Core | 68 | Java files including helpers; source only |
+| Web | 50 | Unit/spec source, mocked Core |
+| Service | 14 | Python test modules; no model run |
+| Android | 4 | Unit/instrumentation source |
+
+No checked-in Actions workflow, Dockerfile or Compose discovered. Local-dev docs separate MySQL/Mailpit containers/processes, not deployed orchestration. Core Gradle wrapper, web npm lint/typecheck/Vitest/Playwright, service requirements/Makefile, Android Gradle. GitHub Actions runs queried by exact head SHA: zero for each; combined status Codeac analyze results success for all four, static analysis status only. Sampled Core AuthenticationLoggingIntegrationTest, AuthorizationExceptionHandlerTest, BranchLookupMvcTest, FinancialWorkflowIntegrationTest; web HTTP/proxy/BFF tests and mock Playwright config; service test_health/test_debug_app; Android tests Part14. No build or test executed. Some supporting helper/test internals not independently retraced after prior reviews; inventory completeness not equivalent to exhaustive behavioral verification. No production deployment, real endpoint, DB, email, model inference, financial/identity operation or provider call. No source changes.
+
+## 15.H New individual records
+
+#### PLATFORM-001 — Branch mutation placeholders
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Admin
+- **User objective:** Maintain branches
+- **Workflow boundary:** POST 201 Branch created, PUT 200 Branch updated, DELETE 204 are canned responses; only GET methods use BranchRepository (ACC-002).
+- **Complete workflow steps:** POST 201 Branch created, PUT 200 Branch updated, DELETE 204 are canned responses; only GET methods use BranchRepository (ACC-002).
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** POST 201 Branch created, PUT 200 Branch updated, DELETE 204 are canned responses; only GET methods use BranchRepository (ACC-002).
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Admin; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** POST 201 Branch created, PUT 200 Branch updated, DELETE 204 are canned responses; only GET methods use BranchRepository (ACC-002). No branch write persistence or connected UI; no validation, deletion rules or readback.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** POST 201 Branch created, PUT 200 Branch updated, DELETE 204 are canned responses; only GET methods use BranchRepository (ACC-002).
+- **Unsupported / incomplete behavior:** No branch write persistence or connected UI; no validation, deletion rules or readback.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/branch/interfaces/BranchController.java)
+- **Future implementation opportunities:** Decide branch maintenance scope and implement authorized persistence and readback.
+
+#### PLATFORM-002 — Scheduled transaction placeholders
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Customer
+- **User objective:** Schedule or cancel banking action
+- **Workflow boundary:** POST 201 Transaction scheduled, GET /my literal list, DELETE literal cancelled; no execution path.
+- **Complete workflow steps:** POST 201 Transaction scheduled, GET /my literal list, DELETE literal cancelled; no execution path.
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** POST 201 Transaction scheduled, GET /my literal list, DELETE literal cancelled; no execution path.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Customer; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** POST 201 Transaction scheduled, GET /my literal list, DELETE literal cancelled; no execution path. No persisted schedule, cancellation state, worker, ledger posting, idempotency or UI.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** POST 201 Transaction scheduled, GET /my literal list, DELETE literal cancelled; no execution path.
+- **Unsupported / incomplete behavior:** No persisted schedule, cancellation state, worker, ledger posting, idempotency or UI.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/scheduled/interfaces/ScheduledTransactionController.java)
+- **Future implementation opportunities:** Define scheduling, execution, ownership and financial invariants.
+
+#### PLATFORM-003 — Feedback submission and listing placeholders
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Customer/Teller; Admin list
+- **User objective:** Send or inspect feedback
+- **Workflow boundary:** POST 201 literal Feedback submitted, GET literal All feedback.
+- **Complete workflow steps:** POST 201 literal Feedback submitted, GET literal All feedback.
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** POST 201 literal Feedback submitted, GET literal All feedback.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Customer/Teller; Admin list; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** POST 201 literal Feedback submitted, GET literal All feedback. No persistence, real listing, feedback review or client.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** POST 201 literal Feedback submitted, GET literal All feedback.
+- **Unsupported / incomplete behavior:** No persistence, real listing, feedback review or client.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/feedback/interfaces/FeedbackController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/feedback/interfaces/FeedbackController.java)
+- **Future implementation opportunities:** Decide support/feedback workflow and implement validation/persistence if required.
+
+#### PLATFORM-004 — Chatbot placeholder
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Customer/Teller/Admin
+- **User objective:** Ask banking assistant
+- **Workflow boundary:** POST /ask returns literal Bot response; no bank-service integration.
+- **Complete workflow steps:** POST /ask returns literal Bot response; no bank-service integration.
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** POST /ask returns literal Bot response; no bank-service integration.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Customer/Teller/Admin; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** POST /ask returns literal Bot response; no bank-service integration. No chatbot inference, conversation, retrieval, UI or working assistant; optional service router flags do not establish implementation.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** POST /ask returns literal Bot response; no bank-service integration.
+- **Unsupported / incomplete behavior:** No chatbot inference, conversation, retrieval, UI or working assistant; optional service router flags do not establish implementation.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/chatbot/interfaces/ChatbotController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/chatbot/interfaces/ChatbotController.java)
+- **Future implementation opportunities:** Define assistant scope, privacy and actual integration.
+
+#### PLATFORM-005 — Fraud and spending analytics placeholders
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Admin; Manager for spending
+- **User objective:** Inspect fraud or spending patterns
+- **Workflow boundary:** GET fraud-detection and spending-patterns return literal labels.
+- **Complete workflow steps:** GET fraud-detection and spending-patterns return literal labels.
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** GET fraud-detection and spending-patterns return literal labels.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Admin; Manager for spending; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** GET fraud-detection and spending-patterns return literal labels. No fraud scoring, aggregates, reporting computation or connected UI.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** GET fraud-detection and spending-patterns return literal labels.
+- **Unsupported / incomplete behavior:** No fraud scoring, aggregates, reporting computation or connected UI.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/analytics/interfaces/AnalyticsController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/analytics/interfaces/AnalyticsController.java)
+- **Future implementation opportunities:** Define risk/analytics requirements and evaluation first.
+
+#### PLATFORM-006 — Operational report placeholders
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Manager/Teller; monthly Manager
+- **User objective:** View daily/monthly/customer reports
+- **Workflow boundary:** Three GET mappings return literal report labels.
+- **Complete workflow steps:** Three GET mappings return literal report labels.
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** Three GET mappings return literal report labels.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Manager/Teller; monthly Manager; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** Three GET mappings return literal report labels. No report data, aggregation, date windows, export or UI.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** Three GET mappings return literal report labels.
+- **Unsupported / incomplete behavior:** No report data, aggregation, date windows, export or UI.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/reports/interfaces/ReportController.java)
+- **Future implementation opportunities:** Implement actual report contracts and access boundaries if needed.
+
+#### PLATFORM-007 — System maintenance placeholders
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Admin
+- **User objective:** Inspect logs or request backup/restore
+- **Workflow boundary:** GET logs, POST backup/restore return literal success labels.
+- **Complete workflow steps:** GET logs, POST backup/restore return literal success labels.
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** GET logs, POST backup/restore return literal success labels.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Admin; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** GET logs, POST backup/restore return literal success labels. No log retrieval, backup artifact, restore, job, recovery check or admin UI.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** GET logs, POST backup/restore return literal success labels.
+- **Unsupported / incomplete behavior:** No log retrieval, backup artifact, restore, job, recovery check or admin UI.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java)
+- **Future implementation opportunities:** Design independently verified backup/restore and monitoring.
+
+#### PLATFORM-008 — Role and account-type utility placeholders
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Authenticated caller
+- **User objective:** Discover supported enumerations
+- **Workflow boundary:** GET roles/account-types return literal strings; separate real Admin role lookup and account opening choices owned earlier.
+- **Complete workflow steps:** GET roles/account-types return literal strings; separate real Admin role lookup and account opening choices owned earlier.
+- **Frontend / Android:** No connected dedicated consumer established.
+- **Next.js BFF / API integration:** Generic forwarding does not implement domain logic; no dedicated client established.
+- **Spring Boot implementation:** GET roles/account-types return literal strings; separate real Admin role lookup and account opening choices owned earlier.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Authenticated caller; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** GET roles/account-types return literal strings; separate real Admin role lookup and account opening choices owned earlier. No usable utility enum collection or dedicated client.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L1 — Placeholder
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** GET roles/account-types return literal strings; separate real Admin role lookup and account opening choices owned earlier.
+- **Unsupported / incomplete behavior:** No usable utility enum collection or dedicated client.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java)
+- **Future implementation opportunities:** Consolidate or remove redundant contracts.
+
+#### PLATFORM-009 — Versioned database schema lifecycle and baseline tooling
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Operator/developer
+- **User objective:** Initialize and evolve schema
+- **Workflow boundary:** Flyway enabled, Hibernate validate, baseline-on-migrate false; V1–V6; explicit existing-schema verification then baseline operator. V3 data migration is not DDL-only.
+- **Complete workflow steps:** Flyway enabled, Hibernate validate, baseline-on-migrate false; V1–V6; explicit existing-schema verification then baseline operator. V3 data migration is not DDL-only.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** Flyway enabled, Hibernate validate, baseline-on-migrate false; V1–V6; explicit existing-schema verification then baseline operator. V3 data migration is not DDL-only.
+- **Database / ledger:** Flyway versioned schema/baseline history; no actual DB operation.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Operator/developer; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** Flyway enabled, Hibernate validate, baseline-on-migrate false; V1–V6; explicit existing-schema verification then baseline operator. V3 data migration is not DDL-only. No target database access, migration pass, restore drill or deployment acceptance established.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L4 — Functionally implemented (bounded source-defined capability)
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** Flyway enabled, Hibernate validate, baseline-on-migrate false; V1–V6; explicit existing-schema verification then baseline operator. V3 data migration is not DDL-only.
+- **Unsupported / incomplete behavior:** No target database access, migration pass, restore drill or deployment acceptance established.
+- **Source references:** [src/main/resources/db/migration/V1__baseline.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V1__baseline.sql); [src/main/resources/db/migration/V2__core_ledger.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V2__core_ledger.sql); [src/main/resources/db/migration/V3__opening_balance_migration.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V3__opening_balance_migration.sql); [src/main/resources/db/migration/V4__legacy_transaction_projection.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V4__legacy_transaction_projection.sql); [src/main/resources/db/migration/V5__customer_account_opening_idempotency.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V5__customer_account_opening_idempotency.sql); [src/main/resources/db/migration/V6__tighten_customer_account_opening_idempotency_result_check.sql](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/db/migration/V6__tighten_customer_account_opening_idempotency_result_check.sql); [scripts/db/baseline-existing-database.sh](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/scripts/db/baseline-existing-database.sh); [scripts/db/verify-pre-flyway-schema.sh](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/scripts/db/verify-pre-flyway-schema.sh); [src/main/java/com/bankingsystem/core/database/FlywayBaselineOperator.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/database/FlywayBaselineOperator.java); [src/main/resources/application.yml](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/application.yml)
+- **Future implementation opportunities:** Verify clean and existing-schema paths in controlled environment.
+
+#### PLATFORM-010 — Startup role and login bootstrap
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Operator; configured logins
+- **User objective:** Initialize roles and initial identities
+- **Workflow boundary:** RoleSeeder order 1 checks case-insensitive roles; DefaultUsersInitializer order 2 creates configured missing usernames with BCrypt, role, active and timestamp. Existing usernames skipped. Branch seed ACC-002.
+- **Complete workflow steps:** RoleSeeder order 1 checks case-insensitive roles; DefaultUsersInitializer order 2 creates configured missing usernames with BCrypt, role, active and timestamp. Existing usernames skipped. Branch seed ACC-002.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** RoleSeeder order 1 checks case-insensitive roles; DefaultUsersInitializer order 2 creates configured missing usernames with BCrypt, role, active and timestamp. Existing usernames skipped. Branch seed ACC-002.
+- **Database / ledger:** Role/User seed persistence; branch seed already ACC-002.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Operator; configured logins; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** RoleSeeder order 1 checks case-insensitive roles; DefaultUsersInitializer order 2 creates configured missing usernames with BCrypt, role, active and timestamp. Existing usernames skipped. Branch seed ACC-002. No linked Employee/Customer created by initializer; no first-run or production provisioning verification; staff eligibility still applies.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L4 — Functionally implemented (bounded source-defined capability)
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** RoleSeeder order 1 checks case-insensitive roles; DefaultUsersInitializer order 2 creates configured missing usernames with BCrypt, role, active and timestamp. Existing usernames skipped. Branch seed ACC-002.
+- **Unsupported / incomplete behavior:** No linked Employee/Customer created by initializer; no first-run or production provisioning verification; staff eligibility still applies.
+- **Source references:** [src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/RoleSeeder.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/RoleSeeder.java); [src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/DefaultUsersInitializer.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/support/bootstrap/DefaultUsersInitializer.java)
+- **Future implementation opportunities:** Define environment-specific bootstrap and linkage policy.
+
+#### PLATFORM-011 — Shared templated SMTP delivery
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Auth workflows; operator
+- **User objective:** Send verification/reset/change-email messages
+- **Workflow boundary:** EmailServiceImpl builds configured plain/HTML messages from templates with escaping, invokes JavaMailSender synchronously; auth/user/reset services call it.
+- **Complete workflow steps:** EmailServiceImpl builds configured plain/HTML messages from templates with escaping, invokes JavaMailSender synchronously; auth/user/reset services call it.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** EmailServiceImpl builds configured plain/HTML messages from templates with escaping, invokes JavaMailSender synchronously; auth/user/reset services call it.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Configured SMTP/JavaMailSender.
+- **Authorization:** Auth workflows; operator; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** EmailServiceImpl builds configured plain/HTML messages from templates with escaping, invokes JavaMailSender synchronously; auth/user/reset services call it. No delivery confirmation, queue, retry worker, audit or live email sent.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L4 — Functionally implemented (bounded source-defined capability)
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** EmailServiceImpl builds configured plain/HTML messages from templates with escaping, invokes JavaMailSender synchronously; auth/user/reset services call it.
+- **Unsupported / incomplete behavior:** No delivery confirmation, queue, retry worker, audit or live email sent.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/system/application/impl/EmailServiceImpl.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/application/impl/EmailServiceImpl.java); [src/main/resources/templates/email/email-change-verification.html](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/templates/email/email-change-verification.html); [src/main/resources/templates/email/reset-password.html](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/templates/email/reset-password.html); [src/main/resources/templates/email/verify-email.html](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/templates/email/verify-email.html)
+- **Future implementation opportunities:** Verify SMTP and link origins; consider durable delivery.
+
+#### PLATFORM-012 — Shared API error translation and client propagation
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** All API callers
+- **User objective:** Understand request/business failures
+- **Workflow boundary:** Core advice maps selected exceptions; Next forwards status/content and emits transport/config errors; typed web ApiError; native repositories and FastAPI own formats.
+- **Complete workflow steps:** Core advice maps selected exceptions; Next forwards status/content and emits transport/config errors; typed web ApiError; native repositories and FastAPI own formats.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** Core advice maps selected exceptions; Next forwards status/content and emits transport/config errors; typed web ApiError; native repositories and FastAPI own formats.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** All API callers; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** Core advice maps selected exceptions; Next forwards status/content and emits transport/config errors; typed web ApiError; native repositories and FastAPI own formats. Filter/default errors and FastAPI detail differ; no uniform cross-client envelope, native handling varies.
+- **Existing automated tests:** AuthorizationExceptionHandlerTest and web HTTP/proxy/BFF test source.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L3 — Partially implemented
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** Core advice maps selected exceptions; Next forwards status/content and emits transport/config errors; typed web ApiError; native repositories and FastAPI own formats.
+- **Unsupported / incomplete behavior:** Filter/default errors and FastAPI detail differ; no uniform cross-client envelope, native handling varies.
+- **Source references:** [src/main/java/com/bankingsystem/core/modules/common/exceptions/GlobalExceptionHandler.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/exceptions/GlobalExceptionHandler.java); [lib/api/errors.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/errors.ts); [lib/api/http.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/lib/api/http.ts); [app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/features/accounts/integration/repository/AccountRepositoryImpl.kt)
+- **Future implementation opportunities:** Define versioned cross-client contract and test propagation.
+
+#### PLATFORM-013 — Authentication-aware diagnostic logging
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Developer/operator
+- **User objective:** Diagnose requests without exposing protected auth payloads
+- **Workflow boundary:** Core listener marks protected request context; TurboFilter suppresses configured sensitive logging; route/status/correlation diagnostics. Next query suppression and Android debug BASIC/nondebug NONE.
+- **Complete workflow steps:** Core listener marks protected request context; TurboFilter suppresses configured sensitive logging; route/status/correlation diagnostics. Next query suppression and Android debug BASIC/nondebug NONE.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** Core listener marks protected request context; TurboFilter suppresses configured sensitive logging; route/status/correlation diagnostics. Next query suppression and Android debug BASIC/nondebug NONE.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Developer/operator; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** Core listener marks protected request context; TurboFilter suppresses configured sensitive logging; route/status/correlation diagnostics. Next query suppression and Android debug BASIC/nondebug NONE. No centralized logging, retention, audit, alerting or cross-service trace guarantee.
+- **Existing automated tests:** AuthenticationLoggingIntegrationTest uses protected synthetic markers and correlation assertions.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L4 — Functionally implemented (bounded source-defined capability)
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** Core listener marks protected request context; TurboFilter suppresses configured sensitive logging; route/status/correlation diagnostics. Next query suppression and Android debug BASIC/nondebug NONE.
+- **Unsupported / incomplete behavior:** No centralized logging, retention, audit, alerting or cross-service trace guarantee.
+- **Source references:** [src/main/java/com/bankingsystem/core/modules/common/logging/AuthenticationLoggingConfiguration.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/modules/common/logging/AuthenticationLoggingConfiguration.java); [src/main/resources/logback-spring.xml](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/resources/logback-spring.xml); [src/test/java/com/bankingsystem/core/features/auth/AuthenticationLoggingIntegrationTest.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/test/java/com/bankingsystem/core/features/auth/AuthenticationLoggingIntegrationTest.java); [next.config.ts](https://github.com/gimesha-adikari/bank-web/blob/012fbc6ff2687d126c67c85ce54cfc8d16f79f27/next.config.ts); [app/src/main/java/com/bankingsystem/mobile/app/di/NetworkModule.kt](https://github.com/gimesha-adikari/bank-app/blob/9d98ba24cb754b8295bd58770cd502438d3b7b38/app/src/main/java/com/bankingsystem/mobile/app/di/NetworkModule.kt)
+- **Future implementation opportunities:** Validate deployed behavior and define telemetry policy.
+
+#### PLATFORM-014 — Process health and readiness boundary
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** Operator; authenticated Core caller
+- **User objective:** Check process and dependency availability
+- **Workflow boundary:** Core system/status and utils/health return literals; Actuator dependency, no explicit readiness contract; public FastAPI /health reports process.
+- **Complete workflow steps:** Core system/status and utils/health return literals; Actuator dependency, no explicit readiness contract; public FastAPI /health reports process.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** Core system/status and utils/health return literals; Actuator dependency, no explicit readiness contract; public FastAPI /health reports process.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Pinned source dependencies; no operational verification.
+- **Authorization:** Operator; authenticated Core caller; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** Core system/status and utils/health return literals; Actuator dependency, no explicit readiness contract; public FastAPI /health reports process. No dependency-aware DB/SMTP/ML readiness or monitoring established; no endpoint run.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L3 — Partially implemented
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** Core system/status and utils/health return literals; Actuator dependency, no explicit readiness contract; public FastAPI /health reports process.
+- **Unsupported / incomplete behavior:** No dependency-aware DB/SMTP/ML readiness or monitoring established; no endpoint run.
+- **Source references:** [src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/SystemController.java); [src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/src/main/java/com/bankingsystem/core/features/system/interfaces/UtilityController.java); [build.gradle](https://github.com/gimesha-adikari/bank-core/blob/9f58e595a653db9d8aa59b70a35af8e2b0e725d3/build.gradle); [app/main.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/main.py)
+- **Future implementation opportunities:** Implement dependency readiness and monitored operational checks.
+
+#### PLATFORM-015 — Separate verification debug application
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** ML developer/operator
+- **User objective:** Exercise verification components independently
+- **Workflow boundary:** Separate debug FastAPI app exposes ping, face score/diagnostic, liveness, OCR and document classification; not mounted into main; no explicit debug router auth.
+- **Complete workflow steps:** Separate debug FastAPI app exposes ping, face score/diagnostic, liveness, OCR and document classification; not mounted into main; no explicit debug router auth.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** Not a Core controller; separate service capability.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Verification component dependencies/local filesystem as applicable.
+- **Authorization:** ML developer/operator; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** Separate debug FastAPI app exposes ping, face score/diagnostic, liveness, OCR and document classification; not mounted into main; no explicit debug router auth. No banking consumer, deployed accessibility or model accuracy established.
+- **Existing automated tests:** FastAPI test_debug_app source.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L4 — Functionally implemented (bounded source-defined capability)
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** Separate debug FastAPI app exposes ping, face score/diagnostic, liveness, OCR and document classification; not mounted into main; no explicit debug router auth.
+- **Unsupported / incomplete behavior:** No banking consumer, deployed accessibility or model accuracy established.
+- **Source references:** [app/api/debug_router.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/api/debug_router.py); [app/debug_app.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/debug_app.py); [tests/test_debug_app.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/tests/test_debug_app.py)
+- **Future implementation opportunities:** Isolate debug service and verify access policy.
+
+#### PLATFORM-016 — Optional verification calibration telemetry and offline tooling
+
+- **Review part:** 15 — Cross-cutting platform capabilities and remaining API inventory
+- **User roles:** ML developer/operator
+- **User objective:** Collect verification scores and evaluate labelled results
+- **Workflow boundary:** Opt-in aggregate calibration CSV default false; daily UTC rows; offline label merge/calibration; no automatic accuracy improvement.
+- **Complete workflow steps:** Opt-in aggregate calibration CSV default false; daily UTC rows; offline label merge/calibration; no automatic accuracy improvement.
+- **Frontend / Android:** Shared infrastructure or developer/operator tooling; consumer coverage in preceding matrices. No independent banking journey claimed.
+- **Next.js BFF / API integration:** See integration inventory; native direct Core and separate FastAPI tooling are independent of BFF.
+- **Spring Boot implementation:** Not a Core controller; separate service capability.
+- **Database / ledger:** No independent financial posting or new banking persistence established.
+- **External dependencies:** Verification component dependencies/local filesystem as applicable.
+- **Authorization:** ML developer/operator; Core authority remains applicable to Core mappings.
+- **Success, failure and recovery behavior:** Opt-in aggregate calibration CSV default false; daily UTC rows; offline label merge/calibration; no automatic accuracy improvement. No representative labelled data, measured accuracy, durable monitoring or production telemetry verified.
+- **Existing automated tests:** No independent passing feature-specific run established; see source test inventory.
+- **Available live verification:** None; no builds, tests, live requests, financial, identity, database, email or model operations.
+- **Completeness level:** L4 — Functionally implemented (bounded source-defined capability)
+- **Independent status:** None
+- **Evidence confidence:** Source-confirmed
+- **Supported behavior:** Opt-in aggregate calibration CSV default false; daily UTC rows; offline label merge/calibration; no automatic accuracy improvement.
+- **Unsupported / incomplete behavior:** No representative labelled data, measured accuracy, durable monitoring or production telemetry verified.
+- **Source references:** [app/tools/calibrate.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/tools/calibrate.py); [app/tools/merge_labels.py](https://github.com/gimesha-adikari/bank-service/blob/cabdd323b4aa394910cb192ead6d233e9a12d9d3/app/tools/merge_labels.py)
+- **Future implementation opportunities:** Use approved evaluation data and report reproducible performance before tuning.
+
+
+## 15.I Classification reconciliation
+
+Part 15: 16 records, L4 6/L3 2/L1 8; all Source-confirmed. Cumulative 181 records, L4 112/L3 41/L2 14/L1 14/L0 0/L5 0. No prior score altered. Counts describe documented capabilities, not overall completion percentage. Final roadmap and prioritization reserved for Part 16, NOT REVIEWED.
 
 ### Part 16 — Final completeness map and future development planning
 
@@ -6051,6 +6713,14 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 | ANDROID-001/002 → AUTH-011/012/DASH-015 | Build transport and backup policy distinct from local auth/preferences |
 | Android → Part 15 | Remaining platform API inventory deferred; no Part 15 assessment begun |
 
+### Part 15 dependency additions
+
+- PLATFORM-009/010: Core DB schema and startup roles/logins underpin AUTH and staff eligibility; linked Employee/Customer still separate.
+- PLATFORM-011: auth verification/reset/change-email depend on configured SMTP and link origins.
+- PLATFORM-012/013/014: errors, safe diagnostics and process health support existing journeys without establishing uniform contract, audit or readiness.
+- PLATFORM-015/016: separate debug and local calibration developer tools, not verified accuracy or banking workflows.
+- PLATFORM-001–008: no implemented domain logic merely because a route responds successfully.
+
 ## 12. Future implementation candidates
 
 **Part 01 candidates based on traced auth implementation.** Ideas only; no work authorized. Do not implement these during review or treat an opportunity as a proven defect.
@@ -6233,6 +6903,25 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 - Separate Wallet simulation from real deployment, explicitly label fake outcomes, reconcile repository ownership and hosted deep links; retain provider disablement until authorized readiness, real decoding/biller selection and durable intent recovery.
 - Verify release endpoint and native transport/backup rules on authorized build/device; add meaningful ViewModel, API contract, camera, local lock, navigation, lifecycle and variant acceptance tests.
 
+### Part 15 future candidates (unprioritized)
+
+- PLATFORM-001: Decide branch maintenance scope and implement authorized persistence and readback.
+- PLATFORM-002: Define scheduling, execution, ownership and financial invariants.
+- PLATFORM-003: Decide support/feedback workflow and implement validation/persistence if required.
+- PLATFORM-004: Define assistant scope, privacy and actual integration.
+- PLATFORM-005: Define risk/analytics requirements and evaluation first.
+- PLATFORM-006: Implement actual report contracts and access boundaries if needed.
+- PLATFORM-007: Design independently verified backup/restore and monitoring.
+- PLATFORM-008: Consolidate or remove redundant contracts.
+- PLATFORM-009: Verify clean and existing-schema paths in controlled environment.
+- PLATFORM-010: Define environment-specific bootstrap and linkage policy.
+- PLATFORM-011: Verify SMTP and link origins; consider durable delivery.
+- PLATFORM-012: Define versioned cross-client contract and test propagation.
+- PLATFORM-013: Validate deployed behavior and define telemetry policy.
+- PLATFORM-014: Implement dependency readiness and monitored operational checks.
+- PLATFORM-015: Isolate debug service and verify access policy.
+- PLATFORM-016: Use approved evaluation data and report reproducible performance before tuning.
+
 ## 13. Known evidence limitations
 
 - Part 00 inspected GitHub repository metadata, the default-branch refs, three known commits and root-level directories **only**.
@@ -6342,6 +7031,10 @@ Copy this structure into the appropriate part when a feature is actually reviewe
 
 No APK built/installed/launched; no device, emulator, migration, endpoint, live financial or provider acceptance. Static test sources only; no tests run. Full tree enumerated, meaningful Kotlin/config/API/DI/route and dependency boundaries reviewed; image/IDE resources indexed, not executed. Build-time release syntax does not imply availability. Standard backup rules not OEM verification. No new L5. Existing 163 record texts preserved; 165 records total (L4 106, L3 39, L2 14, L1 6, L0/L5 0); all Source-confirmed. No Part 15/16 conclusions.
 
+### Part 15 evidence limits
+
+Complete pinned recursive tree and API declaration reconciliation; no runtime registration, deployment, build/test, DB, mail, model, financial or identity operation. No Actions runs at pinned heads; Codeac success is static status only. Prior 165 records preserved; 181 unique records L4 112/L3 41/L2 14/L1 14. Part 16 NOT REVIEWED; no completion percentage.
+
 ## 14. Final planning summary
 
 **Reserved for Part 16.** Synthesize evidenced feature coverage, actual supported workflows, incomplete and deferred functions, dependencies, future development options and explicit limitations. Do not prefill it from conversation summaries.
@@ -6370,7 +7063,8 @@ No APK built/installed/launched; no device, emulator, migration, endpoint, live 
 | 2026-11-24 | 13 | External payments and wallet source review: PayHere disabled 404/422, retired webhook 410, BFF local 404, conditional intents/callback/card metadata, no provider-to-ledger settlement, Android debug real/non-debug fake, deferred loan placeholders. Added six EXT-PAY records (L3 2/L2 3/L1 1); preserved all 157 prior records; updated dependencies, candidates, limitations, counts. No provider/test/financial operation. | `docs/feature-completeness-review` (this documentation branch) |
 
 | 2026-11-24 | 14 | Complete native Android inventory: 227 source-tree files, 11 authenticated destinations, all 27 Retrofit methods, actual DI/variant behavior, auth/local protection, KYC, Accounts, preview and Wallet boundaries, parity and recovery. Added ANDROID-001/002 (both L4); preserved all 163 earlier records and scores; 165 total (L4 106, L3 39, L2 14, L1 6). No builds, tests or runtime operations. | `docs/feature-completeness-review` (this documentation branch) |
+| 2026-11-24 | 15 | Source-reconciled 24 Core controllers/105 pairs, 32 web pages/7 BFF handlers, 27 native methods, 8 main/7 debug service mappings; shared infrastructure and remaining placeholders. Added PLATFORM-001–016 (L4 6/L3 2/L1 8); preserved 165 prior records/scores, 181 total. No tests/builds/runtime operations. | `docs/feature-completeness-review` (this documentation branch) |
 
 ---
 
-**Next review:** Part 15 — Cross-cutting platform capabilities and remaining API inventory, only in a separate ChatGPT conversation when specifically requested. **Do not start Part 15 automatically.**
+**Next review:** Part 16 — Final completeness map and future development planning, only in a separate ChatGPT conversation when specifically requested. **Do not start Part 16 automatically.**

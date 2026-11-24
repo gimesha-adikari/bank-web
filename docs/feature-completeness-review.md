@@ -6369,8 +6369,8 @@ No APK built/installed/launched; no device, emulator, migration, endpoint, live 
 
 | 2026-11-24 | 13 | External payments and wallet source review: PayHere disabled 404/422, retired webhook 410, BFF local 404, conditional intents/callback/card metadata, no provider-to-ledger settlement, Android debug real/non-debug fake, deferred loan placeholders. Added six EXT-PAY records (L3 2/L2 3/L1 1); preserved all 157 prior records; updated dependencies, candidates, limitations, counts. No provider/test/financial operation. | `docs/feature-completeness-review` (this documentation branch) |
 
----
+| 2026-11-24 | 14 | Complete native Android inventory: 227 source-tree files, 11 authenticated destinations, all 27 Retrofit methods, actual DI/variant behavior, auth/local protection, KYC, Accounts, preview and Wallet boundaries, parity and recovery. Added ANDROID-001/002 (both L4); preserved all 163 earlier records and scores; 165 total (L4 106, L3 39, L2 14, L1 6). No builds, tests or runtime operations. | `docs/feature-completeness-review` (this documentation branch) |
 
-| Part 14 | Complete Android bank-app feature completeness review | 2 new independent L4 policy records; 165 total (L4 106, L3 39, L2 14, L1 6); previous 163 preserved | Source-confirmed; application mains unchanged; no builds/tests/runtime | Parent 2cab87725a78aa35c8f8779dcf9c124cec404ceb |
+---
 
 **Next review:** Part 15 — Cross-cutting platform capabilities and remaining API inventory, only in a separate ChatGPT conversation when specifically requested. **Do not start Part 15 automatically.**
